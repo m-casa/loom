@@ -73,16 +73,19 @@ crashlytics-build.properties
 [Aa]ssets/[Ss]treamingAssets/aa/*
 
 ## Peek
-Ludiq*
+Peek*
 
 ## Easy Character Movement
 Easy Character Movement*
 
 ## Hyper Casual Characters
-orchakoff*
+Hyper Casual Characters*
 
 ## Final IK
 RootMotion*
 
 ## UModeler
-tripolygon*
+UModeler*
+
+## FlatKit
+FlatKit*
