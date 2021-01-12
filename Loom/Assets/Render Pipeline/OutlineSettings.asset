@@ -23,5 +23,5 @@ MonoBehaviour:
   maxNormalsThreshold: 0.25
   minColorThreshold: 0
   maxColorThreshold: 0.5
-  renderEvent: 500
+  renderEvent: 350
   outlineOnly: 0
