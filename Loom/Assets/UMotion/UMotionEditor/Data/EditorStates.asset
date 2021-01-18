@@ -15,5 +15,4 @@ MonoBehaviour:
   GeneralStates:
     LoadedProjectGUID:
       valueInternal: 
-    RecentlyOpenedProjectGUIDsList:
-    - valueInternal: 2f27e00f271303d4fa0f293582eacf4a
+    RecentlyOpenedProjectGUIDsList: []
