@@ -110,14 +110,20 @@ namespace ECM.Controllers
 
         protected override void Animate()
         {
-            if (run && moveDirection != Vector3.zero)
-                animator.speed = 1.5f;
-            else
-                animator.speed = 1f;
+            if (animator.runtimeAnimatorController != null)
+            {
+                if (run && moveDirection != Vector3.zero)
+                {
+                    animator.speed = 1.5f;
+                }
+                else
+                {
+                    animator.speed = 1f;
+                }
 
-            animator.SetFloat("horizontal", moveDirection.x, 1f, Time.deltaTime * 10f);
-            animator.SetFloat("vertical", moveDirection.z, 1f, Time.deltaTime * 10f);
-
+                animator.SetFloat("horizontal", moveDirection.x, 1f, Time.deltaTime * 10f);
+                animator.SetFloat("vertical", moveDirection.z, 1f, Time.deltaTime * 10f);
+            }
         }
 
         /// <summary>
@@ -213,8 +219,8 @@ namespace ECM.Controllers
             // Toggle pause / resume.
             // By default, will restore character's velocity on resume (eg: restoreVelocityOnResume = true)
 
-            if (Input.GetKeyDown(KeyCode.P))
-                pause = !pause;
+            //if (Input.GetKeyDown(KeyCode.P))
+            //    pause = !pause;
 
             // Player input
 
