@@ -227,9 +227,9 @@ namespace ECM.Controllers
 
             run = Input.GetButton("Fire3");
 
-            jump = Input.GetButton("Jump");
+            //jump = Input.GetButton("Jump");
 
-            crouch = Input.GetKey(KeyCode.C);
+            //crouch = Input.GetKey(KeyCode.C);
         }
 
         #endregion
