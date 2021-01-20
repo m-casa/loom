@@ -30,6 +30,8 @@ public class Role : MonoBehaviour
     // Update is called once per frame
     public void Update()
     {
+        rangeSensor.Pulse();
+
         // Check if player is viewing an interactable object
         if (canInteract)
         {

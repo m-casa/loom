@@ -34,5 +34,6 @@ public class Life : MonoBehaviour
         // Spawn in the blood particle effect
         deathEffect = (GameObject) Instantiate(deathPrefab);
         deathEffect.transform.position = transform.position;
+        deathEffect.transform.parent = transform;
     }
 }
