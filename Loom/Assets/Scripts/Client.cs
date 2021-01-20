@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Net.Sockets;
 using System;
+using System.Net;
 
 public class Client : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class Client : MonoBehaviour
     public int port = 26950;
     public int myId = 0;
     public TCP tcp;
+    public UDP udp;
 
     // A delegate basically says "feel free to assign any method to this delegate if the signature matches"
     // Since our HandleData method has a "using" that matches the "Packet _packet" signature,
@@ -38,6 +40,7 @@ public class Client : MonoBehaviour
     private void Start()
     {
         tcp = new TCP();
+        udp = new UDP();
     }
 
     public void ConnectToServer()
@@ -195,12 +198,101 @@ public class Client : MonoBehaviour
         }
     }
 
+    public class UDP 
+    {
+        public UdpClient socket;
+        public IPEndPoint endPoint;
+
+        public UDP()
+        {
+            endPoint = new IPEndPoint(IPAddress.Parse(instance.ip), instance.port);
+        }
+
+        public void Connect(int _localPort)
+        {
+            socket = new UdpClient(_localPort);
+
+            socket.Connect(endPoint);
+            // Begin receiving data
+            socket.BeginReceive(ReceiveCallback, null);
+
+            // This packet's sole purpose is to immediately initiate a connection with the server
+            //   and open up the client's local ports so that they can receive messages
+            using (Packet _packet = new Packet())
+            {
+                SendData(_packet);
+            }
+        }
+
+        public void SendData(Packet _packet)
+        {
+            try
+            {
+                // Because of the way UDP works, it's hard to give clients their own UDP id
+                _packet.InsertInt(instance.myId);
+                if (socket != null)
+                {
+                    socket.BeginSend(_packet.ToArray(), _packet.Length(), null, null);
+                }
+            }
+            catch (Exception _ex)
+            {
+                Debug.Log($"Error sending data to server via UDP: {_ex}");
+            }
+        }
+
+        private void ReceiveCallback(IAsyncResult _result)
+        {
+            try
+            {
+                byte[] _data = socket.EndReceive(_result, ref endPoint);
+                // Continue receiving data
+                socket.BeginReceive(ReceiveCallback, null);
+
+                // Might not have to disconnect, as it could be a common occurence that data is less than 4 bytes
+                if (_data.Length < 4)
+                {
+                    // TODO: disconnect
+                    return;
+                }
+
+                HandleData(_data);
+            }
+            catch (Exception _ex)
+            {
+                // TODO: disconnect
+                Debug.Log($"Error receiving UDP data: {_ex}");
+            }
+        }
+
+        private void HandleData(byte[] _data)
+        {
+            using (Packet _packet = new Packet(_data))
+            {
+                // Read out the packet length
+                int _packetLength = _packet.ReadInt();
+                // Read out the specified amount of bytes from the length into the data variable
+                _data = _packet.ReadBytes(_packetLength);
+            }
+
+            ThreadManager.ExecuteOnMainThread(() =>
+            {
+                using (Packet _packet = new Packet(_data))
+                {
+                    int _packetId = _packet.ReadInt();
+                    packetHandlers[_packetId](_packet);
+                }
+            });
+        }
+    }
+
     // Initialize all our handlers
     private void InitializeClientData()
     {
         packetHandlers = new Dictionary<int, PacketHandler>()
         {
-            { (int)ServerPackets.welcome, ClientHandle.Welcome }
+            { (int)ServerPackets.welcome, ClientHandle.Welcome },
+            { (int)ServerPackets.udpTest, ClientHandle.UDPTest }
         };
         Debug.Log("Initialized packets.");
     }
