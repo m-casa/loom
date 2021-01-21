@@ -3,7 +3,7 @@ using System.Net;
 
 public class ClientHandle : MonoBehaviour
 {
-    // Read welcome packet
+    // Reads a welcome packet from the server
     public static void Welcome(Packet _packet)
     {
         string _msg = _packet.ReadString();
@@ -16,6 +16,7 @@ public class ClientHandle : MonoBehaviour
         Client.instance.udp.Connect(((IPEndPoint)Client.instance.tcp.socket.Client.LocalEndPoint).Port);
     }
 
+    // Reads a packet from the server with the client's spawn position information
     public static void SpawnPlayer(Packet _packet)
     {
         int _id = _packet.ReadInt();

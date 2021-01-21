@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
+    // A new dictionary to keep track of our players and their ids
     public static Dictionary<int, PlayerManager> players = new Dictionary<int, PlayerManager>();
 
     public GameObject localPlayerPrefab;
@@ -25,9 +26,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Spawns in a new player to the client
     public void SpawnPlayer(int _id, string _username, Vector3 _position, Quaternion _rotation)
     {
         GameObject _player;
+
         // Check whether to instantiate the local player or another player
         if (_id == Client.instance.myId)
         {

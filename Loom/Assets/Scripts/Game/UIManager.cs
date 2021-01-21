@@ -22,6 +22,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    // Will connect the client to the game server
     public void ConnectToServer()
     {
         startMenu.SetActive(false);
