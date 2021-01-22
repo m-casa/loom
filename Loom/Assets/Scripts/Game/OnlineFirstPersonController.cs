@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace ECM.Controllers
 {
@@ -11,7 +11,7 @@ namespace ECM.Controllers
     /// As the base character controllers, this default behaviour can easily be modified or completely replaced in a derived class. 
     /// </summary>
 
-    public class BaseFirstPersonController : BaseCharacterController
+    public class OnlineFirstPersonController : BaseCharacterController
     {
         #region EDITOR EXPOSED FIELDS
 
@@ -103,6 +103,28 @@ namespace ECM.Controllers
         #endregion
 
         #region METHODS
+
+        /// <summary>
+        /// Perform character animation.
+        /// </summary>
+
+        protected override void Animate()
+        {
+            if (animator.runtimeAnimatorController != null)
+            {
+                if (run && moveDirection != Vector3.zero)
+                {
+                    animator.speed = 1.5f;
+                }
+                else
+                {
+                    animator.speed = 1f;
+                }
+
+                animator.SetFloat("horizontal", Mathf.Round(moveDirection.x), 1f, Time.deltaTime * 10f);
+                animator.SetFloat("vertical", Mathf.Round(moveDirection.z), 1f, Time.deltaTime * 10f);
+            }
+        }
 
         /// <summary>
         /// Use this method to animate camera.
@@ -197,8 +219,8 @@ namespace ECM.Controllers
             // Toggle pause / resume.
             // By default, will restore character's velocity on resume (eg: restoreVelocityOnResume = true)
 
-            if (Input.GetKeyDown(KeyCode.P))
-                pause = !pause;
+            //if (Input.GetKeyDown(KeyCode.P))
+            //    pause = !pause;
 
             // Player input
 
@@ -211,9 +233,27 @@ namespace ECM.Controllers
 
             run = Input.GetButton("Fire3");
 
-            jump = Input.GetButton("Jump");
+            //jump = Input.GetButton("Jump");
 
-            crouch = Input.GetKey(KeyCode.C);
+            //crouch = Input.GetKey(KeyCode.C);
+        }
+
+        /// <summary>
+        /// Sends player input to server.
+        /// </summary>
+        /// 
+
+        private void SendInputToServer()
+        {
+            bool[] _inputs = new bool[]
+            {
+                Input.GetKey(KeyCode.W),
+                Input.GetKey(KeyCode.S),
+                Input.GetKey(KeyCode.A),
+                Input.GetKey(KeyCode.D),
+            };
+
+            ClientSend.PlayerMovement(_inputs);
         }
 
         #endregion
@@ -280,6 +320,21 @@ namespace ECM.Controllers
                 cameraTransform = cam.transform;
                 mouseLook.Init(transform, cameraTransform);
             }
+        }
+
+        public override void FixedUpdate()
+        {
+            // Send character movement to server
+
+            SendInputToServer();
+
+            // Perform character movement
+
+            //Move();
+
+            // Handle crouch
+
+            //Crouch();
         }
 
         public virtual void LateUpdate()

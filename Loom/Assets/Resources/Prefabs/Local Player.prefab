@@ -104,7 +104,7 @@ GameObject:
   - component: {fileID: 7253635150957711593}
   - component: {fileID: 7253635150957711592}
   - component: {fileID: 7253635150957711591}
-  - component: {fileID: 7253635150957711590}
+  - component: {fileID: 7031961964521256449}
   - component: {fileID: 7253635150957711589}
   - component: {fileID: 7253635150957711588}
   - component: {fileID: 7253635150957711587}
@@ -165,7 +165,7 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
---- !u!114 &7253635150957711590
+--- !u!114 &7031961964521256449
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -174,7 +174,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7253635150957711614}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bdd78ad1b02523246af003cc14e20b40, type: 3}
+  m_Script: {fileID: 11500000, guid: c7db2474164d05b49b67825f03f345b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 5
@@ -197,9 +197,9 @@ MonoBehaviour:
   _maxMidAirJumps: 1
   _useRootMotion: 0
   _rootMotionRotation: 0
-  _forwardSpeed: 6
-  _backwardSpeed: 6
-  _strafeSpeed: 6
+  _forwardSpeed: 5
+  _backwardSpeed: 5
+  _strafeSpeed: 5
   _runSpeedMultiplier: 1.5
 --- !u!114 &7253635150957711589
 MonoBehaviour:
