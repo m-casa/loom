@@ -326,12 +326,14 @@ public class Client : MonoBehaviour
     // Initialize our packet handlers
     private void InitializeClientData()
     {
+        // These packets are for receiving
         packetHandlers = new Dictionary<int, PacketHandler>()
         {
             { (int)ServerPackets.welcome, ClientHandle.Welcome },
             { (int)ServerPackets.spawnPlayer, ClientHandle.SpawnPlayer },
             { (int)ServerPackets.playerPosition, ClientHandle.PlayerPosition },
             { (int)ServerPackets.playerRotation, ClientHandle.PlayerRotation },
+            { (int)ServerPackets.playerInput, ClientHandle.PlayerInput },
         };
         Debug.Log("Initialized packets.");
     }

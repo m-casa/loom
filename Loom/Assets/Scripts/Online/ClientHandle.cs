@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Net;
+using ECM.Controllers;
 
 public class ClientHandle : MonoBehaviour
 {
@@ -43,5 +44,14 @@ public class ClientHandle : MonoBehaviour
         Quaternion _rotation = _packet.ReadQuaternion();
 
         GameManager.players[_id].transform.rotation = _rotation;
+    }
+
+    // Reads a packet from the server with player rotation information
+    public static void PlayerInput(Packet _packet)
+    {
+        int _id = _packet.ReadInt();
+        Vector3 _moveDirection = _packet.ReadVector3();
+
+        GameManager.players[_id].GetComponent<OnlineFirstPersonController>().moveDirection = _moveDirection;
     }
 }

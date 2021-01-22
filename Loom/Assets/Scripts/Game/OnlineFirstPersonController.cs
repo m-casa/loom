@@ -210,47 +210,17 @@ namespace ECM.Controllers
         }
 
         /// <summary>
-        /// Overrides 'BaseCharacterController' HandleInput method,
-        /// to perform custom input code. 
-        /// </summary>
-
-        protected override void HandleInput()
-        {
-            // Toggle pause / resume.
-            // By default, will restore character's velocity on resume (eg: restoreVelocityOnResume = true)
-
-            //if (Input.GetKeyDown(KeyCode.P))
-            //    pause = !pause;
-
-            // Player input
-
-            moveDirection = new Vector3
-            {
-                x = Input.GetAxisRaw("Horizontal"),
-                y = 0.0f,
-                z = Input.GetAxisRaw("Vertical")
-            };
-
-            run = Input.GetButton("Fire3");
-
-            //jump = Input.GetButton("Jump");
-
-            //crouch = Input.GetKey(KeyCode.C);
-        }
-
-        /// <summary>
         /// Sends player input to server.
         /// </summary>
-        /// 
+        ///
 
         private void SendInputToServer()
         {
-            bool[] _inputs = new bool[]
+            float[] _inputs = new float[]
             {
-                Input.GetKey(KeyCode.W),
-                Input.GetKey(KeyCode.S),
-                Input.GetKey(KeyCode.A),
-                Input.GetKey(KeyCode.D),
+                Input.GetAxisRaw("Horizontal"),
+                0.0f,
+                Input.GetAxisRaw("Vertical"),
             };
 
             ClientSend.PlayerMovement(_inputs);
@@ -324,17 +294,24 @@ namespace ECM.Controllers
 
         public override void FixedUpdate()
         {
-            // Send character movement to server
+            // Perform character movement
+
+            Move();
+        }
+
+        public override void Update()
+        {
+            // Send player input to the server
 
             SendInputToServer();
 
-            // Perform character movement
+            // Update character rotation (if not paused)
 
-            //Move();
+            UpdateRotation();
 
-            // Handle crouch
+            // Perform character animation (if not paused)
 
-            //Crouch();
+            Animate();
         }
 
         public virtual void LateUpdate()
