@@ -34,7 +34,15 @@ public class ClientHandle : MonoBehaviour
         int _id = _packet.ReadInt();
         Vector3 _position = _packet.ReadVector3();
 
-        GameManager.players[_id].transform.position = _position;
+        if (_id == Client.instance.myId)
+        {
+            GameManager.players[_id].GetComponent<LocalFirstPersonController>().targetPosition = _position;
+        }
+        else
+        {
+            GameManager.players[_id].GetComponent<OnlineFirstPersonController>().targetPosition = _position;
+        }
+        //GameManager.players[_id].transform.position = Vector3.MoveTowards(GameManager.players[_id].transform.position, _position, .5f);
     }
 
     // Reads a packet from the server with player rotation information
@@ -52,13 +60,6 @@ public class ClientHandle : MonoBehaviour
         int _id = _packet.ReadInt();
         Vector3 _moveDirection = _packet.ReadVector3();
 
-        // Sometimes an error occurs where the client could not find the id of another player in the dictionary
-        // This may happen because this packet may have been sent to the client before the client received the SpawnPlayer packet. 
-        //  So first check if the id exists.
-        if (GameManager.players.TryGetValue(_id, out PlayerManager player))
-        {
-            player.GetComponent<OnlineFirstPersonController>().moveDirection = _moveDirection;
-        }
-        //GameManager.players[_id].GetComponent<OnlineFirstPersonController>().moveDirection = _moveDirection;
+        GameManager.players[_id].GetComponent<OnlineFirstPersonController>().moveDirection = _moveDirection;
     }
 }

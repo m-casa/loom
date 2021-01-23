@@ -351,7 +351,7 @@ GameObject:
   - component: {fileID: 7895108494425555087}
   - component: {fileID: 7895108494425555174}
   - component: {fileID: 7895108494425555152}
-  - component: {fileID: 3438337809004152260}
+  - component: {fileID: 286214134994890769}
   - component: {fileID: 7895108494425555140}
   - component: {fileID: 7895108494425555143}
   - component: {fileID: 7895108494425555142}
@@ -373,15 +373,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7895108494425555221}
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: -7.5, y: 0.5, z: -44.995}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 7895108494425555122}
   - {fileID: 7895108494425555124}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &7895108494425555174
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -412,7 +412,7 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
---- !u!114 &3438337809004152260
+--- !u!114 &286214134994890769
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -421,7 +421,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7895108494425555221}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7db2474164d05b49b67825f03f345b3, type: 3}
+  m_Script: {fileID: 11500000, guid: 81adb58b1ae4ea149a83142387c38bf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 5
@@ -433,7 +433,7 @@ MonoBehaviour:
   _brakingFriction: 8
   _airFriction: 0
   _airControl: 0.2
-  _canCrouch: 0
+  _canCrouch: 1
   _standingHeight: 2
   _crouchingHeight: 1
   _baseJumpHeight: 1.5

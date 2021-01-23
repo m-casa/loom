@@ -11,7 +11,7 @@ namespace ECM.Controllers
     /// As the base character controllers, this default behaviour can easily be modified or completely replaced in a derived class. 
     /// </summary>
 
-    public class OnlineFirstPersonController : BaseCharacterController
+    public class LocalFirstPersonController : BaseCharacterController
     {
         #region EDITOR EXPOSED FIELDS
 
@@ -255,6 +255,35 @@ namespace ECM.Controllers
             applyRootMotion = useRootMotion && movement.isGrounded;
         }
 
+        /// <summary>
+        /// Handles input.
+        /// </summary>
+
+        protected override void HandleInput()
+        {
+            // Handle user input
+
+            float[] _inputs = new float[]
+            {
+                Input.GetAxisRaw("Horizontal"),
+                0.0f,
+                Input.GetAxisRaw("Vertical"),
+            };
+
+            // Store a copy of the user's input for local use
+
+            moveDirection = new Vector3
+            {
+                x = _inputs[0],
+                y = _inputs[1],
+                z = _inputs[2],
+            };
+
+            // Send a copy of the user's input to the server for verification
+
+            ClientSend.PlayerMovement(_inputs);
+        }
+
         #endregion
 
         #region MONOBEHAVIOUR
@@ -330,6 +359,14 @@ namespace ECM.Controllers
 
         public override void Update()
         {
+            // Handle input
+
+            HandleInput();
+
+            // Update character rotation (if not paused)
+
+            UpdateRotation();
+
             // Perform character animation (if not paused)
 
             Animate();
