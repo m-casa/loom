@@ -15,6 +15,8 @@ public class Client : MonoBehaviour
     public TCP tcp;
     public UDP udp;
 
+    private bool isConnected = false;
+
     // A delegate basically says "feel free to assign any method to this delegate if the signature matches"
     // Since our HandleData method has a "using" that matches the "Packet _packet" signature,
     //  we know that is where the packet is being handled, hence this delegate's name
@@ -44,10 +46,19 @@ public class Client : MonoBehaviour
         udp = new UDP();
     }
 
+    // Unity editor does not properly close connections when leaving play mode until you enter play mode again
+    // So close the connection manually
+    private void OnApplicationQuit()
+    {
+        Disconnect();
+    }
+
     // Connects our client to the server through TCP
     public void ConnectToServer()
     {
         InitializeClientData();
+
+        isConnected = true;
         tcp.Connect();
     }
 
@@ -126,7 +137,7 @@ public class Client : MonoBehaviour
                 // If there is no data we would disconnect
                 if (_byteLength <= 0)
                 {
-                    // TODO: disconnect
+                    instance.Disconnect();
                     return;
                 }
 
@@ -146,7 +157,7 @@ public class Client : MonoBehaviour
             catch (Exception _ex)
             {
                 Console.WriteLine($"Error receiving TCP data: {_ex}");
-                // TODO: disconnect
+                Disconnect();
             }
         }
 
@@ -212,6 +223,17 @@ public class Client : MonoBehaviour
             }
 
             return false;
+        }
+
+        // Close out our connection with the server through TCP
+        public void Disconnect()
+        {
+            instance.Disconnect();
+            
+            stream = null;
+            receivedData = null;
+            receiveBuffer = null;
+            socket = null;
         }
     }
 
@@ -283,7 +305,7 @@ public class Client : MonoBehaviour
                 // NOTE: Might not have to disconnect, as it could be a common occurence that data is less than 4 bytes
                 if (_data.Length < 4)
                 {
-                    // TODO: disconnect
+                    instance.Disconnect();
                     return;
                 }
 
@@ -292,8 +314,8 @@ public class Client : MonoBehaviour
             }
             catch (Exception _ex)
             {
-                // TODO: disconnect
                 Debug.Log($"Error receiving UDP data: {_ex}");
+                Disconnect();
             }
         }
 
@@ -321,6 +343,15 @@ public class Client : MonoBehaviour
                 }
             });
         }
+
+        // Close out our connection with the server through UDP
+        public void Disconnect()
+        {
+            instance.Disconnect();
+
+            endPoint = null;
+            socket = null;
+        }
     }
 
     // Initialize our packet handlers
@@ -336,5 +367,18 @@ public class Client : MonoBehaviour
             { (int)ServerPackets.playerInput, ClientHandle.PlayerInput },
         };
         Debug.Log("Initialized packets.");
+    }
+
+    // Closes our TCP and UDP connections to the server
+    private void Disconnect()
+    {
+        if (isConnected)
+        {
+            isConnected = false;
+            tcp.socket.Close();
+            udp.socket.Close();
+
+            Debug.Log("Disconnected from server.");
+        }
     }
 }

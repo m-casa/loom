@@ -210,6 +210,46 @@ namespace ECM.Controllers
         }
 
         /// <summary>
+        /// Perform character movement logic.
+        /// 
+        /// NOTE: Must be called in FixedUpdate.
+        /// </summary>
+
+        protected override void Move()
+        {
+            // Apply movement
+
+            // If using root motion and root motion is being applied (eg: grounded),
+            // move without acceleration / deceleration, let the animation takes full control
+
+            var desiredVelocity = CalcDesiredVelocity();
+
+            if (useRootMotion && applyRootMotion)
+                movement.Move(desiredVelocity, speed, !allowVerticalMovement);
+            else
+            {
+                // Move with acceleration and friction
+
+                var currentFriction = isGrounded ? groundFriction : airFriction;
+                var currentBrakingFriction = useBrakingFriction ? brakingFriction : currentFriction;
+
+                movement.Move(desiredVelocity, speed, acceleration, deceleration, currentFriction,
+                    currentBrakingFriction, !allowVerticalMovement);
+            }
+
+            // Jump logic
+
+            Jump();
+            MidAirJump();
+            UpdateJumpTimer();
+
+            // Update root motion state,
+            // should animator root motion be enabled? (eg: is grounded)
+
+            applyRootMotion = useRootMotion && movement.isGrounded;
+        }
+
+        /// <summary>
         /// Sends player input to server.
         /// </summary>
         ///
@@ -224,6 +264,23 @@ namespace ECM.Controllers
             };
 
             ClientSend.PlayerMovement(_inputs);
+        }
+
+        /// <summary>
+        /// Sends player position to server.
+        /// </summary>
+        ///
+
+        private void SendPositionToServer()
+        {
+            float[] _position = new float[]
+            {
+                transform.position.x,
+                transform.position.y,
+                transform.position.z,
+            };
+
+            ClientSend.PlayerPosition(_position);
         }
 
         #endregion
@@ -297,6 +354,10 @@ namespace ECM.Controllers
             // Perform character movement
 
             Move();
+
+            // Send the character's current position to the server
+
+            SendPositionToServer();
         }
 
         public override void Update()
@@ -304,7 +365,7 @@ namespace ECM.Controllers
             // Send player input to the server
 
             SendInputToServer();
-
+            
             // Update character rotation (if not paused)
 
             UpdateRotation();

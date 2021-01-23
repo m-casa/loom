@@ -46,12 +46,19 @@ public class ClientHandle : MonoBehaviour
         GameManager.players[_id].transform.rotation = _rotation;
     }
 
-    // Reads a packet from the server with player rotation information
+    // Reads a packet from the server with player input information
     public static void PlayerInput(Packet _packet)
     {
         int _id = _packet.ReadInt();
         Vector3 _moveDirection = _packet.ReadVector3();
 
-        GameManager.players[_id].GetComponent<OnlineFirstPersonController>().moveDirection = _moveDirection;
+        // Sometimes an error occurs where the client could not find the id of another player in the dictionary
+        // This may happen because this packet may have been sent to the client before the client received the SpawnPlayer packet. 
+        //  So first check if the id exists.
+        if (GameManager.players.TryGetValue(_id, out PlayerManager player))
+        {
+            player.GetComponent<OnlineFirstPersonController>().moveDirection = _moveDirection;
+        }
+        //GameManager.players[_id].GetComponent<OnlineFirstPersonController>().moveDirection = _moveDirection;
     }
 }

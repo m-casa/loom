@@ -47,5 +47,21 @@ public class ClientSend : MonoBehaviour
             SendUDPData(_packet);
         }
     }
+
+    // Sends a packet to the server containing player position
+    public static void PlayerPosition(float[] _inputs)
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.playerPosition))
+        {
+            _packet.Write(_inputs.Length);
+            foreach (float _input in _inputs)
+            {
+                _packet.Write(_input);
+            }
+            _packet.Write(GameManager.players[Client.instance.myId].transform.rotation);
+
+            SendUDPData(_packet);
+        }
+    }
     #endregion
 }
