@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -26,7 +25,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // Spawns in a new player to the client
+    // Spawns in a new player for the client
     public void SpawnPlayer(int _id, string _username, Vector3 _position, Quaternion _rotation)
     {
         GameObject _player;
@@ -44,5 +43,12 @@ public class GameManager : MonoBehaviour
         _player.GetComponent<PlayerManager>().id = _id;
         _player.GetComponent<PlayerManager>().username = _username;
         players.Add(_id, _player.GetComponent<PlayerManager>());
+    }
+
+    // Destroys a specified player for the client
+    public void DestroyPlayer(int _id)
+    {
+        Destroy(players[_id].gameObject);
+        players.Remove(_id);
     }
 }

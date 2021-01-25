@@ -33,16 +33,13 @@ public class ClientSend : MonoBehaviour
     }
 
     // Sends a packet to the server containing player movement inputs
-    public static void PlayerMovement(float[] _inputs)
+    public static void PlayerMovement(Vector3 _moveDirection, Quaternion _rotation, int _tickNumber)
     {
         using (Packet _packet = new Packet((int)ClientPackets.playerMovement))
         {
-            _packet.Write(_inputs.Length);
-            foreach (float _input in _inputs)
-            {
-                _packet.Write(_input);
-            }
-            _packet.Write(GameManager.players[Client.instance.myId].transform.rotation);
+            _packet.Write(_moveDirection);
+            _packet.Write(_rotation);
+            _packet.Write(_tickNumber);
 
             SendUDPData(_packet);
         }

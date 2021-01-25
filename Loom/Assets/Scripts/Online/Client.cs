@@ -47,7 +47,7 @@ public class Client : MonoBehaviour
     }
 
     // Unity editor does not properly close connections when leaving play mode until you enter play mode again
-    // So close the connection manually
+    // So close the connection manually or else the port will be locked
     private void OnApplicationQuit()
     {
         Disconnect();
@@ -362,9 +362,10 @@ public class Client : MonoBehaviour
         {
             { (int)ServerPackets.welcome, ClientHandle.Welcome },
             { (int)ServerPackets.spawnPlayer, ClientHandle.SpawnPlayer },
+            { (int)ServerPackets.playerInput, ClientHandle.PlayerInput },
             { (int)ServerPackets.playerPosition, ClientHandle.PlayerPosition },
             { (int)ServerPackets.playerRotation, ClientHandle.PlayerRotation },
-            { (int)ServerPackets.playerInput, ClientHandle.PlayerInput },
+            { (int)ServerPackets.destroyPlayer, ClientHandle.DestroyPlayer },
         };
         Debug.Log("Initialized packets.");
     }
@@ -374,11 +375,12 @@ public class Client : MonoBehaviour
     {
         if (isConnected)
         {
+            Debug.Log("Disconnected from server.");
+
             isConnected = false;
+
             tcp.socket.Close();
             udp.socket.Close();
-
-            Debug.Log("Disconnected from server.");
         }
     }
 }

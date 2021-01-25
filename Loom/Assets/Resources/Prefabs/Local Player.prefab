@@ -201,6 +201,7 @@ MonoBehaviour:
   _backwardSpeed: 5
   _strafeSpeed: 5
   _runSpeedMultiplier: 1.5
+  _lerpSpeed: 0.5
 --- !u!114 &7253635150957711589
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2390,7 +2391,7 @@ Transform:
   - {fileID: 7253635151211344072}
   m_Father: {fileID: 7253635150967493967}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 270.01978, y: 0.0000008644598, z: 0}
 --- !u!137 &7253635152474647464
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 0

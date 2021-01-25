@@ -433,7 +433,7 @@ MonoBehaviour:
   _brakingFriction: 8
   _airFriction: 0
   _airControl: 0.2
-  _canCrouch: 1
+  _canCrouch: 0
   _standingHeight: 2
   _crouchingHeight: 1
   _baseJumpHeight: 1.5
@@ -448,6 +448,7 @@ MonoBehaviour:
   _backwardSpeed: 5
   _strafeSpeed: 5
   _runSpeedMultiplier: 1.5
+  _lerpSpeed: 1
 --- !u!114 &7895108494425555140
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -616,6 +617,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 0
   username: 
+  moveDirection: {x: 0, y: 0, z: 0}
+  position: {x: 0, y: 0, z: 0}
 --- !u!1 &7895108494425555222
 GameObject:
   m_ObjectHideFlags: 0

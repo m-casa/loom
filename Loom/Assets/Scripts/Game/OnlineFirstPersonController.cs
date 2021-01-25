@@ -22,22 +22,26 @@ namespace ECM.Controllers
 
         [Tooltip("Speed when moving backwards.")]
         [SerializeField]
-        private float _backwardSpeed = 3.0f;
+        private float _backwardSpeed = 5.0f;
 
         [Tooltip("Speed when moving sideways.")]
         [SerializeField]
-        private float _strafeSpeed = 4.0f;
+        private float _strafeSpeed = 5.0f;
 
         [Tooltip("Speed multiplier while running.")]
         [SerializeField]
-        private float _runSpeedMultiplier = 2.0f;
+        private float _runSpeedMultiplier = 1.5f;
+
+        [Tooltip("Speed multiplier for syncing player.")]
+        [SerializeField]
+        private float _lerpSpeed = 1f;
 
         #endregion
 
         #region PROPERTIES
 
         /// <summary>
-        /// Cached camera pivot transform.
+        /// Cached target position.
         /// </summary>
 
         public Vector3 targetPosition { get; set; }
@@ -255,6 +259,16 @@ namespace ECM.Controllers
             applyRootMotion = useRootMotion && movement.isGrounded;
         }
 
+        /// <summary>
+        /// Syncs player's location to the server.
+        /// </summary>
+        /// 
+
+        protected virtual void SyncPlayer()
+        {
+            transform.position = Vector3.Slerp(transform.position, targetPosition, _lerpSpeed);
+        }
+
         #endregion
 
         #region MONOBEHAVIOUR
@@ -326,6 +340,10 @@ namespace ECM.Controllers
             // Perform character movement
 
             Move();
+
+            // Sync the character's location to the server
+
+            SyncPlayer();
         }
 
         public override void Update()
@@ -333,8 +351,6 @@ namespace ECM.Controllers
             // Perform character animation (if not paused)
 
             Animate();
-
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, 5f * Time.deltaTime);
         }
 
         public virtual void LateUpdate()

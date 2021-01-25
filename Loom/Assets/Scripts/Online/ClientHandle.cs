@@ -28,21 +28,38 @@ public class ClientHandle : MonoBehaviour
         GameManager.instance.SpawnPlayer(_id, _username, _position, _rotation);
     }
 
+    // Reads a packet from the server with player input information
+    public static void PlayerInput(Packet _packet)
+    {
+        int _id = _packet.ReadInt();
+        Vector3 _moveDirection = _packet.ReadVector3();
+
+        // Check if this player is spawned in first
+        if (GameManager.players.TryGetValue(_id, out PlayerManager _player))
+        {
+            _player.GetComponent<OnlineFirstPersonController>().moveDirection = _moveDirection;
+        }
+    }
+
     // Reads a packet from the server with player position information
     public static void PlayerPosition(Packet _packet)
     {
         int _id = _packet.ReadInt();
         Vector3 _position = _packet.ReadVector3();
+        int _tickNumber = _packet.ReadInt();
 
-        if (_id == Client.instance.myId)
+        // Check if this player is spawned in first
+        if (GameManager.players.TryGetValue(_id, out PlayerManager _player))
         {
-            GameManager.players[_id].GetComponent<LocalFirstPersonController>().targetPosition = _position;
+            if (_id == Client.instance.myId)
+            {
+                _player.GetComponent<LocalFirstPersonController>().SyncPlayer(_position, _tickNumber);
+            }
+            else
+            {
+                _player.GetComponent<OnlineFirstPersonController>().targetPosition = _position;
+            }
         }
-        else
-        {
-            GameManager.players[_id].GetComponent<OnlineFirstPersonController>().targetPosition = _position;
-        }
-        //GameManager.players[_id].transform.position = Vector3.MoveTowards(GameManager.players[_id].transform.position, _position, .5f);
     }
 
     // Reads a packet from the server with player rotation information
@@ -51,15 +68,19 @@ public class ClientHandle : MonoBehaviour
         int _id = _packet.ReadInt();
         Quaternion _rotation = _packet.ReadQuaternion();
 
-        GameManager.players[_id].transform.rotation = _rotation;
+        // Check if this player is spawned in first
+        if (GameManager.players.TryGetValue(_id, out PlayerManager _player))
+        {
+            _player.transform.rotation = _rotation;
+        }
     }
 
-    // Reads a packet from the server with player input information
-    public static void PlayerInput(Packet _packet)
+
+    // Reads a packet from the server letting us know which player to destroy
+    public static void DestroyPlayer(Packet _packet)
     {
         int _id = _packet.ReadInt();
-        Vector3 _moveDirection = _packet.ReadVector3();
 
-        GameManager.players[_id].GetComponent<OnlineFirstPersonController>().moveDirection = _moveDirection;
+        GameManager.instance.DestroyPlayer(_id);
     }
 }
