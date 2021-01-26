@@ -36,11 +36,17 @@ namespace ECM.Controllers
 
         #region PROPERTIES
 
-        // An array that holds the player's various states with a state buffer size of 512; 
-        // This buffer size divided by the tick rate is how much time is recorded for the player
-        // 512 divided by 30 is about 17 seconds to work with
+        /// <summary>
+        /// Cached buffer size.
+        /// </summary>
 
-        private PlayerManager[] clientStateBuffer = new PlayerManager[512];
+        public int bufferSize { get; private set; }
+
+        /// <summary>
+        /// Cached player state buffer.
+        /// </summary>
+
+        public PlayerManager[] playerStateBuffer { get; private set; }
 
         /// <summary>
         /// Cached timer.
@@ -51,16 +57,8 @@ namespace ECM.Controllers
         /// <summary>
         /// Cached tick number.
         /// </summary>
-        /// 
 
         public int tickNumber { get; private set; }
-
-        /// <summary>
-        /// Cached target position.
-        /// </summary>
-        /// 
-
-        public Vector3 targetPosition { get; set; }
 
         /// <summary>
         /// Cached camera pivot transform.
@@ -276,6 +274,21 @@ namespace ECM.Controllers
         }
 
         /// <summary>
+        /// Stores input.
+        /// </summary>
+
+        protected virtual void StoreInput()
+        {
+            // Store a copy of the player's input for local use
+            moveDirection = new Vector3
+            {
+                x = Input.GetAxisRaw("Horizontal"),
+                y = 0.0f,
+                z = Input.GetAxisRaw("Vertical"),
+            };
+        }
+
+        /// <summary>
         /// Handles input.
         /// </summary>
 
@@ -283,36 +296,21 @@ namespace ECM.Controllers
         {
             // Subtract from the timer to get closer to the point in time that
             //  the last FixedUpdate was called
-
             timer -= Time.fixedDeltaTime;
 
-            // Store a copy of the player's input for local use
-
-            moveDirection = new Vector3
-            {
-                x = Input.GetAxisRaw("Horizontal"),
-                y = 0.0f,
-                z = Input.GetAxisRaw("Vertical"),
-            };
-
             // Send a copy of the player's movement status to the server for verification
-
-            ClientSend.PlayerMovement(moveDirection, transform.rotation, tickNumber);
+            ClientSend.PlayerState(moveDirection, transform.rotation, tickNumber);
 
             // Store a copy of the player's state at this point in time
             // We use the remainder as our buffer slot to signify the state's point in time
+            uint bufferSlot = (uint)(tickNumber % bufferSize);
+            playerStateBuffer[bufferSlot].moveDirection = moveDirection;
+            playerStateBuffer[bufferSlot].position = transform.position;
 
-            uint bufferSlot = (uint)tickNumber % 512;
-            clientStateBuffer[bufferSlot].moveDirection = moveDirection;
-            clientStateBuffer[bufferSlot].position = transform.position;
-
-            // Simulate movement for the character by calling Physics.Simulate
-            // This will esentially run FixedUpdate manually
-
+            // Simulate the character movement
             Physics.Simulate(Time.fixedDeltaTime);
 
             // Update the tick that our next physics simulation will begin at
-
             tickNumber++;
         }
 
@@ -321,43 +319,55 @@ namespace ECM.Controllers
         /// </summary>
         /// 
 
-        public virtual void SyncPlayer(Vector3 _position, int _tickNumber)
+        public virtual void SyncPlayer(Vector3 _moveDirection, Vector3 _position, int _tickNumber)
         {
             //This buffer signifies the point in time we are correcting
+            uint bufferSlot = (uint)(_tickNumber % bufferSize);
 
-            uint bufferSlot = (uint)_tickNumber % 512;
+            // Check for the margin of error in the player's position at the specified point in time (the tick received)
+            Vector3 positionMarginOfError = _position - playerStateBuffer[bufferSlot].position;
 
-            // Check for the margin of error in the player's position at the specified point in time (the tick)
-
-            Vector3 positionMarginOfError = _position - clientStateBuffer[bufferSlot].position;
-
-            // If there is a slight margin of error, rewind and replay
-
+            // If there is a margin of error, rewind and replay
             if (positionMarginOfError.sqrMagnitude > 0.0000001f)
             {
-                // Snap the player to the correct position in the state returned
-
+                // Get the player's rigidbody information
                 Rigidbody playerRigidbody = GetComponent<Rigidbody>();
-                //playerRigidbody.position = _position;
-                playerRigidbody.position = Vector3.Slerp(playerRigidbody.position, _position, 0.8f);
+
+                // Capture the player's current predicted position (for smoothing later)
+                Vector3 predictedPosition = playerRigidbody.position + positionMarginOfError;
+
+                // Snap the player to the correct position in the state returned (rewind)
+                playerRigidbody.position = Vector3.Slerp(playerRigidbody.position, _position, 0.9f * Time.deltaTime);
 
                 // The tick number of the server when its version of the player was done calculating
-
                 uint rewindTickNumber = (uint)_tickNumber;
 
-                // Correct the margin of error until we are caught back up
-
+                // Correct the margin of error until we are caught back up (replay)
                 while (rewindTickNumber < tickNumber)
                 {
-                    bufferSlot = rewindTickNumber % 512;
-                    clientStateBuffer[bufferSlot].moveDirection = moveDirection;
-                    clientStateBuffer[bufferSlot].position = playerRigidbody.position;
+                    // Revise the player's state at this point in time
+                    // We use the remainder as our buffer slot to signify the state's point in time
+                    bufferSlot = (uint)(rewindTickNumber % bufferSize);
+                    playerStateBuffer[bufferSlot].moveDirection = _moveDirection;
+                    playerStateBuffer[bufferSlot].position = playerRigidbody.position;
 
-                    // Execute the above calculations
-
+                    // Simulate the character movement
                     Physics.Simulate(Time.fixedDeltaTime);
 
+                    // Update the tick that our next physics simulation will begin at
                     rewindTickNumber++;
+                }
+
+                // If the predicted position is still more than 2 metres away then
+                //  we'll just snap back since smoothing wouldn't help a large correction
+                // Else, smooth the difference
+                if ((predictedPosition - playerRigidbody.position).sqrMagnitude >= 4.0f)
+                {
+                    playerStateBuffer[bufferSlot].position = predictedPosition;
+                }
+                else
+                {
+                    playerStateBuffer[bufferSlot].position = Vector3.Slerp(playerStateBuffer[bufferSlot].position, predictedPosition, 0.9f * Time.deltaTime);
                 }
             }
         }
@@ -392,11 +402,9 @@ namespace ECM.Controllers
         public override void Awake()
         {
             // Call the parent class' version of method
-
             base.Awake();
 
             // Cache and initialize this components
-
             mouseLook = GetComponent<Components.MouseLook>();
             if (mouseLook == null)
             {
@@ -427,59 +435,58 @@ namespace ECM.Controllers
                 mouseLook.Init(transform, cameraTransform);
             }
 
+            // The buffer size divided by the tick rate is equal to the amount of time 
+            //  that can be recorded into a player's state buffer
+            // EX. 512 divided by 30 is about 17 seconds to work with
+            bufferSize = 512;
+
+            // A buffer that can hold a player's various states
+            playerStateBuffer = new PlayerManager[bufferSize];
+
             // Set up the player's buffer states
-
-            for (int i = 0; i < clientStateBuffer.Length; i++)
+            for (int i = 0; i < playerStateBuffer.Length; i++)
             {
-                clientStateBuffer[i] = gameObject.AddComponent<PlayerManager>();
+                playerStateBuffer[i] = gameObject.AddComponent<PlayerManager>();
             }
-        }
 
-        /// <summary>
-        /// Initialize this.
-        /// </summary>
-
-        public virtual void Start()
-        {
+            // Will be used to keep track of Time.deltaTime
             timer = 0.0f;
+
+            // Will be used to help keep track of player states
             tickNumber = 0;
         }
 
         public override void FixedUpdate()
         {
-            // Perform character movement
-
-            Move();
-        }
-
-        public override void Update()
-        {
             // Record the amount of time it took to finish the last frame (Time.deltaTime)
-
             timer += Time.deltaTime;
 
-            // Record which tick we will begin the next physics simulation at
-
+            // Reset the tick number to signify we will begin recording new player states
             tickNumber = 0;
 
             // Execute this while loop so long as the timer is greater than the amount of time it took
             //  to finish the last call to FixedUpdate (Time.fixedDeltaTime)
             // NOTE: The time it takes to finish the last frame is usually greater than
             //  the time it takes to finish the last call to FixedUpdate
-
             while (timer >= Time.fixedDeltaTime)
             {
                 // Handle input
-
                 HandleInput();
             }
 
-            // Update character rotation (if not paused)
+            // Perform character movement
+            Move();
+        }
 
+        public override void Update()
+        {
+            // Store input
+            StoreInput();
+
+            // Update character rotation (if not paused)
             UpdateRotation();
 
             // Perform character animation (if not paused)
-
             Animate();
         }
 

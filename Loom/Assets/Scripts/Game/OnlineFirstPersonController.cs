@@ -41,12 +41,6 @@ namespace ECM.Controllers
         #region PROPERTIES
 
         /// <summary>
-        /// Cached target position.
-        /// </summary>
-
-        public Vector3 targetPosition { get; set; }
-
-        /// <summary>
         /// Cached camera pivot transform.
         /// </summary>
 
@@ -264,9 +258,9 @@ namespace ECM.Controllers
         /// </summary>
         /// 
 
-        protected virtual void SyncPlayer()
+        public virtual void SyncPlayer(Vector3 _position)
         {
-            transform.position = Vector3.Slerp(transform.position, targetPosition, _lerpSpeed);
+            transform.position = Vector3.Slerp(transform.position, _position, _lerpSpeed);
         }
 
         #endregion
@@ -338,18 +332,12 @@ namespace ECM.Controllers
         public override void FixedUpdate()
         {
             // Perform character movement
-
             Move();
-
-            // Sync the character's location to the server
-
-            SyncPlayer();
         }
 
         public override void Update()
         {
             // Perform character animation (if not paused)
-
             Animate();
         }
 

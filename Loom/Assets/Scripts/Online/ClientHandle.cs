@@ -41,27 +41,6 @@ public class ClientHandle : MonoBehaviour
         }
     }
 
-    // Reads a packet from the server with player position information
-    public static void PlayerPosition(Packet _packet)
-    {
-        int _id = _packet.ReadInt();
-        Vector3 _position = _packet.ReadVector3();
-        int _tickNumber = _packet.ReadInt();
-
-        // Check if this player is spawned in first
-        if (GameManager.players.TryGetValue(_id, out PlayerManager _player))
-        {
-            if (_id == Client.instance.myId)
-            {
-                _player.GetComponent<LocalFirstPersonController>().SyncPlayer(_position, _tickNumber);
-            }
-            else
-            {
-                _player.GetComponent<OnlineFirstPersonController>().targetPosition = _position;
-            }
-        }
-    }
-
     // Reads a packet from the server with player rotation information
     public static void PlayerRotation(Packet _packet)
     {
@@ -75,6 +54,40 @@ public class ClientHandle : MonoBehaviour
         }
     }
 
+    // Reads a packet from the server with player position information
+    public static void PlayerPosition(Packet _packet)
+    {
+        int _id = _packet.ReadInt();
+        Vector3 _position = _packet.ReadVector3();
+
+        // Check if this player is spawned in first
+        if (GameManager.players.TryGetValue(_id, out PlayerManager _player))
+        {
+            _player.transform.position = _position;
+        }
+    }
+
+    // Reads a packet from the server with the server's state of the player
+    public static void PlayerState(Packet _packet)
+    {
+        int _id = _packet.ReadInt();
+        Vector3 _moveDirection = _packet.ReadVector3();
+        Vector3 _position = _packet.ReadVector3();
+        int _tickNumber = _packet.ReadInt();
+
+        // Check if this player is spawned in first
+        if (GameManager.players.TryGetValue(_id, out PlayerManager _player))
+        {
+            if (_id == Client.instance.myId)
+            {
+                _player.GetComponent<LocalFirstPersonController>().SyncPlayer(_moveDirection, _position, _tickNumber);
+            }
+            else
+            {
+                _player.GetComponent<OnlineFirstPersonController>().SyncPlayer(_position);
+            }
+        }
+    }
 
     // Reads a packet from the server letting us know which player to destroy
     public static void DestroyPlayer(Packet _packet)

@@ -32,10 +32,10 @@ public class ClientSend : MonoBehaviour
         }
     }
 
-    // Sends a packet to the server containing player movement inputs
-    public static void PlayerMovement(Vector3 _moveDirection, Quaternion _rotation, int _tickNumber)
+    // Sends a packet to the server containing the players state
+    public static void PlayerState(Vector3 _moveDirection, Quaternion _rotation, int _tickNumber)
     {
-        using (Packet _packet = new Packet((int)ClientPackets.playerMovement))
+        using (Packet _packet = new Packet((int)ClientPackets.playerState))
         {
             _packet.Write(_moveDirection);
             _packet.Write(_rotation);

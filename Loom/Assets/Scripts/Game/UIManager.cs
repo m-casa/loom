@@ -4,7 +4,6 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
     public static UIManager instance;
-
     public GameObject startMenu;
     public InputField usernameField;
 

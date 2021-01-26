@@ -8,13 +8,11 @@ public class Client : MonoBehaviour
 {
     public static Client instance;
     public static int dataBufferSize = 4096;
-
     public string ip = "127.0.0.1";
     public int port = 26950;
     public int myId = 0;
     public TCP tcp;
     public UDP udp;
-
     private bool isConnected = false;
 
     // A delegate basically says "feel free to assign any method to this delegate if the signature matches"
@@ -363,8 +361,9 @@ public class Client : MonoBehaviour
             { (int)ServerPackets.welcome, ClientHandle.Welcome },
             { (int)ServerPackets.spawnPlayer, ClientHandle.SpawnPlayer },
             { (int)ServerPackets.playerInput, ClientHandle.PlayerInput },
-            { (int)ServerPackets.playerPosition, ClientHandle.PlayerPosition },
             { (int)ServerPackets.playerRotation, ClientHandle.PlayerRotation },
+            { (int)ServerPackets.playerPosition, ClientHandle.PlayerPosition },
+            { (int)ServerPackets.playerState, ClientHandle.PlayerState },
             { (int)ServerPackets.destroyPlayer, ClientHandle.DestroyPlayer },
         };
         Debug.Log("Initialized packets.");
