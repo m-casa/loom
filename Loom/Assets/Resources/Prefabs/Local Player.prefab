@@ -197,11 +197,11 @@ MonoBehaviour:
   _maxMidAirJumps: 1
   _useRootMotion: 0
   _rootMotionRotation: 0
-  _forwardSpeed: 5
-  _backwardSpeed: 5
-  _strafeSpeed: 5
+  _forwardSpeed: 7
+  _backwardSpeed: 7
+  _strafeSpeed: 7
   _runSpeedMultiplier: 1.5
-  _lerpSpeed: 0.5
+  _lerpSpeed: 1
 --- !u!114 &7253635150957711589
 MonoBehaviour:
   m_ObjectHideFlags: 0

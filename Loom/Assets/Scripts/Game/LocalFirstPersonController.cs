@@ -18,19 +18,23 @@ namespace ECM.Controllers
         [Header("First Person")]
         [Tooltip("Speed when moving forward.")]
         [SerializeField]
-        private float _forwardSpeed = 5.0f;
+        private float _forwardSpeed = 7.0f;
 
         [Tooltip("Speed when moving backwards.")]
         [SerializeField]
-        private float _backwardSpeed = 5.0f;
+        private float _backwardSpeed = 7.0f;
 
         [Tooltip("Speed when moving sideways.")]
         [SerializeField]
-        private float _strafeSpeed = 5.0f;
+        private float _strafeSpeed = 7.0f;
 
         [Tooltip("Speed multiplier while running.")]
         [SerializeField]
         private float _runSpeedMultiplier = 1.5f;
+
+        [Tooltip("Speed multiplier for syncing player.")]
+        [SerializeField]
+        private float _lerpSpeed = 1.0f;
 
         #endregion
 
@@ -46,7 +50,7 @@ namespace ECM.Controllers
         /// Cached player state buffer.
         /// </summary>
 
-        public PlayerManager[] playerStateBuffer { get; private set; }
+        public PlayerState[] playerStateBuffer { get; private set; }
 
         /// <summary>
         /// Cached timer.
@@ -317,9 +321,8 @@ namespace ECM.Controllers
         /// <summary>
         /// Syncs player's location to the server.
         /// </summary>
-        /// 
 
-        public virtual void SyncPlayer(Vector3 _moveDirection, Vector3 _position, int _tickNumber)
+        public virtual void SyncPlayer(Vector3 _position, int _tickNumber)
         {
             //This buffer signifies the point in time we are correcting
             uint bufferSlot = (uint)(_tickNumber % bufferSize);
@@ -336,8 +339,16 @@ namespace ECM.Controllers
                 // Capture the player's current predicted position (for smoothing later)
                 Vector3 predictedPosition = playerRigidbody.position + positionMarginOfError;
 
-                // Snap the player to the correct position in the state returned (rewind)
-                playerRigidbody.position = Vector3.Slerp(playerRigidbody.position, _position, 0.9f * Time.deltaTime);
+                // If the current position is more than 2 metres away from the correct position in the state returned then
+                //  snap back (rewind) since smoothing wouldn't help a large correction, else add in smoothing
+                if ((_position - playerRigidbody.position).sqrMagnitude >= 4.0f)
+                {
+                    playerRigidbody.position = _position;
+                }
+                else
+                {
+                    playerRigidbody.position = Vector3.Slerp(playerRigidbody.position, _position, _lerpSpeed * Time.deltaTime);
+                }
 
                 // The tick number of the server when its version of the player was done calculating
                 uint rewindTickNumber = (uint)_tickNumber;
@@ -348,7 +359,7 @@ namespace ECM.Controllers
                     // Revise the player's state at this point in time
                     // We use the remainder as our buffer slot to signify the state's point in time
                     bufferSlot = (uint)(rewindTickNumber % bufferSize);
-                    playerStateBuffer[bufferSlot].moveDirection = _moveDirection;
+                    playerStateBuffer[bufferSlot].moveDirection = moveDirection;
                     playerStateBuffer[bufferSlot].position = playerRigidbody.position;
 
                     // Simulate the character movement
@@ -359,15 +370,14 @@ namespace ECM.Controllers
                 }
 
                 // If the predicted position is still more than 2 metres away then
-                //  we'll just snap back since smoothing wouldn't help a large correction
-                // Else, smooth the difference
+                //  snap back since smoothing wouldn't help a large correction, else add in smoothing
                 if ((predictedPosition - playerRigidbody.position).sqrMagnitude >= 4.0f)
                 {
                     playerStateBuffer[bufferSlot].position = predictedPosition;
                 }
                 else
                 {
-                    playerStateBuffer[bufferSlot].position = Vector3.Slerp(playerStateBuffer[bufferSlot].position, predictedPosition, 0.9f * Time.deltaTime);
+                    playerStateBuffer[bufferSlot].position = Vector3.Slerp(playerStateBuffer[bufferSlot].position, predictedPosition, _lerpSpeed * Time.deltaTime);
                 }
             }
         }
@@ -441,12 +451,12 @@ namespace ECM.Controllers
             bufferSize = 512;
 
             // A buffer that can hold a player's various states
-            playerStateBuffer = new PlayerManager[bufferSize];
+            playerStateBuffer = new PlayerState[bufferSize];
 
             // Set up the player's buffer states
             for (int i = 0; i < playerStateBuffer.Length; i++)
             {
-                playerStateBuffer[i] = gameObject.AddComponent<PlayerManager>();
+                playerStateBuffer[i] = new PlayerState();
             }
 
             // Will be used to keep track of Time.deltaTime
@@ -458,6 +468,9 @@ namespace ECM.Controllers
 
         public override void FixedUpdate()
         {
+            // Perform character movement
+            Move();
+
             // Record the amount of time it took to finish the last frame (Time.deltaTime)
             timer += Time.deltaTime;
 
@@ -473,9 +486,6 @@ namespace ECM.Controllers
                 // Handle input
                 HandleInput();
             }
-
-            // Perform character movement
-            Move();
         }
 
         public override void Update()

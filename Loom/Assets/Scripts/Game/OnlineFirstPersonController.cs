@@ -18,15 +18,15 @@ namespace ECM.Controllers
         [Header("First Person")]
         [Tooltip("Speed when moving forward.")]
         [SerializeField]
-        private float _forwardSpeed = 5.0f;
+        private float _forwardSpeed = 7.0f;
 
         [Tooltip("Speed when moving backwards.")]
         [SerializeField]
-        private float _backwardSpeed = 5.0f;
+        private float _backwardSpeed = 7.0f;
 
         [Tooltip("Speed when moving sideways.")]
         [SerializeField]
-        private float _strafeSpeed = 5.0f;
+        private float _strafeSpeed = 7.0f;
 
         [Tooltip("Speed multiplier while running.")]
         [SerializeField]
@@ -34,7 +34,7 @@ namespace ECM.Controllers
 
         [Tooltip("Speed multiplier for syncing player.")]
         [SerializeField]
-        private float _lerpSpeed = 1f;
+        private float _lerpSpeed = 1.0f;
 
         #endregion
 

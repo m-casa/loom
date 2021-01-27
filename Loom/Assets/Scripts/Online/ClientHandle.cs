@@ -71,7 +71,6 @@ public class ClientHandle : MonoBehaviour
     public static void PlayerState(Packet _packet)
     {
         int _id = _packet.ReadInt();
-        Vector3 _moveDirection = _packet.ReadVector3();
         Vector3 _position = _packet.ReadVector3();
         int _tickNumber = _packet.ReadInt();
 
@@ -80,7 +79,7 @@ public class ClientHandle : MonoBehaviour
         {
             if (_id == Client.instance.myId)
             {
-                _player.GetComponent<LocalFirstPersonController>().SyncPlayer(_moveDirection, _position, _tickNumber);
+                _player.GetComponent<LocalFirstPersonController>().SyncPlayer(_position, _tickNumber);
             }
             else
             {
