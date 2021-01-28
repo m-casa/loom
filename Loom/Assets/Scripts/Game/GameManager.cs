@@ -4,6 +4,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    private float timer;
 
     // A new dictionary to keep track of our players and their ids
     public static Dictionary<int, PlayerManager> players = new Dictionary<int, PlayerManager>();
@@ -17,11 +18,30 @@ public class GameManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
+            timer = 0;
         }
         else if (instance != this)
         {
             Debug.Log("Instance already exists, destroying object!");
             Destroy(this);
+        }
+    }
+
+    // FixedUpdate will be called at the same rate as the tick rate
+    public void FixedUpdate()
+    {
+        // Record at what point in time the last frame finished rendering
+        timer += Time.deltaTime;
+
+        // Catch up with the game time.
+        // Advance the physics simulation in portions of Time.fixedDeltaTime
+        // Note that generally, we don't want to pass variable delta to Simulate as that leads to unstable results.
+        while (timer >= Time.fixedDeltaTime)
+        {
+            timer -= Time.fixedDeltaTime;
+
+            // Simulate movement for every character on the server at once
+            Physics.Simulate(Time.fixedDeltaTime);
         }
     }
 
