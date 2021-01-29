@@ -32,6 +32,18 @@ public class ClientSend : MonoBehaviour
         }
     }
 
+    // Send a request to spawn the player in everyone's instance
+    public static void SpawnRequest()
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.spawnRequest))
+        {
+            _packet.Write(UIManager.instance.usernameField.text);
+            _packet.Write(UIManager.instance.colorField.value);
+
+            SendTCPData(_packet);
+        }
+    }
+
     // Sends a packet to the server containing the players state
     public static void PlayerState(Vector3 _moveDirection, Quaternion _rotation, int _tickNumber)
     {

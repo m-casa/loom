@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
     }
 
     // Spawns in a new player for the client
-    public void SpawnPlayer(int _id, string _username, Vector3 _position, Quaternion _rotation)
+    public void SpawnPlayer(int _id, string _username, int _color, Vector3 _position, Quaternion _rotation)
     {
         GameObject _player;
 
@@ -62,6 +62,7 @@ public class GameManager : MonoBehaviour
 
         _player.GetComponent<PlayerManager>().id = _id;
         _player.GetComponent<PlayerManager>().username = _username;
+        _player.GetComponent<PlayerManager>().ChangeColor(_color);
         players.Add(_id, _player.GetComponent<PlayerManager>());
     }
 

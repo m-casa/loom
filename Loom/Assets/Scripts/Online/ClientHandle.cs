@@ -17,15 +17,16 @@ public class ClientHandle : MonoBehaviour
         Client.instance.udp.Connect(((IPEndPoint)Client.instance.tcp.socket.Client.LocalEndPoint).Port);
     }
 
-    // Reads a packet from the server with player spawn position information
+    // Reads a packet from the server with player spawn information
     public static void SpawnPlayer(Packet _packet)
     {
         int _id = _packet.ReadInt();
         string _username = _packet.ReadString();
+        int _color = _packet.ReadInt();
         Vector3 _position = _packet.ReadVector3();
         Quaternion _rotation = _packet.ReadQuaternion();
 
-        GameManager.instance.SpawnPlayer(_id, _username, _position, _rotation);
+        GameManager.instance.SpawnPlayer(_id, _username, _color, _position, _rotation);
     }
 
     // Reads a packet from the server with player input information

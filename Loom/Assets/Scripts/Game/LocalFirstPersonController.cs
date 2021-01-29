@@ -317,12 +317,12 @@ namespace ECM.Controllers
             {
                 // If the current position is more than 1.5 units away from the server position then
                 //  snap back (rewind) since smoothing wouldn't help a large correction
-                // Else apply smoothing if more than 0.75 units, and no correction if less than that
+                // Else apply smoothing if more than 0.25 units, and no correction if less than that
                 if ((_position - transform.position).sqrMagnitude >= 2.25f)
                 {
                     transform.position = _position;
                 }
-                else if ((_position - transform.position).sqrMagnitude >= 0.55f)
+                else if ((_position - transform.position).sqrMagnitude >= 0.06f)
                 {
                     transform.position = Vector3.Slerp(transform.position, _position, _lerpSpeed * Time.deltaTime);
                 }

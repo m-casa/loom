@@ -29,4 +29,11 @@ public class UIManager : MonoBehaviour
         colorField.gameObject.SetActive(true);
         Client.instance.ConnectToServer();
     }
+
+    // Will request the server to spawn in the client
+    public void SendRequest()
+    {
+        startMenu.SetActive(false);
+        ClientSend.SpawnRequest();
+    }
 }
