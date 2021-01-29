@@ -317,7 +317,7 @@ namespace ECM.Controllers
             {
                 // If the current position is more than 1.5 units away from the server position then
                 //  snap back (rewind) since smoothing wouldn't help a large correction
-                // Else apply smoothing if 0.75 units, and no correction if less than that
+                // Else apply smoothing if more than 0.75 units, and no correction if less than that
                 if ((_position - transform.position).sqrMagnitude >= 2.25f)
                 {
                     transform.position = _position;
@@ -325,10 +325,6 @@ namespace ECM.Controllers
                 else if ((_position - transform.position).sqrMagnitude >= 0.55f)
                 {
                     transform.position = Vector3.Slerp(transform.position, _position, _lerpSpeed * Time.deltaTime);
-                }
-                else
-                {
-                    return;
                 }
 
                 // The tick number of the server when its version of the player was done calculating

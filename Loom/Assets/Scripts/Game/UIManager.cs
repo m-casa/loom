@@ -6,6 +6,7 @@ public class UIManager : MonoBehaviour
     public static UIManager instance;
     public GameObject startMenu;
     public InputField usernameField;
+    public Dropdown colorField;
 
     // Make sure there is only once instance of this client
     private void Awake()
@@ -24,8 +25,8 @@ public class UIManager : MonoBehaviour
     // Will connect the client to the game server
     public void ConnectToServer()
     {
-        startMenu.SetActive(false);
-        usernameField.interactable = false;
+        usernameField.gameObject.SetActive(false);
+        colorField.gameObject.SetActive(true);
         Client.instance.ConnectToServer();
     }
 }
