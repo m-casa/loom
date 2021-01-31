@@ -8,7 +8,7 @@ public class Role : MonoBehaviour
     private GameObject interactableObject;
     private RangeSensor rangeSensor;
     private Life crewmateLife;
-    private bool use, kill, report;
+    private bool isUsing, isKilling, isReporting;
 
     // Properties
     public bool canInteract { get; set; }
@@ -46,26 +46,26 @@ public class Role : MonoBehaviour
     // Handles player input for interactions
     public void HandleInteractions()
     {
-        use = Input.GetKeyDown(KeyCode.E);
+        isUsing = Input.GetKeyDown(KeyCode.E);
 
         if (isImposter)
         {
-            kill = Input.GetKeyDown(KeyCode.F);
+            isKilling = Input.GetKeyDown(KeyCode.F);
         }
 
-        report = Input.GetKeyDown(KeyCode.Q);
+        isReporting = Input.GetKeyDown(KeyCode.Q);
     }
 
     // Performs any interactions based on player input
     public void PerformInteractions()
     {
-        if (use) {
+        if (isUsing) {
             Use();
         }
-        else if (canKill && kill) {
+        else if (canKill && isKilling) {
             Kill();
         }
-        else if (report) {
+        else if (isReporting) {
             Report();
         }
     }

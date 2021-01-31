@@ -26,6 +26,7 @@ public class ClientHandle : MonoBehaviour
         Vector3 _position = _packet.ReadVector3();
         Quaternion _rotation = _packet.ReadQuaternion();
 
+        UIManager.instance.startMenu.SetActive(false);
         GameManager.instance.SpawnPlayer(_id, _username, _color, _position, _rotation);
     }
 
