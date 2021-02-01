@@ -1,5 +1,6 @@
 using UnityEngine;
 using SensorToolkit;
+using System.Collections.Generic;
 
 public class Role : MonoBehaviour
 {
@@ -8,10 +9,8 @@ public class Role : MonoBehaviour
     private GameObject interactableObject;
     private RangeSensor rangeSensor;
     private Life crewmateLife;
-    private bool isUsing, isKilling, isReporting;
-
-    // Properties
-    public bool canInteract { get; set; }
+    private bool canInteract, isUsing, isKilling, isReporting;
+    private int numOfInteractables;
 
     // Awake is called before Start
     public void Awake()
@@ -19,6 +18,7 @@ public class Role : MonoBehaviour
         rangeSensor = GetComponent<RangeSensor>();
         canKill = false;
         canInteract = false;
+        numOfInteractables = 0;
     }
 
     // Start is called before the first frame update
@@ -40,6 +40,21 @@ public class Role : MonoBehaviour
 
             // Perform any interaction the player wants
             PerformInteractions();
+        }
+    }
+
+    // Used to decide if there are interactable objects
+    public void CheckForInteractables(int _numOfInteractables)
+    {
+        numOfInteractables += _numOfInteractables;
+
+        if (numOfInteractables > 0)
+        {
+            canInteract = true;
+        }
+        else
+        {
+            canInteract = false;
         }
     }
 
@@ -79,10 +94,21 @@ public class Role : MonoBehaviour
     // Kill whicever player is within range
     public void Kill()
     {
-        interactableObject = rangeSensor.GetNearest();
+        List<GameObject> crewmates = new List<GameObject>();
 
-        if (interactableObject.tag == "Crewmate")
+        // Check if there are crewmates near the imposter
+        foreach (GameObject detectedObject in rangeSensor.GetDetected())
         {
+            if (detectedObject.tag == "Crewmate")
+            {
+                crewmates.Add(detectedObject);
+            }
+        }
+
+        // Kill the crewmate that first entered the kill range
+        if (crewmates.Count != 0)
+        {
+            interactableObject = crewmates[0];
             crewmateLife = interactableObject.GetComponent<Life>();
             crewmateLife.Die();
         }
