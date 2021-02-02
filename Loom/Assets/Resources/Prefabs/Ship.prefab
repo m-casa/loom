@@ -49838,9 +49838,10 @@ GameObject:
   - component: {fileID: 7903669462508652084}
   - component: {fileID: 8518046335090060676}
   - component: {fileID: 1167247226}
+  - component: {fileID: 8145281724151148283}
   m_Layer: 3
   m_Name: Computer_mesh
-  m_TagString: Untagged
+  m_TagString: Interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -49922,6 +49923,18 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -4455788751452973512, guid: 4529be0be99120947ae89c6e23d3f1d7, type: 3}
+--- !u!114 &8145281724151148283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6225002515239516209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3539d67c5ea1b684b8cf35ca71a8f734, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6243931698621554229
 GameObject:
   m_ObjectHideFlags: 0

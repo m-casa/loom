@@ -598,7 +598,7 @@ MonoBehaviour:
   SensorRange: 3.5
   DetectsOnLayers:
     serializedVersion: 2
-    m_Bits: 72
+    m_Bits: 64
   SensorUpdateMode: 1
   CheckInterval: 1
   InitialBufferSize: 20

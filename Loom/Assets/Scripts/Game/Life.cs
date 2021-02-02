@@ -12,18 +12,6 @@ public class Life : MonoBehaviour
         deathPrefab = Resources.Load<GameObject>("Prefabs/Death");
     }
 
-    // Start is called before the first frame update
-    public void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    public void Update()
-    {
-
-    }
-
     // Kills the player
     public void Die()
     {

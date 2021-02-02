@@ -1,14 +1,12 @@
+using System.Collections.Generic;
 using UnityEngine;
 using SensorToolkit;
-using System.Collections.Generic;
 
 public class Role : MonoBehaviour
 {
     // Fields
     public bool isCewmate, isImposter, canKill;
-    private GameObject interactableObject;
     private RangeSensor rangeSensor;
-    private Life crewmateLife;
     private bool canInteract, isUsing, isKilling, isReporting;
     private int numOfInteractables;
 
@@ -19,12 +17,6 @@ public class Role : MonoBehaviour
         canKill = false;
         canInteract = false;
         numOfInteractables = 0;
-    }
-
-    // Start is called before the first frame update
-    public void Start()
-    {
-
     }
 
     // Update is called once per frame
@@ -59,9 +51,9 @@ public class Role : MonoBehaviour
     }
 
     // Handles player input for interactions
-    public void HandleInteractions()
+    private void HandleInteractions()
     {
-        isUsing = Input.GetKeyDown(KeyCode.E);
+        isUsing = Input.GetKey(KeyCode.E);
 
         if (isImposter)
         {
@@ -72,51 +64,69 @@ public class Role : MonoBehaviour
     }
 
     // Performs any interactions based on player input
-    public void PerformInteractions()
+    private void PerformInteractions()
     {
-        if (isUsing) {
-            Use();
-        }
-        else if (canKill && isKilling) {
+        Use();
+
+        if (canKill) {
             Kill();
         }
-        else if (isReporting) {
-            Report();
-        }
+
+        Report();
     }
 
     // Use whicever object is within range
-    public void Use()
+    private void Use()
     {
-        interactableObject = rangeSensor.GetNearest();
-    }
+        List<GameObject> interactables = new List<GameObject>();
 
-    // Kill whicever player is within range
-    public void Kill()
-    {
-        List<GameObject> crewmates = new List<GameObject>();
-
-        // Check if there are crewmates near the imposter
+        // Check if there are interactables near the player
         foreach (GameObject detectedObject in rangeSensor.GetDetected())
         {
-            if (detectedObject.tag == "Crewmate")
+            if (detectedObject.tag == "Interactable")
             {
-                crewmates.Add(detectedObject);
+                interactables.Add(detectedObject);
             }
         }
 
-        // Kill the crewmate that first entered the kill range
-        if (crewmates.Count != 0)
+        // Interact with the object that first entered the interaction range
+        if (interactables.Count != 0)
         {
-            interactableObject = crewmates[0];
-            crewmateLife = interactableObject.GetComponent<Life>();
-            crewmateLife.Die();
+            GameObject interactable = interactables[0];
+            Task task = interactable.GetComponent<Task>();
+            task.Interact(isUsing);
+        }
+    }
+
+    // Kill whicever player is within range
+    private void Kill()
+    {
+        if (isKilling)
+        {
+            List<GameObject> crewmates = new List<GameObject>();
+
+            // Check if there are crewmates near the imposter
+            foreach (GameObject detectedObject in rangeSensor.GetDetected())
+            {
+                if (detectedObject.tag == "Crewmate")
+                {
+                    crewmates.Add(detectedObject);
+                }
+            }
+
+            // Kill the crewmate that first entered the kill range
+            if (crewmates.Count != 0)
+            {
+                GameObject crewmate = crewmates[0];
+                Life life = crewmate.GetComponent<Life>();
+                life.Die();
+            }
         }
     }
 
     // Report whicever body is within range
-    public void Report()
+    private void Report()
     {
-        interactableObject = rangeSensor.GetNearest();
+
     }
 }

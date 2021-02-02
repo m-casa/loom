@@ -6,11 +6,12 @@ TagManager:
   tags:
   - Crewmate
   - Imposter
+  - Interactable
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Interactable
+  - 
   - Water
   - UI
   - Player

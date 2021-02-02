@@ -1913,6 +1913,11 @@ PrefabInstance:
       propertyPath: mainRenderableMesh
       value: 
       objectReference: {fileID: 1096836904}
+    - target: {fileID: 6225002515239516209, guid: cbe14ea7fbd17824789669a7a780bca9,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 6397068144325254530, guid: cbe14ea7fbd17824789669a7a780bca9,
         type: 3}
       propertyPath: m_Mesh
