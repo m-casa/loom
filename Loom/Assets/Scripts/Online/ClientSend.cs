@@ -56,5 +56,17 @@ public class ClientSend : MonoBehaviour
             SendUDPData(_packet);
         }
     }
+
+    // Tell the server to start the round
+    public static void RoundRequest()
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.roundRequest))
+        {
+            // Prepare packet with what we will send to the server
+            _packet.Write("Start the round.");
+
+            SendTCPData(_packet);
+        }
+    }
     #endregion
 }

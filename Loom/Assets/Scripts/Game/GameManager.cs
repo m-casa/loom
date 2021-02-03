@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
 
     public GameObject localPlayerPrefab;
     public GameObject playerPrefab;
+    public PlayerManager localPlayerManager;
 
     // Make sure there is only once instance of this client
     private void Awake()
@@ -54,6 +55,7 @@ public class GameManager : MonoBehaviour
         if (_id == Client.instance.myId)
         {
             _player = Instantiate(localPlayerPrefab, _position, _rotation);
+            localPlayerManager = _player.GetComponent<PlayerManager>();
         }
         else
         {

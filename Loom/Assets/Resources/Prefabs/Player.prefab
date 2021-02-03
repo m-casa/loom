@@ -355,9 +355,7 @@ GameObject:
   - component: {fileID: 7895108494425555140}
   - component: {fileID: 7895108494425555143}
   - component: {fileID: 7895108494425555142}
-  - component: {fileID: 7895108494425555145}
   - component: {fileID: 7895108494425555144}
-  - component: {fileID: 4271481630239695316}
   - component: {fileID: 7895108494425555162}
   m_Layer: 6
   m_Name: Player
@@ -512,21 +510,6 @@ MonoBehaviour:
   _clampPitch: 1
   _minPitchAngle: -90
   _maxPitchAngle: 90
---- !u!114 &7895108494425555145
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7895108494425555221}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a4610dee89bf5f54fa905d7f9500829d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isCewmate: 0
-  isImposter: 0
-  canKill: 0
 --- !u!114 &7895108494425555144
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -541,68 +524,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   model: {fileID: 7895108494425555240}
   deadModel: {fileID: 7895108494425555261}
---- !u!114 &4271481630239695316
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7895108494425555221}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fd1782782c33a144aa3b0d575bb80ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  IgnoreList:
-  - {fileID: 7895108494425555221}
-  EnableTagFilter: 0
-  AllowedTags: []
-  OnDetected:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 7895108494425555145}
-        m_TargetAssemblyTypeName: Role, Assembly-CSharp
-        m_MethodName: CheckForInteractables
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 1
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-  OnLostDetection:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 7895108494425555145}
-        m_TargetAssemblyTypeName: Role, Assembly-CSharp
-        m_MethodName: CheckForInteractables
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: -1
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  DetectionMode: 0
-  RequiresLineOfSight: 0
-  BlocksLineOfSight:
-    serializedVersion: 2
-    m_Bits: 0
-  TestLOSTargetsOnly: 0
-  NumberOfRays: 1
-  MinimumVisibility: 0.5
-  SensorRange: 3.5
-  DetectsOnLayers:
-    serializedVersion: 2
-    m_Bits: 64
-  SensorUpdateMode: 1
-  CheckInterval: 1
-  InitialBufferSize: 20
-  DynamicallyIncreaseBufferSize: 1
 --- !u!114 &7895108494425555162
 MonoBehaviour:
   m_ObjectHideFlags: 0
