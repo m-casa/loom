@@ -2,8 +2,7 @@ using UnityEngine;
 
 public class PlayerState
 {
-    public Vector3 moveDirection;
-    public Vector3 position;
+    public Vector3 moveDirection, position;
 
     public PlayerState()
     {

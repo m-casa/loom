@@ -366,6 +366,7 @@ public class Client : MonoBehaviour
             { (int)ServerPackets.playerPosition, ClientHandle.PlayerPosition },
             { (int)ServerPackets.playerState, ClientHandle.PlayerState },
             { (int)ServerPackets.destroyPlayer, ClientHandle.DestroyPlayer },
+            { (int)ServerPackets.playerRole, ClientHandle.PlayerRole },
         };
         Debug.Log("Initialized packets.");
     }

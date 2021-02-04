@@ -88124,6 +88124,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isBeingUsed: 0
+  isBeingHeld: 0
 --- !u!1 &5848131862692802670
 GameObject:
   m_ObjectHideFlags: 0

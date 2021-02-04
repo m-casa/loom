@@ -90,6 +90,30 @@ public class ClientHandle : MonoBehaviour
         }
     }
 
+    // Reads a packet from the server letting us know the player's role
+    public static void PlayerRole(Packet _packet)
+    {
+        int _id = _packet.ReadInt();
+        bool _isImposter = _packet.ReadBool();
+
+        if (_id == Client.instance.myId)
+        {
+            GameManager.players[_id].GetComponent<Role>().isImposter = _isImposter;
+            GameManager.players[_id].GetComponent<Role>().UpdateRole();
+        }
+        else
+        {
+            if (_isImposter)
+            {
+                GameManager.players[_id].tag = "Imposter";
+            }
+            else
+            {
+                GameManager.players[_id].tag = "Crewmate";
+            }
+        }
+    }
+
     // Reads a packet from the server letting us know which player to destroy
     public static void DestroyPlayer(Packet _packet)
     {

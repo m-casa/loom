@@ -1,13 +1,16 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using SensorToolkit;
 
 public class Role : MonoBehaviour
 {
     // Fields
-    public bool isCewmate, isImposter, canKill;
+    public Text roleIndicator, killIndicator;
     private RangeSensor rangeSensor;
-    private bool canInteract, isUsing, isKilling, isReporting;
+    public bool isImposter, canKill;
+    private bool canInteract, isUsing, isHolding, isKilling, isReporting;
+    private float killCooldown, currentCooldown;
     private int numOfInteractables;
 
     // Awake is called before Start
@@ -16,7 +19,14 @@ public class Role : MonoBehaviour
         rangeSensor = GetComponent<RangeSensor>();
         canKill = false;
         canInteract = false;
+        killCooldown = 30f;
         numOfInteractables = 0;
+    }
+
+    // Start is called before the first frame update
+    public void Start()
+    {
+        currentCooldown = killCooldown;
     }
 
     // Update is called once per frame
@@ -32,6 +42,11 @@ public class Role : MonoBehaviour
 
             // Perform any interaction the player wants
             PerformInteractions();
+        }
+
+        if (isImposter)
+        {
+            UpdateKillCooldown();
         }
     }
 
@@ -50,10 +65,47 @@ public class Role : MonoBehaviour
         }
     }
 
+    // Update the role of the player
+    public void UpdateRole()
+    {
+        if (isImposter)
+        {
+            roleIndicator.color = Color.red;
+            roleIndicator.text = "Imposter";
+
+            currentCooldown = killCooldown;
+            killIndicator.gameObject.SetActive(true);
+        }
+        else
+        {
+            roleIndicator.color = Color.white;
+            roleIndicator.text = "Crewmate";
+        }
+
+        roleIndicator.gameObject.SetActive(true);
+    }
+
+    // If the player is an imposter, this will update their kill cooldown
+    private void UpdateKillCooldown()
+    {
+        if (currentCooldown <= 0)
+        {
+            canKill = true;
+            killIndicator.text = "Kill";
+        }
+        else
+        {
+            currentCooldown -= 1 * Time.deltaTime;
+            killIndicator.text = currentCooldown.ToString("0");
+        }
+    }
+
     // Handles player input for interactions
     private void HandleInteractions()
     {
-        isUsing = Input.GetKey(KeyCode.E);
+        isUsing = Input.GetKeyDown(KeyCode.E);
+
+        isHolding = Input.GetKey(KeyCode.E);
 
         if (isImposter)
         {
@@ -94,7 +146,7 @@ public class Role : MonoBehaviour
         {
             GameObject interactable = interactables[0];
             Task task = interactable.GetComponent<Task>();
-            task.Interact(isUsing);
+            task.Interact(isUsing, isHolding);
         }
     }
 
@@ -120,6 +172,10 @@ public class Role : MonoBehaviour
                 GameObject crewmate = crewmates[0];
                 Life life = crewmate.GetComponent<Life>();
                 life.Die();
+                crewmate.tag = "Dead";
+
+                currentCooldown = killCooldown;
+                canKill = false;
             }
         }
     }

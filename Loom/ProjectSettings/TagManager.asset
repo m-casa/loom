@@ -7,6 +7,7 @@ TagManager:
   - Crewmate
   - Imposter
   - Interactable
+  - Dead
   layers:
   - Default
   - TransparentFX
