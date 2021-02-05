@@ -65,6 +65,7 @@ public class GameManager : MonoBehaviour
         _player.GetComponent<PlayerManager>().id = _id;
         _player.GetComponent<PlayerManager>().username = _username;
         _player.GetComponent<PlayerManager>().ChangeColor(_color);
+        _player.GetComponent<PlayerManager>().ChangeName(_username);
         players.Add(_id, _player.GetComponent<PlayerManager>());
     }
 

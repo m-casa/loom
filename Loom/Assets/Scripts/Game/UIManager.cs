@@ -25,9 +25,12 @@ public class UIManager : MonoBehaviour
     // Will connect the client to the game server
     public void ConnectToServer()
     {
-        usernameField.gameObject.SetActive(false);
-        colorField.gameObject.SetActive(true);
-        Client.instance.ConnectToServer();
+        if (usernameField.text != "" && usernameField.text.Length <= 20)
+        {
+            usernameField.gameObject.SetActive(false);
+            colorField.gameObject.SetActive(true);
+            Client.instance.ConnectToServer();
+        }
     }
 
     // Will request the server to spawn in the client

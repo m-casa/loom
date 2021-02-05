@@ -14,10 +14,6 @@ public class RoundController : MonoBehaviour
                 ClientSend.RoundRequest();
                 task.isBeingUsed = false;
             }
-            else
-            {
-
-            }
         }
     }
 }

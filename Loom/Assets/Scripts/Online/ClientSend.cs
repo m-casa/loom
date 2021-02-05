@@ -57,13 +57,24 @@ public class ClientSend : MonoBehaviour
         }
     }
 
-    // Tell the server to start the round
+    // Send a request to the server to start the round
     public static void RoundRequest()
     {
         using (Packet _packet = new Packet((int)ClientPackets.roundRequest))
         {
             // Prepare packet with what we will send to the server
             _packet.Write("Start the round.");
+
+            SendTCPData(_packet);
+        }
+    }
+
+    // Sends a packet to the server specifying which player was just killed
+    public static void KillRequest(int _id)
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.killRequest))
+        {
+            _packet.Write(_id);
 
             SendTCPData(_packet);
         }

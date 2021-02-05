@@ -7,6 +7,7 @@ public class Role : MonoBehaviour
 {
     // Fields
     public Text roleIndicator, killIndicator;
+    public Life life;
     private RangeSensor rangeSensor;
     public bool isImposter, canKill;
     private bool canInteract, isUsing, isHolding, isKilling, isReporting;
@@ -19,7 +20,7 @@ public class Role : MonoBehaviour
         rangeSensor = GetComponent<RangeSensor>();
         canKill = false;
         canInteract = false;
-        killCooldown = 30f;
+        killCooldown = 20f;
         numOfInteractables = 0;
     }
 
@@ -66,12 +67,25 @@ public class Role : MonoBehaviour
     }
 
     // Update the role of the player
-    public void UpdateRole()
+    public void UpdateRole(bool _isImposter)
     {
+        isImposter = _isImposter;
+
+        // Updates the player's HUD to reflect what their role is
         if (isImposter)
         {
             roleIndicator.color = Color.red;
             roleIndicator.text = "Imposter";
+
+            // If the local player became an imposter after the other player, then
+            //  look for that player and change their nameplate to red so the local player knows who their teammate is
+            foreach (PlayerManager player in GameManager.players.Values)
+            {
+                if (player.tag.Equals("Imposter"))
+                {
+                    player.nameInidcator.color = Color.red;
+                }
+            }
 
             currentCooldown = killCooldown;
             killIndicator.gameObject.SetActive(true);
@@ -82,16 +96,50 @@ public class Role : MonoBehaviour
             roleIndicator.text = "Crewmate";
         }
 
-        roleIndicator.gameObject.SetActive(true);
+        // If the role indicator is not on then turn it on
+        if (!roleIndicator.gameObject.activeSelf)
+        {
+            roleIndicator.gameObject.SetActive(true);
+        }
+    }
+
+    // Update the player's HUD to display the winning team
+    public void UpdateWinners(string _winningTeam)
+    {
+        // Updates the player's HUD to reflect which team won the last round
+        if (_winningTeam.Equals("Crewmates"))
+        {
+            roleIndicator.color = Color.green;
+            roleIndicator.text = "Winners: " + _winningTeam;
+        }
+        else
+        {
+            roleIndicator.color = Color.red;
+            roleIndicator.text = "Winners: " + _winningTeam;
+        }
+
+        // If the player was an imposter, revert their role
+        if (isImposter)
+        {
+            isImposter = false;
+            killIndicator.gameObject.SetActive(false);
+        }
+
+        // If the player was dead, respawn their body
+        if (life.isDead)
+        {
+            life.Respawn();
+        }
     }
 
     // If the player is an imposter, this will update their kill cooldown
     private void UpdateKillCooldown()
     {
+        // Gives the player an update on when they are allowed to kill
         if (currentCooldown <= 0)
         {
             canKill = true;
-            killIndicator.text = "Kill";
+            killIndicator.text = "Kill: F";
         }
         else
         {
@@ -170,8 +218,11 @@ public class Role : MonoBehaviour
             if (crewmates.Count != 0)
             {
                 GameObject crewmate = crewmates[0];
-                Life life = crewmate.GetComponent<Life>();
-                life.Die();
+
+                ClientSend.KillRequest(crewmate.GetComponent<PlayerManager>().id);
+
+                Life crewmateLife = crewmate.GetComponent<Life>();
+                crewmateLife.Die();
                 crewmate.tag = "Dead";
 
                 currentCooldown = killCooldown;

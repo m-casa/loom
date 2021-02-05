@@ -28,6 +28,7 @@ public class ClientHandle : MonoBehaviour
 
         UIManager.instance.startMenu.SetActive(false);
         GameManager.instance.SpawnPlayer(_id, _username, _color, _position, _rotation);
+        GameManager.players[_id].GetComponent<PlayerManager>().localPlayer = GameManager.players[Client.instance.myId].gameObject;
     }
 
     // Reads a packet from the server with player input information
@@ -96,21 +97,68 @@ public class ClientHandle : MonoBehaviour
         int _id = _packet.ReadInt();
         bool _isImposter = _packet.ReadBool();
 
+        // Check if the local player or another player's is getting a role update
         if (_id == Client.instance.myId)
         {
-            GameManager.players[_id].GetComponent<Role>().isImposter = _isImposter;
-            GameManager.players[_id].GetComponent<Role>().UpdateRole();
+            GameManager.players[_id].GetComponent<Role>().UpdateRole(_isImposter);
         }
         else
         {
+            // If another player is the imposter, tag them so they can't be team killed
             if (_isImposter)
             {
                 GameManager.players[_id].tag = "Imposter";
+
+                // If the local player became an imposter before this player, then
+                //  change this player's nameplate to red so the local player knows who their teammate is
+                if (GameManager.players[Client.instance.myId].GetComponent<Role>().isImposter)
+                {
+                    GameManager.players[_id].GetComponent<PlayerManager>().nameInidcator.color = Color.red;
+                }
             }
             else
             {
                 GameManager.players[_id].tag = "Crewmate";
             }
+        }
+    }
+
+    // Reads a packet from the server letting us know which player died
+    public static void KillPlayer(Packet _packet)
+    {
+        int _targetId = _packet.ReadInt();
+
+        GameManager.players[_targetId].GetComponent<Life>().Die();
+        GameManager.players[_targetId].tag = "Dead";
+    }
+
+    // Reads a packet from the server letting us know which team won
+    public static void Winners(Packet _packet)
+    {
+        int _id = _packet.ReadInt();
+        string _winningTeam = _packet.ReadString();
+
+        // Check if the local player or another player's is getting an end of round update
+        if (_id == Client.instance.myId)
+        {
+            GameManager.players[_id].GetComponent<Role>().UpdateWinners(_winningTeam);
+        }
+        else
+        {
+            // If another player was the imposter, reset their nameplate color
+            if (GameManager.players[_id].tag.Equals("Imposter"))
+            {
+                GameManager.players[_id].GetComponent<PlayerManager>().nameInidcator.color = Color.white;
+            }
+
+            // If another player was dead, respawn their body
+            if (GameManager.players[_id].GetComponent<Life>().isDead)
+            {
+                GameManager.players[_id].GetComponent<Life>().Respawn();
+            }
+
+            // Reset this player's tag
+            GameManager.players[_id].tag = "Untagged";
         }
     }
 
