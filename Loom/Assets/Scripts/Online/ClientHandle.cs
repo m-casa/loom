@@ -129,7 +129,28 @@ public class ClientHandle : MonoBehaviour
         int _targetId = _packet.ReadInt();
 
         GameManager.players[_targetId].GetComponent<Life>().Die();
-        GameManager.players[_targetId].tag = "Dead";
+
+        // If the local player is dead, let them see any other players that are dead
+        if (GameManager.players[Client.instance.myId].GetComponent<Life>().isDead)
+        {
+            foreach (PlayerManager player in GameManager.players.Values)
+            {
+                if (player.GetComponent<Life>().isDead)
+                {
+                    player.nameInidcator.gameObject.SetActive(true);
+                }
+            }
+        }
+    }
+
+    // Reads a packet from the server letting us know that a body was reported
+    public static void ReportBody(Packet _packet)
+    {
+        string _msg = _packet.ReadString();
+
+        Debug.Log(_msg);
+
+        GameManager.instance.DespawnBodies();
     }
 
     // Reads a packet from the server letting us know which team won
@@ -145,11 +166,8 @@ public class ClientHandle : MonoBehaviour
         }
         else
         {
-            // If another player was the imposter, reset their nameplate color
-            if (GameManager.players[_id].tag.Equals("Imposter"))
-            {
-                GameManager.players[_id].GetComponent<PlayerManager>().nameInidcator.color = Color.white;
-            }
+            // Reset this player's nameplate to white in case they were an imposter
+            GameManager.players[_id].GetComponent<PlayerManager>().nameInidcator.color = Color.white;
 
             // If another player was dead, respawn their body
             if (GameManager.players[_id].GetComponent<Life>().isDead)

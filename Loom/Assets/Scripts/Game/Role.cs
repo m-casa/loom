@@ -5,11 +5,10 @@ using SensorToolkit;
 
 public class Role : MonoBehaviour
 {
-    // Fields
-    public Text roleIndicator, killIndicator;
+    public Text roleIndicator, useIndicator, killIndicator, reportIndicator;
     public Life life;
-    private RangeSensor rangeSensor;
     public bool isImposter, canKill;
+    private RangeSensor rangeSensor;
     private bool canInteract, isUsing, isHolding, isKilling, isReporting;
     private float killCooldown, currentCooldown;
     private int numOfInteractables;
@@ -17,6 +16,9 @@ public class Role : MonoBehaviour
     // Awake is called before Start
     public void Awake()
     {
+        useIndicator.CrossFadeAlpha(0.25f, 0f, true);
+        killIndicator.CrossFadeAlpha(0.25f, 0f, true);
+        reportIndicator.CrossFadeAlpha(0.25f, 0f, true);
         rangeSensor = GetComponent<RangeSensor>();
         canKill = false;
         canInteract = false;
@@ -59,10 +61,30 @@ public class Role : MonoBehaviour
         if (numOfInteractables > 0)
         {
             canInteract = true;
+
+            // Change the UI based on the interactables nearby
+            foreach (GameObject detectedObject in rangeSensor.GetDetected())
+            {
+                if (detectedObject.tag == "Interactable")
+                {
+                    useIndicator.CrossFadeAlpha(1f, 0f, true);
+                }
+                else if (detectedObject.tag == "Crewmate")
+                {
+                    killIndicator.CrossFadeAlpha(1f, 0f, true);
+                }
+                else if (detectedObject.tag == "DeadBody")
+                {
+                    reportIndicator.CrossFadeAlpha(1f, 0f, true);
+                }
+            }
         }
         else
         {
             canInteract = false;
+            useIndicator.CrossFadeAlpha(0.25f, 0f, true);
+            killIndicator.CrossFadeAlpha(0.25f, 0f, true);
+            reportIndicator.CrossFadeAlpha(0.25f, 0f, true);
         }
     }
 
@@ -223,7 +245,7 @@ public class Role : MonoBehaviour
 
                 Life crewmateLife = crewmate.GetComponent<Life>();
                 crewmateLife.Die();
-                crewmate.tag = "Dead";
+                crewmate.GetComponent<PlayerManager>().nameInidcator.gameObject.SetActive(false);
 
                 currentCooldown = killCooldown;
                 canKill = false;
@@ -234,6 +256,30 @@ public class Role : MonoBehaviour
     // Report whicever body is within range
     private void Report()
     {
+        if (isReporting && !life.isDead)
+        {
+            List<GameObject> bodies = new List<GameObject>();
 
+            // Check if there are bodies near the player
+            foreach (GameObject detectedObject in rangeSensor.GetDetected())
+            {
+                if (detectedObject.tag == "DeadBody")
+                {
+                    bodies.Add(detectedObject);
+                }
+            }
+
+            // Report the body that first entered the report range
+            if (bodies.Count != 0)
+            {
+                // Destroy any dead bodies near the player to prevent report spamming
+                foreach (GameObject deadBody in bodies)
+                {
+                    Destroy(deadBody);
+                }
+
+                ClientSend.ReportRequest();
+            }
+        }
     }
 }

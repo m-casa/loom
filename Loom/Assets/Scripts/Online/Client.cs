@@ -25,7 +25,7 @@ public class Client : MonoBehaviour
     private static Dictionary<int, PacketHandler> packetHandlers;
 
     // Make sure there is only once instance of this client
-    private void Awake()
+    public void Awake()
     {
         if (instance == null)
         {
@@ -39,17 +39,10 @@ public class Client : MonoBehaviour
     }
 
     // Create a new instace of TCP and UDP
-    private void Start()
+    public void Start()
     {
         tcp = new TCP();
         udp = new UDP();
-    }
-
-    // Unity editor does not properly close connections when leaving play mode until you enter play mode again
-    // So close the connection manually or else the port will be locked
-    private void OnApplicationQuit()
-    {
-        Disconnect();
     }
 
     // Connects our client to the server through TCP
@@ -367,6 +360,7 @@ public class Client : MonoBehaviour
             { (int)ServerPackets.playerState, ClientHandle.PlayerState },
             { (int)ServerPackets.playerRole, ClientHandle.PlayerRole },
             { (int)ServerPackets.killPlayer, ClientHandle.KillPlayer },
+            { (int)ServerPackets.reportBody, ClientHandle.ReportBody },
             { (int)ServerPackets.winners, ClientHandle.Winners },
             { (int)ServerPackets.destroyPlayer, ClientHandle.DestroyPlayer },
         };
@@ -385,5 +379,12 @@ public class Client : MonoBehaviour
             tcp.socket.Close();
             udp.socket.Close();
         }
+    }
+
+    // Unity editor does not properly close connections when leaving play mode until you enter play mode again
+    // So close the connection manually or else the port will be locked
+    private void OnApplicationQuit()
+    {
+        Disconnect();
     }
 }

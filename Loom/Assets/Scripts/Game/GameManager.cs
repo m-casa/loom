@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
     public PlayerManager localPlayerManager;
 
     // Make sure there is only once instance of this client
-    private void Awake()
+    public void Awake()
     {
         if (instance == null)
         {
@@ -67,6 +67,22 @@ public class GameManager : MonoBehaviour
         _player.GetComponent<PlayerManager>().ChangeColor(_color);
         _player.GetComponent<PlayerManager>().ChangeName(_username);
         players.Add(_id, _player.GetComponent<PlayerManager>());
+    }
+
+    // Despawn any left over dead bodies
+    public void DespawnBodies()
+    {
+        GameObject deadBody;
+
+        foreach (PlayerManager player in players.Values)
+        {
+            deadBody = player.GetComponent<Life>().deadBody;
+
+            if (deadBody != null)
+            {
+                Destroy(deadBody);
+            }
+        }
     }
 
     // Destroys a specified player for the client

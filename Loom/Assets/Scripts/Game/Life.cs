@@ -2,10 +2,13 @@ using UnityEngine;
 
 public class Life : MonoBehaviour
 {
+    [HideInInspector]
+    public GameObject deadBody;
     public bool isDead;
+
     [SerializeField]
     private GameObject model, deadModel;
-    private GameObject deadBody, deathPrefab, deathEffect;
+    private GameObject deathPrefab, deathEffect;
 
     // Awake is called before Start
     public void Awake()
@@ -17,8 +20,10 @@ public class Life : MonoBehaviour
     // Kills the player
     public void Die()
     {
-        // Hide the player's body
+        // Hide the player's body and set their tag as a Ghost
         model.SetActive(false);
+        GetComponent<PlayerManager>().nameInidcator.gameObject.SetActive(false);
+        gameObject.tag = "Ghost";
 
         // Spawn in the dead body and assign it the correct color
         deadBody = Instantiate(deadModel);
@@ -38,6 +43,7 @@ public class Life : MonoBehaviour
     {
         // Show the player's body again
         model.SetActive(true);
+        GetComponent<PlayerManager>().nameInidcator.gameObject.SetActive(true);
 
         // Destroy the player's dead body if it is still in the ship
         if (deadBody != null)

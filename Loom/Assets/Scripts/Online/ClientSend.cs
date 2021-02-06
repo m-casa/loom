@@ -62,8 +62,18 @@ public class ClientSend : MonoBehaviour
     {
         using (Packet _packet = new Packet((int)ClientPackets.roundRequest))
         {
-            // Prepare packet with what we will send to the server
             _packet.Write("Start the round.");
+
+            SendTCPData(_packet);
+        }
+    }
+
+    // Send a request to the server to report a body
+    public static void ReportRequest()
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.reportRequest))
+        {
+            _packet.Write("Report a dead body.");
 
             SendTCPData(_packet);
         }
