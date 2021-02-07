@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour
 
     public GameObject localPlayerPrefab;
     public GameObject playerPrefab;
+
+    [HideInInspector]
     public PlayerManager localPlayerManager;
 
     // Make sure there is only once instance of this client
@@ -47,7 +49,7 @@ public class GameManager : MonoBehaviour
     }
 
     // Spawns in a new player for the client
-    public void SpawnPlayer(int _id, string _username, int _color, Vector3 _position, Quaternion _rotation)
+    public void SpawnPlayer(int _id, string _username, int _colorId, Vector3 _position, Quaternion _rotation)
     {
         GameObject _player;
 
@@ -64,8 +66,10 @@ public class GameManager : MonoBehaviour
 
         _player.GetComponent<PlayerManager>().id = _id;
         _player.GetComponent<PlayerManager>().username = _username;
-        _player.GetComponent<PlayerManager>().ChangeColor(_color);
-        _player.GetComponent<PlayerManager>().ChangeName(_username);
+        _player.GetComponent<PlayerManager>().colorId = _colorId;
+        _player.GetComponent<PlayerManager>().ChangeName();
+        _player.GetComponent<PlayerManager>().ChangeIcon();
+        _player.GetComponent<PlayerManager>().ChangeColor();
         players.Add(_id, _player.GetComponent<PlayerManager>());
     }
 

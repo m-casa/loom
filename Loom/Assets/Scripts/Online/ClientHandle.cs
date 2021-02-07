@@ -153,6 +153,16 @@ public class ClientHandle : MonoBehaviour
         GameManager.instance.DespawnBodies();
     }
 
+    // Reads a packet from the server letting us know to attend the meeting
+    public static void Meeting(Packet _packet)
+    {
+        string _msg = _packet.ReadString();
+
+        Debug.Log(_msg);
+
+        UIManager.instance.StartMeeting();
+    }
+
     // Reads a packet from the server letting us know which team won
     public static void Winners(Packet _packet)
     {

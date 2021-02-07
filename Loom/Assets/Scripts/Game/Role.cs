@@ -7,9 +7,9 @@ public class Role : MonoBehaviour
 {
     public Text roleIndicator, useIndicator, killIndicator, reportIndicator;
     public Life life;
-    public bool isImposter, canKill;
+    public bool isImposter, canInteract, canKill;
     private RangeSensor rangeSensor;
-    private bool canInteract, isUsing, isHolding, isKilling, isReporting;
+    private bool isUsing, isHolding, isKilling, isReporting;
     private float killCooldown, currentCooldown;
     private int numOfInteractables;
 

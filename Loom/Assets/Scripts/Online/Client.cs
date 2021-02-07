@@ -361,6 +361,7 @@ public class Client : MonoBehaviour
             { (int)ServerPackets.playerRole, ClientHandle.PlayerRole },
             { (int)ServerPackets.killPlayer, ClientHandle.KillPlayer },
             { (int)ServerPackets.reportBody, ClientHandle.ReportBody },
+            { (int)ServerPackets.meeting, ClientHandle.Meeting },
             { (int)ServerPackets.winners, ClientHandle.Winners },
             { (int)ServerPackets.destroyPlayer, ClientHandle.DestroyPlayer },
         };

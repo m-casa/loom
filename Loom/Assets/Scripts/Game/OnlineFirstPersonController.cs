@@ -116,15 +116,6 @@ namespace ECM.Controllers
         {
             if (animator.runtimeAnimatorController != null)
             {
-                if (run && moveDirection != Vector3.zero)
-                {
-                    animator.speed = 1.5f;
-                }
-                else
-                {
-                    animator.speed = 1f;
-                }
-
                 animator.SetFloat("horizontal", Mathf.Round(moveDirection.x), 1f, Time.deltaTime * 10f);
                 animator.SetFloat("vertical", Mathf.Round(moveDirection.z), 1f, Time.deltaTime * 10f);
             }

@@ -3,11 +3,14 @@ using UnityEngine.UI;
 
 public class PlayerManager : MonoBehaviour
 {
-    public int id;
+    public int id, colorId;
     public string username;
+    public GameObject localPlayer;
     public Material[] color;
-    public GameObject model, localPlayer;
+    public Sprite[] icon;
     public Text nameInidcator;
+    public SpriteRenderer spriteRenderer;
+    public SkinnedMeshRenderer skinnedMeshRenderer;
 
     // LateUpdate is called after Update
     public void LateUpdate()
@@ -16,15 +19,21 @@ public class PlayerManager : MonoBehaviour
         nameInidcator.transform.LookAt(nameInidcator.transform.position + localPlayer.transform.forward);
     }
 
-    // Change to the color selected on the main menu
-    public void ChangeColor(int _color)
+    // Change to the username chosen on the main menu
+    public void ChangeName()
     {
-        model.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial = color[_color];
+        nameInidcator.text = username;
     }
 
-    // Change to the username chosen on the main menu
-    public void ChangeName(string _username)
+    // Change the icon to represent the chosen color
+    public void ChangeIcon()
     {
-        nameInidcator.text = _username;
+        spriteRenderer.sprite = icon[colorId];
+    }
+
+    // Change to the color selected on the main menu
+    public void ChangeColor()
+    {
+        skinnedMeshRenderer.sharedMaterial = color[colorId];
     }
 }
