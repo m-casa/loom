@@ -163,6 +163,24 @@ public class ClientHandle : MonoBehaviour
         UIManager.instance.StartMeeting();
     }
 
+    // Reads a packet from the server letting us know the remining time of the meeting
+    public static void RemainingTime(Packet _packet)
+    {
+        float _meetingTimer = _packet.ReadFloat();
+
+        UIManager.instance.UpdateMeetingTime(_meetingTimer);
+    }
+
+    // Reads a packet from the server letting us know to resume the current round
+    public static void ResumeRound(Packet _packet)
+    {
+        string _msg = _packet.ReadString();
+
+        Debug.Log(_msg);
+
+        UIManager.instance.EndMeeting();
+    }
+
     // Reads a packet from the server letting us know which team won
     public static void Winners(Packet _packet)
     {

@@ -4,7 +4,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    private float timer;
+    private float simulationTimer;
 
     // A new dictionary to keep track of our players and their ids
     public static Dictionary<int, PlayerManager> players = new Dictionary<int, PlayerManager>();
@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            timer = 0;
+            simulationTimer = 0;
         }
         else if (instance != this)
         {
@@ -34,14 +34,14 @@ public class GameManager : MonoBehaviour
     public void FixedUpdate()
     {
         // Record at what point in time the last frame finished rendering
-        timer += Time.deltaTime;
+        simulationTimer += Time.deltaTime;
 
         // Catch up with the game time.
         // Advance the physics simulation in portions of Time.fixedDeltaTime
         // Note that generally, we don't want to pass variable delta to Simulate as that leads to unstable results.
-        while (timer >= Time.fixedDeltaTime)
+        while (simulationTimer >= Time.fixedDeltaTime)
         {
-            timer -= Time.fixedDeltaTime;
+            simulationTimer -= Time.fixedDeltaTime;
 
             // Simulate movement for every character on the server at once
             Physics.Simulate(Time.fixedDeltaTime);
@@ -92,6 +92,18 @@ public class GameManager : MonoBehaviour
     // Destroys a specified player for the client
     public void DestroyPlayer(int _id)
     {
+        int cardId = _id - 1;
+
+        // Look for and remove this player's voting card
+        foreach (PlayerManager onlinePlayer in players.Values)
+        {
+            if (onlinePlayer == players[_id])
+            {
+                UIManager.instance.option[cardId].gameObject.SetActive(false);
+                break;
+            }
+        }
+
         Destroy(players[_id].gameObject);
         players.Remove(_id);
     }

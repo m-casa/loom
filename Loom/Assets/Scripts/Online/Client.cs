@@ -8,7 +8,6 @@ public class Client : MonoBehaviour
 {
     public static Client instance;
     public static int dataBufferSize = 4096;
-    //public string ip = "127.0.0.1";
     public string ip = "104.43.217.105";
     public int port = 26950;
     public int myId = 0;
@@ -362,6 +361,8 @@ public class Client : MonoBehaviour
             { (int)ServerPackets.killPlayer, ClientHandle.KillPlayer },
             { (int)ServerPackets.reportBody, ClientHandle.ReportBody },
             { (int)ServerPackets.meeting, ClientHandle.Meeting },
+            { (int)ServerPackets.remainingTime, ClientHandle.RemainingTime },
+            { (int)ServerPackets.resumeRound, ClientHandle.ResumeRound },
             { (int)ServerPackets.winners, ClientHandle.Winners },
             { (int)ServerPackets.destroyPlayer, ClientHandle.DestroyPlayer },
         };

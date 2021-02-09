@@ -8,10 +8,12 @@ public class Role : MonoBehaviour
     public Text roleIndicator, useIndicator, killIndicator, reportIndicator;
     public Life life;
     public bool isImposter, canInteract, canKill;
+
+    [HideInInspector]
+    public int numOfInteractables;
     private RangeSensor rangeSensor;
     private bool isUsing, isHolding, isKilling, isReporting;
     private float killCooldown, currentCooldown;
-    private int numOfInteractables;
 
     // Awake is called before Start
     public void Awake()

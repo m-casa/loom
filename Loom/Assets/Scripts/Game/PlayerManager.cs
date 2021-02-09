@@ -6,9 +6,9 @@ public class PlayerManager : MonoBehaviour
     public int id, colorId;
     public string username;
     public GameObject localPlayer;
-    public Material[] color;
-    public Sprite[] icon;
     public Text nameInidcator;
+    public Sprite[] icon;
+    public Material[] color;
     public SpriteRenderer spriteRenderer;
     public SkinnedMeshRenderer skinnedMeshRenderer;
 
