@@ -146,9 +146,9 @@ public class ClientHandle : MonoBehaviour
     // Reads a packet from the server letting us know that a body was reported
     public static void ReportBody(Packet _packet)
     {
-        string _msg = _packet.ReadString();
+        int _reporter = _packet.ReadInt();
 
-        Debug.Log(_msg);
+        UIManager.instance.Announce(GameManager.players[_reporter].username + " reported a body!");
 
         GameManager.instance.DespawnBodies();
     }
@@ -169,6 +169,15 @@ public class ClientHandle : MonoBehaviour
         float _meetingTimer = _packet.ReadFloat();
 
         UIManager.instance.UpdateMeetingTime(_meetingTimer);
+    }
+
+    // Reads a packet from the server letting us know which player was voted for
+    public static void PlayerVote(Packet _packet)
+    {
+        int _fromClient = _packet.ReadInt();
+        int _playerId = _packet.ReadInt();
+
+        UIManager.instance.UpdateVotingCards(_fromClient, _playerId);
     }
 
     // Reads a packet from the server letting us know to resume the current round

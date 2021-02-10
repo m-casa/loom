@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -92,14 +93,16 @@ public class GameManager : MonoBehaviour
     // Destroys a specified player for the client
     public void DestroyPlayer(int _id)
     {
-        int cardId = _id - 1;
+        Button votingOption;
 
         // Look for and remove this player's voting card
-        foreach (PlayerManager onlinePlayer in players.Values)
+        for (int i = 0; i < players.Count; i++)
         {
-            if (onlinePlayer == players[_id])
+            votingOption = UIManager.instance.votingOption[i];
+
+            if (votingOption.GetComponent<CardInfo>().id == _id)
             {
-                UIManager.instance.option[cardId].gameObject.SetActive(false);
+                votingOption.gameObject.SetActive(false);
                 break;
             }
         }

@@ -79,6 +79,17 @@ public class ClientSend : MonoBehaviour
         }
     }
 
+    // Send in the player's vote to the server
+    public static void PlayerVote(int _playerId)
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.playerVote))
+        {
+            _packet.Write(_playerId);
+
+            SendTCPData(_packet);
+        }
+    }
+
     // Sends a packet to the server specifying which player was just killed
     public static void KillRequest(int _id)
     {

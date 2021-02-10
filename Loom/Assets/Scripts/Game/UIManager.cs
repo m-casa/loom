@@ -10,9 +10,11 @@ public class UIManager : MonoBehaviour
     public GameObject startMenu, meetingMenu;
     public InputField usernameField;
     public Dropdown colorField;
-    public Button[] option;
+    public Button[] votingOption;
     public Button skip;
-    public Text meetingTimer;
+    public Text meetingTimerText, serverMessage;
+    private bool activeMeeting;
+    private float meetingTimer;
 
     // Make sure there is only once instance of this client
     public void Awake()
@@ -28,6 +30,15 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    // Update is called once per frame
+    public void Update()
+    {
+        if (activeMeeting && meetingTimer <= 0)
+        {
+            RevealVotes();
+        }
+    }
+
     // Will connect the client to the game server
     public void ConnectToServer()
     {
@@ -40,17 +51,25 @@ public class UIManager : MonoBehaviour
     }
 
     // Will request the server to spawn in the client
-    public void SendRequest()
+    public void SendSpawnRequest()
     {
         ClientSend.SpawnRequest();
+    }
+
+    // Announce to the player a message from the server
+    public void Announce(string _serverMessage)
+    {
+        serverMessage.text = _serverMessage;
+        serverMessage.CrossFadeAlpha(1f, 0f, true);
+        serverMessage.CrossFadeAlpha(0f, 5f, false);
     }
 
     // Start the meeting
     public void StartMeeting()
     {
-        Image[] images;
         PlayerManager localPlayer = GameManager.players[Client.instance.myId];
-        int cardId;
+        PlayerManager onlinePlayer;
+        CardInfo cardInfo;
 
         // Disable the local player's movement/input, and allow them to interact with the voting system
         localPlayer.GetComponent<LocalFirstPersonController>().enabled = false;
@@ -59,11 +78,12 @@ public class UIManager : MonoBehaviour
         localPlayer.GetComponent<Role>().numOfInteractables = 0;
         localPlayer.GetComponent<MouseLook>().SetCursorLock(false);
 
-        // Show the number of voting cards equal to the number of players
-        foreach (PlayerManager onlinePlayer in GameManager.players.Values)
+        // Set up the number of voting cards equal to the number of players
+        for (int i = 0; i < GameManager.players.Count; i++)
         {
-            cardId = onlinePlayer.id - 1;
-            images = option[cardId].GetComponentsInChildren<Image>();
+            onlinePlayer = GameManager.players[i + 1];
+            cardInfo = votingOption[i].GetComponent<CardInfo>();
+            cardInfo.id = onlinePlayer.id;
 
             // Disable this player's movement if they are not the local player
             if (onlinePlayer != localPlayer)
@@ -74,55 +94,77 @@ public class UIManager : MonoBehaviour
             // If the local player is dead, do not allow them to vote, else allow voting
             if (localPlayer.GetComponent<Life>().isDead)
             {
-                option[cardId].interactable = false;
+                votingOption[i].interactable = false;
                 skip.interactable = false;
             }
             else
             {
-                option[cardId].interactable = true;
+                votingOption[i].interactable = true;
                 skip.interactable = true;
             }
 
             // If this player is dead, darken the card and do not allow the local player to vote on it
             if (onlinePlayer.GetComponent<Life>().isDead)
             {
-                ColorBlock newColor = option[cardId].colors;
+                ColorBlock newColor = votingOption[i].colors;
                 newColor.disabledColor = new Color(255f, 0f, 0f, 0.25f);
 
-                option[cardId].interactable = false;
-                option[cardId].colors = newColor;
+                votingOption[i].colors = newColor;
+                votingOption[i].interactable = false;
             }
 
-            // Change the second image's sprite in the array (since we do not want to modify the parent's sprite)
-            //  to match this player's icon
-            images[1].sprite = onlinePlayer.GetComponent<PlayerManager>().spriteRenderer.sprite;
+            // Change the icon on this voting card to match this player's icon
+            cardInfo.icon.sprite = onlinePlayer.GetComponent<PlayerManager>().spriteRenderer.sprite;
 
             // Change the text on this voting card to match this player's username
-            option[cardId].GetComponentInChildren<Text>().text = onlinePlayer.GetComponent<PlayerManager>().username;
+            cardInfo.username.text = onlinePlayer.GetComponent<PlayerManager>().username;
 
             // Enable this player's voting card
-            option[cardId].gameObject.SetActive(true);
+            votingOption[i].gameObject.SetActive(true);
         }
 
         // Enable the meeting menu after setting up each player's voting card
         meetingMenu.SetActive(true);
+
+        // Start the meeting
+        activeMeeting = true;
     }
 
     // Update the remaining time in the meeting
     public void UpdateMeetingTime(float _meetingTimer)
     {
-        meetingTimer.text = _meetingTimer.ToString("0") + "s";
+        if (_meetingTimer > 0)
+        {
+            meetingTimer = _meetingTimer;
+            meetingTimerText.text = meetingTimer.ToString("0") + "s";
+        }
+        else
+        {
+            meetingTimer = 0;
+            meetingTimerText.text = meetingTimer.ToString("0") + "s";
+        }
     }
 
     // Confirm the local player's vote
     public void ConfirmVote(Button _choice)
     {
-        // Lock in the player's vote
-        for (int i = 0; i < option.Length; i++)
-        {
-            option[i].interactable = false;
-        }
+        // Lock in the player's vote by making each voting option uninteractable
         skip.interactable = false;
+        for (int i = 0; i < votingOption.Length; i++)
+        {
+            votingOption[i].interactable = false;
+
+            // Check which player's voting card was chosen
+            if (_choice == votingOption[i])
+            {
+                ColorBlock newColor = votingOption[i].colors;
+                newColor.normalColor = new Color(0f, 255f, 0f);
+                newColor.disabledColor = new Color(0f, 255f, 0f);
+
+                votingOption[i].colors = newColor;
+                ClientSend.PlayerVote(votingOption[i].GetComponent<CardInfo>().id);
+            }
+        }
 
         // Check if the voting choice was to skip
         if (_choice == skip)
@@ -132,26 +174,56 @@ public class UIManager : MonoBehaviour
             newColor.disabledColor = new Color(0f, 255f, 0f);
 
             skip.colors = newColor;
-            Debug.Log("Voted to skip");
-            return;
+            ClientSend.PlayerVote(11);
+        }
+    }
+
+    // Update the current voting cards to display who voted and for whom they voted for
+    public void UpdateVotingCards(int _fromClient, int _playerId)
+    {
+        CardInfo cardInfo;
+
+        // Check if skip was voted for, else look through the voting cards to see who was chosen below
+        if (_playerId == 11)
+        {
+            // Look through all the positions we can place a vote on for skip
+            for (int i = 0; i < skip.GetComponent<CardInfo>().voterIcon.Length; i++)
+            {
+                // Check if a vote has already been placed on this position, if not place a vote
+                if (!skip.GetComponent<CardInfo>().voterIcon[i].gameObject.activeSelf)
+                {
+                    skip.GetComponent<CardInfo>().voterIcon[i].sprite = GameManager.players[_fromClient].GetComponent<PlayerManager>().spriteRenderer.sprite;
+                    skip.GetComponent<CardInfo>().voterIcon[i].gameObject.SetActive(true);
+                    break;
+                }
+            }
         }
 
-        int cardId;
-
-        // Check which player's voting card was chosen
-        foreach (PlayerManager onlinePlayer in GameManager.players.Values)
+        // Look through all the voting cards
+        for (int v = 0; v < votingOption.Length; v++)
         {
-            cardId = onlinePlayer.id - 1;
+            // Get the info on this voting card
+            cardInfo = votingOption[v].GetComponent<CardInfo>();
 
-            if (_choice == option[cardId])
+            // Check if this is the player that voted
+            if (cardInfo.id == _fromClient)
             {
-                ColorBlock newColor = option[cardId].colors;
-                newColor.normalColor = new Color(0f, 255f, 0f);
-                newColor.disabledColor = new Color(0f, 255f, 0f);
+                cardInfo.checkmark.gameObject.SetActive(true);
+            }
 
-                option[cardId].colors = newColor;
-                Debug.Log("Voted for client " + onlinePlayer.id);
-                return;
+            if (_playerId == cardInfo.id)
+            {
+                // Look through all the positions we can place a vote on for this voting card
+                for (int i = 0; i < cardInfo.voterIcon.Length; i++)
+                {
+                    // Check if a vote has already been placed on this position, if not place a vote
+                    if (!cardInfo.voterIcon[i].gameObject.activeSelf)
+                    {
+                        cardInfo.voterIcon[i].sprite = GameManager.players[_fromClient].GetComponent<PlayerManager>().spriteRenderer.sprite;
+                        cardInfo.voterIcon[i].gameObject.SetActive(true);
+                        break;
+                    }
+                }
             }
         }
     }
@@ -160,14 +232,15 @@ public class UIManager : MonoBehaviour
     public void EndMeeting()
     {
         PlayerManager localPlayer = GameManager.players[Client.instance.myId];
+        CardInfo cardInfo;
         ColorBlock newColor = skip.colors;
         newColor.normalColor = new Color(255f, 255f, 255f);
         newColor.disabledColor = new Color(255f, 255f, 255f);
 
         // Enable the local player's movement/input
         localPlayer.GetComponent<LocalFirstPersonController>().enabled = true;
-        localPlayer.GetComponent<RangeSensor>().enabled = true;
         localPlayer.GetComponent<MouseLook>().SetCursorLock(true);
+        localPlayer.GetComponent<RangeSensor>().enabled = true;
 
         // Enable movement for the other players
         foreach (PlayerManager onlinePlayer in GameManager.players.Values)
@@ -178,15 +251,59 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        // Hide all the voting options for the next meeting and reset the card colors
-        for (int i = 0; i < option.Length; i++)
+        // Go through every voting card and reset it for the next meeting
+        for (int v = 0; v < votingOption.Length; v++)
         {
-            option[i].colors = newColor;
-            option[i].gameObject.SetActive(false);
+            cardInfo = votingOption[v].GetComponent<CardInfo>();
+
+            // Look through all the positions we placed votes on and hide the icons
+            for (int i = 0; i < cardInfo.voterIcon.Length; i++)
+            {
+                // Check if a vote was placed on this position, if so hide the icon
+                if (cardInfo.voterIcon[i].gameObject.activeSelf)
+                {
+                    cardInfo.voterIcon[i].gameObject.SetActive(false);
+                }
+            }
+
+            cardInfo.revealer.SetActive(false);
+            votingOption[v].colors = newColor;
+            votingOption[v].gameObject.SetActive(false);
         }
+
+        //  Go through the skip card and reset it for the next meeting
+        for (int i = 0; i < skip.GetComponent<CardInfo>().voterIcon.Length; i++)
+        {
+            // Check if a vote was placed on this position, if so hide the icon
+            if (skip.GetComponent<CardInfo>().voterIcon[i].gameObject.activeSelf)
+            {
+                skip.GetComponent<CardInfo>().voterIcon[i].gameObject.SetActive(false);
+            }
+        }
+        skip.GetComponent<CardInfo>().revealer.SetActive(false);
         skip.colors = newColor;
 
         // Disable the meeting menu
         meetingMenu.SetActive(false);
+
+        // Reset the timer and end the meeting
+        meetingTimer = 120;
+        activeMeeting = false;
+    }
+
+    // Reveal who each player voted for
+    private void RevealVotes()
+    {
+        CardInfo cardInfo;
+
+        // Go through every voting card and reveal the votes
+        for (int i = 0; i < votingOption.Length; i++)
+        {
+            // Get the info on this voting card
+            cardInfo = votingOption[i].GetComponent<CardInfo>();
+
+            cardInfo.revealer.SetActive(true);
+        }
+        skip.GetComponent<CardInfo>().revealer.SetActive(true);
     }
 }
