@@ -68,6 +68,17 @@ public class ClientSend : MonoBehaviour
         }
     }
 
+    // Sends a packet to the server specifying which player was just killed
+    public static void KillRequest(int _id)
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.killRequest))
+        {
+            _packet.Write(_id);
+
+            SendTCPData(_packet);
+        }
+    }
+
     // Send a request to the server to report a body
     public static void ReportRequest()
     {
@@ -90,12 +101,12 @@ public class ClientSend : MonoBehaviour
         }
     }
 
-    // Sends a packet to the server specifying which player was just killed
-    public static void KillRequest(int _id)
+    // Send the ejected player's id to the server
+    public static void ConfirmEject(int _ejectedId)
     {
-        using (Packet _packet = new Packet((int)ClientPackets.killRequest))
+        using (Packet _packet = new Packet((int)ClientPackets.confirmEject))
         {
-            _packet.Write(_id);
+            _packet.Write(_ejectedId);
 
             SendTCPData(_packet);
         }

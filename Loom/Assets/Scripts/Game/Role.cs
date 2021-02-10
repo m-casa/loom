@@ -10,17 +10,19 @@ public class Role : MonoBehaviour
     public bool isImposter, canInteract, canKill;
 
     [HideInInspector]
+    public float killCooldown, currentCooldown;
+
+    [HideInInspector]
     public int numOfInteractables;
     private RangeSensor rangeSensor;
     private bool isUsing, isHolding, isKilling, isReporting;
-    private float killCooldown, currentCooldown;
 
     // Awake is called before Start
     public void Awake()
     {
-        useIndicator.CrossFadeAlpha(0.25f, 0f, true);
-        killIndicator.CrossFadeAlpha(0.25f, 0f, true);
-        reportIndicator.CrossFadeAlpha(0.25f, 0f, true);
+        useIndicator.CrossFadeAlpha(0.25f, 0f, false);
+        killIndicator.CrossFadeAlpha(0.25f, 0f, false);
+        reportIndicator.CrossFadeAlpha(0.25f, 0f, false);
         rangeSensor = GetComponent<RangeSensor>();
         canKill = false;
         canInteract = false;
@@ -69,24 +71,24 @@ public class Role : MonoBehaviour
             {
                 if (detectedObject.tag == "Interactable")
                 {
-                    useIndicator.CrossFadeAlpha(1f, 0f, true);
+                    useIndicator.CrossFadeAlpha(1f, 0f, false);
                 }
                 else if (detectedObject.tag == "Crewmate")
                 {
-                    killIndicator.CrossFadeAlpha(1f, 0f, true);
+                    killIndicator.CrossFadeAlpha(1f, 0f, false);
                 }
                 else if (detectedObject.tag == "DeadBody")
                 {
-                    reportIndicator.CrossFadeAlpha(1f, 0f, true);
+                    reportIndicator.CrossFadeAlpha(1f, 0f, false);
                 }
             }
         }
         else
         {
             canInteract = false;
-            useIndicator.CrossFadeAlpha(0.25f, 0f, true);
-            killIndicator.CrossFadeAlpha(0.25f, 0f, true);
-            reportIndicator.CrossFadeAlpha(0.25f, 0f, true);
+            useIndicator.CrossFadeAlpha(0.25f, 0f, false);
+            killIndicator.CrossFadeAlpha(0.25f, 0f, false);
+            reportIndicator.CrossFadeAlpha(0.25f, 0f, false);
         }
     }
 

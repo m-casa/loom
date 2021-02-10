@@ -13,8 +13,12 @@ public class UIManager : MonoBehaviour
     public Button[] votingOption;
     public Button skip;
     public Text meetingTimerText, serverMessage;
-    private bool activeMeeting;
+
+    [HideInInspector]
+    public bool activeMeeting;
     private float meetingTimer;
+    private int ejectedId;
+    private bool playerEjected;
 
     // Make sure there is only once instance of this client
     public void Awake()
@@ -22,6 +26,7 @@ public class UIManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
+            meetingTimer = 120;
         }
         else if (instance != this)
         {
@@ -36,6 +41,7 @@ public class UIManager : MonoBehaviour
         if (activeMeeting && meetingTimer <= 0)
         {
             RevealVotes();
+            activeMeeting = false;
         }
     }
 
@@ -60,7 +66,7 @@ public class UIManager : MonoBehaviour
     public void Announce(string _serverMessage)
     {
         serverMessage.text = _serverMessage;
-        serverMessage.CrossFadeAlpha(1f, 0f, true);
+        serverMessage.CrossFadeAlpha(1f, 0f, false);
         serverMessage.CrossFadeAlpha(0f, 5f, false);
     }
 
@@ -186,6 +192,9 @@ public class UIManager : MonoBehaviour
         // Check if skip was voted for, else look through the voting cards to see who was chosen below
         if (_playerId == 11)
         {
+            // Add a vote to this card
+            skip.GetComponent<CardInfo>().numOfVotes++;
+
             // Look through all the positions we can place a vote on for skip
             for (int i = 0; i < skip.GetComponent<CardInfo>().voterIcon.Length; i++)
             {
@@ -213,6 +222,9 @@ public class UIManager : MonoBehaviour
 
             if (_playerId == cardInfo.id)
             {
+                // Add a vote to this card
+                cardInfo.numOfVotes++;
+
                 // Look through all the positions we can place a vote on for this voting card
                 for (int i = 0; i < cardInfo.voterIcon.Length; i++)
                 {
@@ -266,7 +278,9 @@ public class UIManager : MonoBehaviour
                 }
             }
 
+            cardInfo.numOfVotes = 0;
             cardInfo.revealer.SetActive(false);
+            cardInfo.checkmark.gameObject.SetActive(false);
             votingOption[v].colors = newColor;
             votingOption[v].gameObject.SetActive(false);
         }
@@ -280,30 +294,88 @@ public class UIManager : MonoBehaviour
                 skip.GetComponent<CardInfo>().voterIcon[i].gameObject.SetActive(false);
             }
         }
+        skip.GetComponent<CardInfo>().numOfVotes = 0;
         skip.GetComponent<CardInfo>().revealer.SetActive(false);
         skip.colors = newColor;
 
         // Disable the meeting menu
         meetingMenu.SetActive(false);
 
-        // Reset the timer and end the meeting
+        // If the player is an imposter, reset their cooldown
+        if (localPlayer.GetComponent<Role>().isImposter)
+        {
+            localPlayer.GetComponent<Role>().canKill = false;
+            localPlayer.GetComponent<Role>().currentCooldown = localPlayer.GetComponent<Role>().killCooldown;
+        }
+
+        // Reset the timer
         meetingTimer = 120;
-        activeMeeting = false;
+
+        // Check if a player was ejected, if so, let the server check if they were an imposter
+        if (playerEjected)
+        {
+            ClientSend.ConfirmEject(ejectedId);
+        }
     }
 
     // Reveal who each player voted for
     private void RevealVotes()
     {
-        CardInfo cardInfo;
+        CardInfo currentCard;
+        CardInfo mostVoted = skip.GetComponent<CardInfo>();
+        CardInfo previouslyMostVoted = mostVoted;
 
         // Go through every voting card and reveal the votes
         for (int i = 0; i < votingOption.Length; i++)
         {
             // Get the info on this voting card
-            cardInfo = votingOption[i].GetComponent<CardInfo>();
+            currentCard = votingOption[i].GetComponent<CardInfo>();
 
-            cardInfo.revealer.SetActive(true);
+            currentCard.revealer.SetActive(true);
+
+            // Check if the current card's number of votes is greater than the most voted card
+            // Else, check if there is a tie, which would skip the vote
+            if (currentCard.numOfVotes > mostVoted.numOfVotes)
+            {
+                // Since the previously most voted card could have been a tie,
+                //  check if the current card is still the greatest
+                if (currentCard.numOfVotes > previouslyMostVoted.numOfVotes)
+                {
+                    mostVoted = currentCard;
+                }
+            }
+            else if (currentCard.numOfVotes == mostVoted.numOfVotes)
+            {
+                mostVoted = skip.GetComponent<CardInfo>();
+                previouslyMostVoted = currentCard;
+            }
         }
         skip.GetComponent<CardInfo>().revealer.SetActive(true);
+
+        // If a player was ejected, then they must be killed
+        if (mostVoted != skip.GetComponent<CardInfo>())
+        {
+            GameManager.players[mostVoted.id].GetComponent<Life>().Die();
+
+            // If the local player is dead, let them see any other players that are dead
+            if (GameManager.players[Client.instance.myId].GetComponent<Life>().isDead)
+            {
+                foreach (PlayerManager player in GameManager.players.Values)
+                {
+                    if (player.GetComponent<Life>().isDead)
+                    {
+                        player.nameInidcator.gameObject.SetActive(true);
+                    }
+                }
+            }
+
+            ejectedId = mostVoted.id;
+            playerEjected = true;
+            Announce(GameManager.players[ejectedId].username + " was ejected!");
+        }
+        else
+        {
+            playerEjected = false;
+        }
     }
 }

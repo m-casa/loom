@@ -7,7 +7,7 @@ public class RoundController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (task.isBeingUsed && GameManager.instance.localPlayerManager.id == 1)
+        if (task.isBeingUsed && Client.instance.myId == 1)
         {
             if (GameManager.players.Count >= 4)
             {

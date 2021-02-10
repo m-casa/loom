@@ -25,15 +25,18 @@ public class Life : MonoBehaviour
         GetComponent<PlayerManager>().nameInidcator.gameObject.SetActive(false);
         gameObject.tag = "Ghost";
 
-        // Spawn in the dead body and assign it the correct color
-        deadBody = Instantiate(deadModel);
-        deadBody.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial = model.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial;
-        deadBody.transform.position = transform.position;
+        if (!UIManager.instance.activeMeeting)
+        {
+            // Spawn in the dead body and assign it the correct color
+            deadBody = Instantiate(deadModel);
+            deadBody.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial = model.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial;
+            deadBody.transform.position = transform.position;
 
-        // Spawn in the blood particle effect
-        deathEffect = Instantiate(deathPrefab);
-        deathEffect.transform.position = transform.position;
-        deathEffect.transform.parent = deadBody.transform;
+            // Spawn in the blood particle effect
+            deathEffect = Instantiate(deathPrefab);
+            deathEffect.transform.position = transform.position;
+            deathEffect.transform.parent = deadBody.transform;
+        }
 
         isDead = true;
     }
