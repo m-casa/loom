@@ -5,14 +5,11 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-
-    // A new dictionary to keep track of our players and their ids
     public static Dictionary<int, PlayerManager> players = new Dictionary<int, PlayerManager>();
 
     public GameObject localPlayerPrefab;
     public GameObject playerPrefab;
     public Emergency emergency;
-
     private float simulationTimer;
 
     // Make sure there is only once instance of this client
@@ -76,15 +73,15 @@ public class GameManager : MonoBehaviour
     // Despawn any left over dead bodies
     public void DespawnBodies()
     {
-        GameObject deadBody;
+        GameObject body;
 
         foreach (PlayerManager player in players.Values)
         {
-            deadBody = player.GetComponent<Life>().deadBody;
+            body = player.GetComponent<Life>().body;
 
-            if (deadBody != null)
+            if (body != null)
             {
-                Destroy(deadBody);
+                Destroy(body);
             }
         }
     }

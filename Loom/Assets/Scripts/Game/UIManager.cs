@@ -7,16 +7,14 @@ using SensorToolkit;
 public class UIManager : MonoBehaviour
 {
     public static UIManager instance;
+
     public GameObject startMenu, meetingMenu;
     public InputField usernameField;
     public Dropdown colorField;
     public Button[] votingOption;
     public Button skip;
     public Text meetingTimerText, serverMessage;
-
-    [HideInInspector]
     public bool activeMeeting;
-
     private float meetingTimer;
     private int ejectedId;
     private bool playerEjected;
@@ -78,6 +76,9 @@ public class UIManager : MonoBehaviour
         PlayerManager localPlayer = GameManager.players[Client.instance.myId];
         PlayerManager onlinePlayer;
         CardInfo cardInfo;
+
+        // Despawn any left over dead bodies
+        GameManager.instance.DespawnBodies();
 
         // Disable the local player's movement/input, and allow them to interact with the voting system
         localPlayer.GetComponent<LocalFirstPersonController>().enabled = false;

@@ -3,10 +3,7 @@ using UnityEngine;
 public class Emergency : MonoBehaviour
 {
     public Task task;
-
-    [HideInInspector]
     public bool canPanic;
-    [HideInInspector]
     public int numOfUses;
 
     // Awake is called before Start
@@ -17,7 +14,7 @@ public class Emergency : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    public void Update()
     {
         // If the time constraint for hitting the emergency button is over, request a meeting
         if (task.isBeingUsed && canPanic)

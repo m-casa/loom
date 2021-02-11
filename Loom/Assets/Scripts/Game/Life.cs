@@ -2,12 +2,8 @@ using UnityEngine;
 
 public class Life : MonoBehaviour
 {
-    [HideInInspector]
-    public GameObject deadBody;
+    public GameObject body, model, deadModel;
     public bool isDead;
-
-    [SerializeField]
-    private GameObject model, deadModel;
     private GameObject deathPrefab, deathEffect;
 
     // Awake is called before Start
@@ -28,14 +24,14 @@ public class Life : MonoBehaviour
         if (!UIManager.instance.activeMeeting)
         {
             // Spawn in the dead body and assign it the correct color
-            deadBody = Instantiate(deadModel);
-            deadBody.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial = model.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial;
-            deadBody.transform.position = transform.position;
+            body = Instantiate(deadModel);
+            body.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial = model.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial;
+            body.transform.position = transform.position;
 
             // Spawn in the blood particle effect
             deathEffect = Instantiate(deathPrefab);
             deathEffect.transform.position = transform.position;
-            deathEffect.transform.parent = deadBody.transform;
+            deathEffect.transform.parent = body.transform;
         }
 
         isDead = true;
@@ -49,9 +45,9 @@ public class Life : MonoBehaviour
         GetComponent<PlayerManager>().nameInidcator.gameObject.SetActive(true);
 
         // Destroy the player's dead body if it is still in the ship
-        if (deadBody != null)
+        if (body != null)
         {
-            Destroy(deadBody);
+            Destroy(body);
         }
 
         isDead = false;

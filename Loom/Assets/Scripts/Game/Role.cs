@@ -5,18 +5,13 @@ using SensorToolkit;
 
 public class Role : MonoBehaviour
 {
-    public Text roleIndicator, useIndicator, killIndicator, 
-        reportIndicator, emergencyTimerTitle, emergencyTimerText;
+    public Text roleIndicator, useIndicator, killIndicator, reportIndicator, 
+        emergencyTimerTitle, emergencyTimerText;
     public Life life;
-    public bool isImposter, canInteract, canKill;
-
-    [HideInInspector]
     public Emergency emergency;
-    [HideInInspector]
+    public bool isImposter, canInteract, canKill;
     public float killCooldown, currentCooldown, emergencyTimer;
-    [HideInInspector]
     public int numOfInteractables;
-
     private RangeSensor rangeSensor;
     private bool isUsing, isHolding, isKilling, isReporting;
 
