@@ -5,13 +5,15 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    private float simulationTimer;
 
     // A new dictionary to keep track of our players and their ids
     public static Dictionary<int, PlayerManager> players = new Dictionary<int, PlayerManager>();
 
     public GameObject localPlayerPrefab;
     public GameObject playerPrefab;
+    public Emergency emergency;
+
+    private float simulationTimer;
 
     // Make sure there is only once instance of this client
     public void Awake()
@@ -55,6 +57,7 @@ public class GameManager : MonoBehaviour
         if (_id == Client.instance.myId)
         {
             _player = Instantiate(localPlayerPrefab, _position, _rotation);
+            _player.GetComponent<Role>().emergency = emergency;
         }
         else
         {

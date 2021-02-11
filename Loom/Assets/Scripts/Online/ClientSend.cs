@@ -79,6 +79,17 @@ public class ClientSend : MonoBehaviour
         }
     }
 
+    // Send a request to the server to start a meeting
+    public static void MeetingRequest()
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.meetingRequest))
+        {
+            _packet.Write("Start a meeting.");
+
+            SendTCPData(_packet);
+        }
+    }
+
     // Send a request to the server to report a body
     public static void ReportRequest()
     {

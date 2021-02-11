@@ -47,4 +47,4 @@ MonoBehaviour:
     type: 3}
   playerPrefab: {fileID: 7895108494425555221, guid: da8effbe8e3972c4d9c5c9aa5cf8a146,
     type: 3}
-  localPlayerManager: {fileID: 0}
+  emergency: {fileID: 0}

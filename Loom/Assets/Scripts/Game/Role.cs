@@ -5,15 +5,18 @@ using SensorToolkit;
 
 public class Role : MonoBehaviour
 {
-    public Text roleIndicator, useIndicator, killIndicator, reportIndicator;
+    public Text roleIndicator, useIndicator, killIndicator, 
+        reportIndicator, emergencyTimerTitle, emergencyTimerText;
     public Life life;
     public bool isImposter, canInteract, canKill;
 
     [HideInInspector]
-    public float killCooldown, currentCooldown;
-
+    public Emergency emergency;
+    [HideInInspector]
+    public float killCooldown, currentCooldown, emergencyTimer;
     [HideInInspector]
     public int numOfInteractables;
+
     private RangeSensor rangeSensor;
     private bool isUsing, isHolding, isKilling, isReporting;
 
@@ -26,7 +29,8 @@ public class Role : MonoBehaviour
         rangeSensor = GetComponent<RangeSensor>();
         canKill = false;
         canInteract = false;
-        killCooldown = 20f;
+        killCooldown = 20;
+        emergencyTimer = 15;
         numOfInteractables = 0;
     }
 
@@ -55,6 +59,8 @@ public class Role : MonoBehaviour
         {
             UpdateKillCooldown();
         }
+
+        UpdateEmergencyCooldown();
     }
 
     // Used to decide if there are interactable objects
@@ -127,6 +133,15 @@ public class Role : MonoBehaviour
         {
             roleIndicator.gameObject.SetActive(true);
         }
+
+        // If the timer for the panic button is not on then turn it on
+        if (!emergencyTimerTitle.gameObject.activeSelf)
+        {
+            // Reset the panic button contraint
+            emergencyTimer = 15;
+
+            emergencyTimerTitle.gameObject.SetActive(true);
+        }
     }
 
     // Update the player's HUD to display the winning team
@@ -156,6 +171,18 @@ public class Role : MonoBehaviour
         {
             life.Respawn();
         }
+
+        // If the timer for the panic button is active, turn it off
+        if (emergencyTimerTitle.gameObject.activeSelf)
+        {
+            emergencyTimerTitle.gameObject.SetActive(false);
+
+            // Reset the number of uses on the emergency button
+            if (emergency.numOfUses > 0)
+            {
+                emergency.numOfUses = 0;
+            }
+        }
     }
 
     // If the player is an imposter, this will update their kill cooldown
@@ -171,6 +198,25 @@ public class Role : MonoBehaviour
         {
             currentCooldown -= 1 * Time.deltaTime;
             killIndicator.text = currentCooldown.ToString("0");
+        }
+    }
+
+    // Update when the player is allowed to use the panic button
+    private void UpdateEmergencyCooldown()
+    {
+        // Gives the player an update on when they are allowed to panic
+        if (emergencyTimer <= 0)
+        {
+            emergency.canPanic = true;
+            emergencyTimerTitle.text = "Can now panic!";
+            emergencyTimerText.text = "";
+        }
+        else
+        {
+            emergency.canPanic = false;
+            emergencyTimer -= 1 * Time.deltaTime;
+            emergencyTimerTitle.text = "Can panic in:";
+            emergencyTimerText.text = emergencyTimer.ToString("0");
         }
     }
 
