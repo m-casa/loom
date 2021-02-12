@@ -2,7 +2,9 @@ using UnityEngine;
 
 public class CleanO2 : MonoBehaviour
 {
+    // Start is called before the first frame update
     public Task task;
+    public EmptyShoot emptyShoot;
     public bool taskFinished;
     private float taskTime, timeToFinish;
 
@@ -21,7 +23,12 @@ public class CleanO2 : MonoBehaviour
         if (timeToFinish <= 0 && !taskFinished)
         {
             taskFinished = true;
-            Debug.Log("Finished uploading data!");
+            task.outlinable.enabled = false;
+
+            // Have the player empty the O2 shoot
+            emptyShoot.taskFinished = false;
+            emptyShoot.task.outlinable.enabled = true;
+            Debug.Log("Finished cleaning O2!");
 
             // Reset the task states to false
             task.isBeingUsed = false;

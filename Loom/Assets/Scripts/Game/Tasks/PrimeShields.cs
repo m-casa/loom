@@ -11,7 +11,7 @@ public class PrimeShields : MonoBehaviour
     {
         taskTime = 3;
         timeToFinish = taskTime;
-        taskFinished = false;
+        taskFinished = true;
     }
 
     // Update is called once per frame
@@ -21,6 +21,7 @@ public class PrimeShields : MonoBehaviour
         if (timeToFinish <= 0 && !taskFinished)
         {
             taskFinished = true;
+            task.outlinable.enabled = false;
             Debug.Log("Finished priming shields!");
 
             // Reset the task states to false

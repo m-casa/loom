@@ -11,7 +11,7 @@ public class CalibrateDistributor : MonoBehaviour
     {
         taskTime = 5;
         timeToFinish = taskTime;
-        taskFinished = false;
+        taskFinished = true;
     }
 
     // Update is called once per frame
@@ -21,6 +21,7 @@ public class CalibrateDistributor : MonoBehaviour
         if (timeToFinish <= 0 && !taskFinished)
         {
             taskFinished = true;
+            task.outlinable.enabled = false;
             Debug.Log("Finished calibrating distributor!");
 
             // Reset the task states to false

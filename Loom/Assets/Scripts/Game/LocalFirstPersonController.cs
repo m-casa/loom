@@ -306,16 +306,16 @@ namespace ECM.Controllers
             // If there is a margin of error, rewind and replay
             if (positionDifference.sqrMagnitude > 0.0000001f)
             {
-                // If the current position is more than 1.5 units away from the server position then
+                // If the current position is farther away from the server position then
                 //  snap back (rewind) since smoothing wouldn't help a large correction
-                // Else apply smoothing if more than 0.5 units, and no correction if less than that
-                if ((_position - transform.position).sqrMagnitude >= 2.25f)
+                // Else apply smoothing if not too far away, and no correction if less than that
+                if ((_position - transform.position).sqrMagnitude >= 4.5f)
                 {
                     transform.position = _position;
                 }
-                else if ((_position - transform.position).sqrMagnitude >= 0.255f && moveDirection == Vector3.zero)
+                else if ((_position - transform.position).sqrMagnitude >= 0.5f)
                 {
-                    transform.position = Vector3.Slerp(transform.position, _position, _lerpSpeed * Time.deltaTime);
+                    transform.position = Vector3.Lerp(transform.position, _position, _lerpSpeed * Time.deltaTime);
                 }
 
                 // The tick number of the server when its version of the player was done calculating

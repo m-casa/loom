@@ -1,7 +1,9 @@
 using UnityEngine;
+using EPOOutline;
 
 public class Task : MonoBehaviour
 {
+    public Outlinable outlinable;
     public bool isBeingUsed;
     public bool isBeingHeld;
 

@@ -11,7 +11,7 @@ public class StartReactor : MonoBehaviour
     {
         taskTime = 16;
         timeToFinish = taskTime;
-        taskFinished = false;
+        taskFinished = true;
     }
 
     // Update is called once per frame
@@ -21,6 +21,7 @@ public class StartReactor : MonoBehaviour
         if (timeToFinish <= 0 && !taskFinished)
         {
             taskFinished = true;
+            task.outlinable.enabled = false;
             Debug.Log("Finished starting reactor!");
 
             // Reset the task states to false

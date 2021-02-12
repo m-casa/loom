@@ -255,9 +255,9 @@ namespace ECM.Controllers
             {
                 transform.position = _position;
             }
-            else if ((_position - transform.position).sqrMagnitude >= 0.255f && moveDirection == Vector3.zero)
+            else if ((_position - transform.position).sqrMagnitude >= 0.255f)
             {
-                transform.position = Vector3.Slerp(transform.position, _position, _lerpSpeed * Time.deltaTime);
+                transform.position = Vector3.Lerp(transform.position, _position, _lerpSpeed * Time.deltaTime);
             }
         }
 

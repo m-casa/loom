@@ -11,7 +11,7 @@ public class DivertPower : MonoBehaviour
     {
         taskTime = 2;
         timeToFinish = taskTime;
-        taskFinished = false;
+        taskFinished = true;
     }
 
     // Update is called once per frame
@@ -21,6 +21,7 @@ public class DivertPower : MonoBehaviour
         if (timeToFinish <= 0 && !taskFinished)
         {
             taskFinished = true;
+            task.outlinable.enabled = false;
             Debug.Log("Finished diverting power!");
 
             // Reset the task states to false
