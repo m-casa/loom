@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class RoundController : MonoBehaviour
+public class Round : MonoBehaviour
 {
     public Task task;
 

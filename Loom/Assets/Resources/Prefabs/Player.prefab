@@ -553,7 +553,7 @@ MonoBehaviour:
   _backwardSpeed: 7
   _strafeSpeed: 7
   _runSpeedMultiplier: 1.5
-  _lerpSpeed: 1
+  _lerpSpeed: 0.9
 --- !u!114 &7895108494425555140
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -590,7 +590,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _groundMask:
     serializedVersion: 2
-    m_Bits: 129
+    m_Bits: 385
   _groundLimit: 60
   _stepOffset: 0.5
   _ledgeOffset: 0
@@ -629,11 +629,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 626074aab2f584745b8385ca4a80530f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deadBody: {fileID: 0}
-  isDead: 0
+  body: {fileID: 0}
   model: {fileID: 7895108494425555240}
   deadModel: {fileID: 5808116618317577897, guid: 6f0f394f4311f8d468d7e76d9ea3c0b9,
     type: 3}
+  isDead: 0
 --- !u!114 &7895108494425555162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -651,19 +651,7 @@ MonoBehaviour:
   username: 
   localPlayer: {fileID: 3879795407549262724, guid: bde8c1dd6320f2d4c833a4edbeaafa81,
     type: 3}
-  color:
-  - {fileID: 2100000, guid: fb27160d13c0f0649ab9383dbac9cd37, type: 2}
-  - {fileID: 2100000, guid: 0a0b328aee480b34db031a653b2755eb, type: 2}
-  - {fileID: 2100000, guid: dfdf181e449fabe45b03da8fee81cc15, type: 2}
-  - {fileID: 2100000, guid: 7a45a09f778cff24a807e45c07e6e8f7, type: 2}
-  - {fileID: 2100000, guid: f23e0b39c747d2a44bffa8e69de200c6, type: 2}
-  - {fileID: 2100000, guid: 76ffaf87453c49b41bf687a30ead11ae, type: 2}
-  - {fileID: 2100000, guid: 1ef21c7f29d64274da5da09b2ccdf982, type: 2}
-  - {fileID: 2100000, guid: ee8b04d46e67932469bd771c29d7b60d, type: 2}
-  - {fileID: 2100000, guid: d034a0bbc64ea6749a0504693e693c55, type: 2}
-  - {fileID: 2100000, guid: f32132d7aef2f5f40ad690b3d6553d2f, type: 2}
-  - {fileID: 2100000, guid: e1015c67fa2fb404dbaf4bd4c988d0d9, type: 2}
-  - {fileID: 2100000, guid: 96fa54e4abe202e44a2bbe0b55c6819a, type: 2}
+  nameInidcator: {fileID: 2717636619489741139}
   icon:
   - {fileID: 21300000, guid: 56307ed96721b624ea36c30dda317270, type: 3}
   - {fileID: 21300000, guid: 7e76e079f3a851147a3250c1dc4c1744, type: 3}
@@ -677,7 +665,19 @@ MonoBehaviour:
   - {fileID: 21300000, guid: a2f8126f97ee97a4eb27a8e878281379, type: 3}
   - {fileID: 21300000, guid: 923b69c8cde8a2d42943f3b3c071d625, type: 3}
   - {fileID: 21300000, guid: cdd5956fa90a88141b49123e1de1926f, type: 3}
-  nameInidcator: {fileID: 2717636619489741139}
+  color:
+  - {fileID: 2100000, guid: fb27160d13c0f0649ab9383dbac9cd37, type: 2}
+  - {fileID: 2100000, guid: 0a0b328aee480b34db031a653b2755eb, type: 2}
+  - {fileID: 2100000, guid: dfdf181e449fabe45b03da8fee81cc15, type: 2}
+  - {fileID: 2100000, guid: 7a45a09f778cff24a807e45c07e6e8f7, type: 2}
+  - {fileID: 2100000, guid: f23e0b39c747d2a44bffa8e69de200c6, type: 2}
+  - {fileID: 2100000, guid: 76ffaf87453c49b41bf687a30ead11ae, type: 2}
+  - {fileID: 2100000, guid: 1ef21c7f29d64274da5da09b2ccdf982, type: 2}
+  - {fileID: 2100000, guid: ee8b04d46e67932469bd771c29d7b60d, type: 2}
+  - {fileID: 2100000, guid: d034a0bbc64ea6749a0504693e693c55, type: 2}
+  - {fileID: 2100000, guid: f32132d7aef2f5f40ad690b3d6553d2f, type: 2}
+  - {fileID: 2100000, guid: e1015c67fa2fb404dbaf4bd4c988d0d9, type: 2}
+  - {fileID: 2100000, guid: 96fa54e4abe202e44a2bbe0b55c6819a, type: 2}
   spriteRenderer: {fileID: 4134819214636340281}
   skinnedMeshRenderer: {fileID: 7895108494425555161}
 --- !u!1 &7895108494425555225

@@ -34,7 +34,7 @@ namespace ECM.Controllers
 
         [Tooltip("Speed multiplier for syncing player.")]
         [SerializeField]
-        private float _lerpSpeed = 1.0f;
+        private float _lerpSpeed = 0.9f;
 
         #endregion
 
@@ -251,7 +251,14 @@ namespace ECM.Controllers
 
         public virtual void SyncPlayer(Vector3 _position)
         {
-            transform.position = Vector3.Slerp(transform.position, _position, _lerpSpeed);
+            if ((_position - transform.position).sqrMagnitude >= 2.25f)
+            {
+                transform.position = _position;
+            }
+            else if ((_position - transform.position).sqrMagnitude >= 0.255f && moveDirection == Vector3.zero)
+            {
+                transform.position = Vector3.Slerp(transform.position, _position, _lerpSpeed * Time.deltaTime);
+            }
         }
 
         #endregion

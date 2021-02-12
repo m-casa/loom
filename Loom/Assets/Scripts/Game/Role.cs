@@ -7,6 +7,7 @@ public class Role : MonoBehaviour
 {
     public Text roleIndicator, useIndicator, killIndicator, reportIndicator, 
         emergencyTimerTitle, emergencyTimerText;
+    public Slider progressBar, taskBar;
     public Life life;
     public Emergency emergency;
     public bool isImposter, canInteract, canKill;
@@ -222,7 +223,7 @@ public class Role : MonoBehaviour
 
         isHolding = Input.GetKey(KeyCode.E);
 
-        if (isImposter)
+        if (isImposter && !gameObject.tag.Equals("Ghost"))
         {
             isKilling = Input.GetKeyDown(KeyCode.F);
         }

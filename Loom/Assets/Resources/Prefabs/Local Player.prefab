@@ -38,7 +38,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 350, y: -75}
-  m_SizeDelta: {x: 645, y: 95}
+  m_SizeDelta: {x: 620, y: 95}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5403378905091431956
 CanvasRenderer:
@@ -349,7 +349,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 55
+    m_Bits: 823
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: 9c31ed81fd7f9b542bd0d6f447444518, type: 2}
   m_TargetDisplay: 0
@@ -424,9 +424,9 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 7422366343718818488}
-  - {fileID: 1379102069161382963}
   - {fileID: 8170401541240584943}
   - {fileID: 8096569280343493594}
+  - {fileID: 1379102069161382963}
   - {fileID: 5992656209799948602}
   - {fileID: 5077857940620156996}
   - {fileID: 730298740711643760}
@@ -1643,7 +1643,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 247
+    m_Bits: 1015
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -2138,7 +2138,7 @@ MonoBehaviour:
   _backwardSpeed: 7
   _strafeSpeed: 7
   _runSpeedMultiplier: 1.5
-  _lerpSpeed: 1
+  _lerpSpeed: 0.9
 --- !u!114 &3879795407549262751
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2175,7 +2175,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _groundMask:
     serializedVersion: 2
-    m_Bits: 129
+    m_Bits: 385
   _groundLimit: 60
   _stepOffset: 0.5
   _ledgeOffset: 0
@@ -2220,6 +2220,8 @@ MonoBehaviour:
   reportIndicator: {fileID: 2928158173320183014}
   emergencyTimerTitle: {fileID: 8023549812912233019}
   emergencyTimerText: {fileID: 8023549812893002749}
+  progressBar: {fileID: 2927006910844199945}
+  taskBar: {fileID: 6474639555079631571}
   life: {fileID: 3879795407549262747}
   emergency: {fileID: 0}
   isImposter: 0
@@ -2303,7 +2305,7 @@ MonoBehaviour:
   SensorRange: 3.5
   DetectsOnLayers:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 832
   SensorUpdateMode: 1
   CheckInterval: 1
   InitialBufferSize: 20
@@ -2752,7 +2754,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 6, y: 4}
+  m_SizeDelta: {x: 29, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7819877412648229297
 CanvasRenderer:
@@ -2900,12 +2902,12 @@ RectTransform:
   - {fileID: 7425946559684651209}
   - {fileID: 4881925883453942546}
   m_Father: {fileID: 1389395866940737848}
-  m_RootOrder: 1
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 185, y: 150}
-  m_SizeDelta: {x: 320, y: 60}
+  m_SizeDelta: {x: 295, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5346036642381287991
 CanvasRenderer:
@@ -3031,7 +3033,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 6, y: 4}
+  m_SizeDelta: {x: 30, y: 4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1333971294944925547
 CanvasRenderer:
@@ -3414,7 +3416,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1389395866940737848}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
@@ -3566,7 +3568,7 @@ RectTransform:
   m_Children:
   - {fileID: 8170401540777247372}
   m_Father: {fileID: 1389395866940737848}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
