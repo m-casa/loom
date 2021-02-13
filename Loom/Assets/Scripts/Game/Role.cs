@@ -102,6 +102,8 @@ public class Role : MonoBehaviour
         // Updates the player's HUD to reflect what their role is
         if (isImposter)
         {
+            gameObject.tag = "Imposter";
+
             roleIndicator.color = Color.red;
             roleIndicator.text = "Imposter";
 
@@ -120,6 +122,8 @@ public class Role : MonoBehaviour
         }
         else
         {
+            gameObject.tag = "Crewmate";
+
             roleIndicator.color = Color.white;
             roleIndicator.text = "Crewmate";
 
@@ -193,6 +197,12 @@ public class Role : MonoBehaviour
             GameManager.instance.longTask[rngLongTask2].GetComponent<Task>().outlinable.enabled = true;
         }
 
+        // If the task bar is not on, then turn it on
+        if (!taskBar.gameObject.activeSelf)
+        {
+            taskBar.gameObject.SetActive(true);
+        }
+
         // If the role indicator is not on then turn it on
         if (!roleIndicator.gameObject.activeSelf)
         {
@@ -212,6 +222,8 @@ public class Role : MonoBehaviour
     // Update the player's HUD to display the winning team
     public void UpdateWinners(string _winningTeam)
     {
+        gameObject.tag = "Untagged";
+
         // Updates the player's HUD to reflect which team won the last round
         if (_winningTeam.Equals("Crewmates"))
         {
@@ -271,6 +283,12 @@ public class Role : MonoBehaviour
         if (life.isDead)
         {
             life.Respawn();
+        }
+
+        // If the task bar is active, then turn it off
+        if (taskBar.gameObject.activeSelf)
+        {
+            taskBar.gameObject.SetActive(false);
         }
 
         // If the timer for the panic button is active, turn it off

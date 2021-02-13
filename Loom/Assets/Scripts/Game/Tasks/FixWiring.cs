@@ -21,6 +21,7 @@ public class FixWiring : MonoBehaviour
             task.finished = true;
             task.outlinable.enabled = false;
             Debug.Log("Finished fixing wires!");
+            ClientSend.CompletedTask();
 
             // Reset the task states to false
             task.isBeingUsed = false;

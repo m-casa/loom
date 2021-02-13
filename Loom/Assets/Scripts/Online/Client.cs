@@ -365,6 +365,7 @@ public class Client : MonoBehaviour
             { (int)ServerPackets.remainingTime, ClientHandle.RemainingTime },
             { (int)ServerPackets.playerVote, ClientHandle.PlayerVote },
             { (int)ServerPackets.resumeRound, ClientHandle.ResumeRound },
+            { (int)ServerPackets.taskUpdate, ClientHandle.TaskUpdate },
             { (int)ServerPackets.winners, ClientHandle.Winners },
             { (int)ServerPackets.destroyPlayer, ClientHandle.DestroyPlayer },
         };

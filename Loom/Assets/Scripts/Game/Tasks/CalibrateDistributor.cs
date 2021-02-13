@@ -21,6 +21,7 @@ public class CalibrateDistributor : MonoBehaviour
             task.finished = true;
             task.outlinable.enabled = false;
             Debug.Log("Finished calibrating distributor!");
+            ClientSend.CompletedTask();
 
             // Reset the task states to false
             task.isBeingUsed = false;

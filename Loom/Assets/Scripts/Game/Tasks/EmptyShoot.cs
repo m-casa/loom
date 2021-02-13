@@ -22,6 +22,7 @@ public class EmptyShoot : MonoBehaviour
             task.finished = true;
             task.outlinable.enabled = false;
             Debug.Log("Finished emptying shoot!");
+            ClientSend.CompletedTask();
 
             // Reset the task states to false
             task.isBeingUsed = false;

@@ -112,6 +112,17 @@ public class ClientSend : MonoBehaviour
         }
     }
 
+    // Send a message to the server letting it know a task was completed
+    public static void CompletedTask()
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.completedTask))
+        {
+            _packet.Write("Completed a task!");
+
+            SendTCPData(_packet);
+        }
+    }
+
     // Send the ejected player's id to the server
     public static void ConfirmEject(int _ejectedId)
     {

@@ -76,6 +76,13 @@ public class UIManager : MonoBehaviour
         PlayerManager localPlayer = GameManager.players[Client.instance.myId];
         PlayerManager onlinePlayer;
         CardInfo cardInfo;
+        int playerCountOffset = 0;
+
+        // If this is a new player, make them a crewmate
+        if (localPlayer.tag.Equals("Untagged"))
+        {
+            localPlayer.GetComponent<Role>().UpdateRole(false);
+        }
 
         // Despawn any left over dead bodies
         GameManager.instance.DespawnBodies();
@@ -88,48 +95,56 @@ public class UIManager : MonoBehaviour
         localPlayer.GetComponent<MouseLook>().SetCursorLock(false);
 
         // Set up the number of voting cards equal to the number of players
-        for (int i = 0; i < GameManager.players.Count; i++)
+        for (int i = 0; i < GameManager.players.Count + playerCountOffset; i++)
         {
-            onlinePlayer = GameManager.players[i + 1];
-            cardInfo = votingOption[i].GetComponent<CardInfo>();
-            cardInfo.id = onlinePlayer.id;
-
-            // Disable this player's movement if they are not the local player
-            if (onlinePlayer != localPlayer)
+            // Make sure this player is in the game, if not update the player count offset
+            if (GameManager.players.ContainsKey(i + 1))
             {
-                onlinePlayer.GetComponent<OnlineFirstPersonController>().enabled = false;
-            }
+                onlinePlayer = GameManager.players[i + 1];
+                cardInfo = votingOption[i].GetComponent<CardInfo>();
+                cardInfo.id = onlinePlayer.id;
 
-            // If the local player is dead, do not allow them to vote, else allow voting
-            if (localPlayer.GetComponent<Life>().isDead)
-            {
-                votingOption[i].interactable = false;
-                skip.interactable = false;
+                // Disable this player's movement if they are not the local player
+                if (onlinePlayer != localPlayer)
+                {
+                    onlinePlayer.GetComponent<OnlineFirstPersonController>().enabled = false;
+                }
+
+                // If the local player is dead, do not allow them to vote, else allow voting
+                if (localPlayer.GetComponent<Life>().isDead)
+                {
+                    votingOption[i].interactable = false;
+                    skip.interactable = false;
+                }
+                else
+                {
+                    votingOption[i].interactable = true;
+                    skip.interactable = true;
+                }
+
+                // If this player is dead, darken the card and do not allow the local player to vote on it
+                if (onlinePlayer.GetComponent<Life>().isDead)
+                {
+                    ColorBlock newColor = votingOption[i].colors;
+                    newColor.disabledColor = new Color(255f, 0f, 0f, 0.25f);
+
+                    votingOption[i].colors = newColor;
+                    votingOption[i].interactable = false;
+                }
+
+                // Change the icon on this voting card to match this player's icon
+                cardInfo.icon.sprite = onlinePlayer.GetComponent<PlayerManager>().spriteRenderer.sprite;
+
+                // Change the text on this voting card to match this player's username
+                cardInfo.username.text = onlinePlayer.GetComponent<PlayerManager>().username;
+
+                // Enable this player's voting card
+                votingOption[i].gameObject.SetActive(true);
             }
             else
             {
-                votingOption[i].interactable = true;
-                skip.interactable = true;
+                playerCountOffset++;
             }
-
-            // If this player is dead, darken the card and do not allow the local player to vote on it
-            if (onlinePlayer.GetComponent<Life>().isDead)
-            {
-                ColorBlock newColor = votingOption[i].colors;
-                newColor.disabledColor = new Color(255f, 0f, 0f, 0.25f);
-
-                votingOption[i].colors = newColor;
-                votingOption[i].interactable = false;
-            }
-
-            // Change the icon on this voting card to match this player's icon
-            cardInfo.icon.sprite = onlinePlayer.GetComponent<PlayerManager>().spriteRenderer.sprite;
-
-            // Change the text on this voting card to match this player's username
-            cardInfo.username.text = onlinePlayer.GetComponent<PlayerManager>().username;
-
-            // Enable this player's voting card
-            votingOption[i].gameObject.SetActive(true);
         }
 
         // Enable the meeting menu after setting up each player's voting card

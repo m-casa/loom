@@ -190,6 +190,18 @@ public class ClientHandle : MonoBehaviour
         UIManager.instance.EndMeeting();
     }
 
+    // Reads a packet from the server with the updated task bar value
+    public static void TaskUpdate(Packet _packet)
+    {
+        float _updatedValue = _packet.ReadFloat();
+
+        // Check if this player is spawned in first
+        if (GameManager.players.TryGetValue(Client.instance.myId, out PlayerManager _player))
+        {
+            _player.GetComponent<Role>().taskBar.value = _updatedValue;
+        }
+    }
+
     // Reads a packet from the server letting us know which team won
     public static void Winners(Packet _packet)
     {

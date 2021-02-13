@@ -22,6 +22,7 @@ public class Dumpster2 : MonoBehaviour
             task.finished = true;
             task.outlinable.enabled = false;
             Debug.Log("Finished cleaning up all garbage!");
+            ClientSend.CompletedTask();
 
             // Reset the task states to false
             task.isBeingUsed = false;

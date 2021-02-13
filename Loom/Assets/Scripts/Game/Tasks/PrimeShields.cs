@@ -21,6 +21,7 @@ public class PrimeShields : MonoBehaviour
             task.finished = true;
             task.outlinable.enabled = false;
             Debug.Log("Finished priming shields!");
+            ClientSend.CompletedTask();
 
             // Reset the task states to false
             task.isBeingUsed = false;
