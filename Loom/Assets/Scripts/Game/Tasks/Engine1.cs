@@ -5,7 +5,6 @@ public class Engine1 : MonoBehaviour
     // Start is called before the first frame update
     public Task task;
     public Fuel fuel;
-    public bool taskFinished;
     private float taskTime, timeToFinish;
 
     // Awake is called before Start
@@ -13,18 +12,17 @@ public class Engine1 : MonoBehaviour
     {
         taskTime = 4;
         timeToFinish = taskTime;
-        taskFinished = true;
     }
 
     // Update is called once per frame
     public void Update()
     {
         // Check if this task is finished, else if the player is using the task, begin counting down to finish
-        if (timeToFinish <= 0 && !taskFinished)
+        if (timeToFinish <= 0 && !task.finished)
         {
-            taskFinished = true;
+            task.finished = true;
             task.outlinable.enabled = false;
-            fuel.taskFinished = false;
+            fuel.task.finished = false;
             fuel.task.outlinable.enabled = true;
             Debug.Log("Finished filling Engine 1 with fuel!");
 
@@ -33,7 +31,7 @@ public class Engine1 : MonoBehaviour
             task.isBeingHeld = false;
             timeToFinish = taskTime;
         }
-        else if (task.isBeingHeld && !taskFinished)
+        else if (task.isBeingHeld && !task.finished)
         {
             timeToFinish -= 1 * Time.deltaTime;
 
@@ -43,6 +41,15 @@ public class Engine1 : MonoBehaviour
             // Reset the task states to false
             task.isBeingUsed = false;
             task.isBeingHeld = false;
+        }
+
+        if (task.resetTask)
+        {
+            // Reset this task
+            task.resetTask = false;
+            timeToFinish = taskTime;
+            task.finished = true;
+            task.outlinable.enabled = false;
         }
     }
 }

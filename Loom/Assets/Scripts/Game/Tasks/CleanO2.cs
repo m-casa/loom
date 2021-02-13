@@ -5,7 +5,6 @@ public class CleanO2 : MonoBehaviour
     // Start is called before the first frame update
     public Task task;
     public EmptyShoot emptyShoot;
-    public bool taskFinished;
     private float taskTime, timeToFinish;
 
     // Awake is called before Start
@@ -13,20 +12,19 @@ public class CleanO2 : MonoBehaviour
     {
         taskTime = 6;
         timeToFinish = taskTime;
-        taskFinished = false;
     }
 
     // Update is called once per frame
     public void Update()
     {
         // Check if this task is finished, else if the player is using the task, begin counting down to finish
-        if (timeToFinish <= 0 && !taskFinished)
+        if (timeToFinish <= 0 && !task.finished)
         {
-            taskFinished = true;
+            task.finished = true;
             task.outlinable.enabled = false;
 
             // Have the player empty the O2 shoot
-            emptyShoot.taskFinished = false;
+            emptyShoot.task.finished = false;
             emptyShoot.task.outlinable.enabled = true;
             Debug.Log("Finished cleaning O2!");
 
@@ -35,7 +33,7 @@ public class CleanO2 : MonoBehaviour
             task.isBeingHeld = false;
             timeToFinish = taskTime;
         }
-        else if (task.isBeingHeld && !taskFinished)
+        else if (task.isBeingHeld && !task.finished)
         {
             timeToFinish -= 1 * Time.deltaTime;
 
@@ -45,6 +43,18 @@ public class CleanO2 : MonoBehaviour
             // Reset the task states to false
             task.isBeingUsed = false;
             task.isBeingHeld = false;
+        }
+
+        if (task.resetTask)
+        {
+            // Reset this task
+            task.resetTask = false;
+            timeToFinish = taskTime;
+            task.finished = true;
+            task.outlinable.enabled = false;
+
+            // Reset the empty shoot task
+            emptyShoot.task.resetTask = true;
         }
     }
 }

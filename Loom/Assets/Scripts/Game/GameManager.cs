@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour
 
     public GameObject localPlayerPrefab;
     public GameObject playerPrefab;
+    public GameObject[] fixWiring, divertPower, uploadData, shortTask, longTask;
+    public GameObject swipeCard;
     public Emergency emergency;
     private float simulationTimer;
 

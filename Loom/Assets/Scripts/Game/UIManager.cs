@@ -348,7 +348,7 @@ public class UIManager : MonoBehaviour
             // Get the info on this voting card
             currentCard = votingOption[i].GetComponent<CardInfo>();
 
-            // Reveal those votes on this voting card
+            // Reveal the votes on this voting card
             currentCard.revealer.SetActive(true);
 
             // Check if the current card's number of votes is greater than the most voted card
@@ -369,11 +369,11 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        // Reveal those votes to skip
+        // Reveal the votes to skip
         skip.GetComponent<CardInfo>().revealer.SetActive(true);
 
-        // If a player was ejected, then they must be killed
-        if (mostVoted != skip.GetComponent<CardInfo>())
+        // If a player was ejected, then they must be killed (but first check if they're still in the game)
+        if (mostVoted != skip.GetComponent<CardInfo>() && GameManager.players.ContainsKey(mostVoted.id))
         {
             ejectedId = mostVoted.id;
 

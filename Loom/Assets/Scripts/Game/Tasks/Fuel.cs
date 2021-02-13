@@ -6,7 +6,7 @@ public class Fuel : MonoBehaviour
     public Task task;
     public Engine1 engine1;
     public Engine2 engine2;
-    public bool taskFinished, filledEngine1;
+    public bool filledEngine1;
     private float taskTime, timeToFinish;
 
     // Awake is called before Start
@@ -14,23 +14,22 @@ public class Fuel : MonoBehaviour
     {
         taskTime = 4;
         timeToFinish = taskTime;
-        taskFinished = false;
     }
 
     // Update is called once per frame
     public void Update()
     {
         // Check if this task is finished, else if the player is using the task, begin counting down to finish
-        if (timeToFinish <= 0 && !taskFinished)
+        if (timeToFinish <= 0 && !task.finished)
         {
-            taskFinished = true;
+            task.finished = true;
             task.outlinable.enabled = false;
 
             // Check if we've finished the first part of the task, else finish the second part
             if (!filledEngine1)
             {
                 filledEngine1 = true;
-                engine1.taskFinished = false;
+                engine1.task.finished = false;
                 engine1.task.outlinable.enabled = true;
                 Debug.Log("Finished collecting fuel!");
 
@@ -42,7 +41,7 @@ public class Fuel : MonoBehaviour
             else
             {
                 filledEngine1 = false;
-                engine2.taskFinished = false;
+                engine2.task.finished = false;
                 engine2.task.outlinable.enabled = true;
                 Debug.Log("Finished collecting fuel!");
 
@@ -52,7 +51,7 @@ public class Fuel : MonoBehaviour
                 timeToFinish = taskTime;
             }
         }
-        else if (task.isBeingHeld && !taskFinished)
+        else if (task.isBeingHeld && !task.finished)
         {
             timeToFinish -= 1 * Time.deltaTime;
 
@@ -62,6 +61,19 @@ public class Fuel : MonoBehaviour
             // Reset the task states to false
             task.isBeingUsed = false;
             task.isBeingHeld = false;
+        }
+
+        if (task.resetTask)
+        {
+            // Reset this task
+            task.resetTask = false;
+            timeToFinish = taskTime;
+            task.finished = true;
+            task.outlinable.enabled = false;
+
+            // Reset the dumpster tasks
+            engine1.task.resetTask = true;
+            engine2.task.resetTask = true;
         }
     }
 }

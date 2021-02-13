@@ -122,6 +122,75 @@ public class Role : MonoBehaviour
         {
             roleIndicator.color = Color.white;
             roleIndicator.text = "Crewmate";
+
+            int rngFixWiring1 = Random.Range(0, 5);
+            int rngFixWiring2 = rngFixWiring1;
+
+            int rngDivertPower1 = Random.Range(0, 10);
+            int rngDivertPower2 = rngDivertPower1;
+
+            int rngUploadData1 = Random.Range(0, 5);
+            int rngUploadData2 = rngUploadData1;
+
+            int rngShortTask1 = Random.Range(0, 7);
+            int rngShortTask2 = Random.Range(0, 7);
+
+            int rngLongTask1 = Random.Range(0, 7);
+            int rngLongTask2 = Random.Range(0, 7);
+
+            // If the local player is a crewmate, give them tasks by starting with swipe card
+            GameManager.instance.swipeCard.GetComponent<Task>().finished = false;
+            GameManager.instance.swipeCard.GetComponent<Task>().outlinable.enabled = true;
+
+            // Pick two random fix wiring tasks
+            GameManager.instance.fixWiring[rngFixWiring1].GetComponent<Task>().finished = false;
+            GameManager.instance.fixWiring[rngFixWiring1].GetComponent<Task>().outlinable.enabled = true;
+            while (rngFixWiring2 == rngFixWiring1)
+            {
+                rngFixWiring2 = Random.Range(0, 5);
+            }
+            GameManager.instance.fixWiring[rngFixWiring2].GetComponent<Task>().finished = false;
+            GameManager.instance.fixWiring[rngFixWiring2].GetComponent<Task>().outlinable.enabled = true;
+
+            // Pick two random divert power tasks
+            GameManager.instance.divertPower[rngDivertPower1].GetComponent<Task>().finished = false;
+            GameManager.instance.divertPower[rngDivertPower1].GetComponent<Task>().outlinable.enabled = true;
+            while (rngDivertPower2 == rngDivertPower1)
+            {
+                rngDivertPower2 = Random.Range(0, 10);
+            }
+            GameManager.instance.divertPower[rngDivertPower2].GetComponent<Task>().finished = false;
+            GameManager.instance.divertPower[rngDivertPower2].GetComponent<Task>().outlinable.enabled = true;
+
+            // Pick two random upload data tasks
+            GameManager.instance.uploadData[rngUploadData1].GetComponent<Task>().finished = false;
+            GameManager.instance.uploadData[rngUploadData1].GetComponent<Task>().outlinable.enabled = true;
+            while (rngUploadData2 == rngUploadData1)
+            {
+                rngUploadData2 = Random.Range(0, 5);
+            }
+            GameManager.instance.uploadData[rngUploadData2].GetComponent<Task>().finished = false;
+            GameManager.instance.uploadData[rngUploadData2].GetComponent<Task>().outlinable.enabled = true;
+
+            // Pick two random short tasks
+            GameManager.instance.shortTask[rngShortTask1].GetComponent<Task>().finished = false;
+            GameManager.instance.shortTask[rngShortTask1].GetComponent<Task>().outlinable.enabled = true;
+            while (rngShortTask2 == rngShortTask1)
+            {
+                rngShortTask2 = Random.Range(0, 5);
+            }
+            GameManager.instance.shortTask[rngShortTask2].GetComponent<Task>().finished = false;
+            GameManager.instance.shortTask[rngShortTask2].GetComponent<Task>().outlinable.enabled = true;
+
+            // Pick two random long tasks
+            GameManager.instance.longTask[rngLongTask1].GetComponent<Task>().finished = false;
+            GameManager.instance.longTask[rngLongTask1].GetComponent<Task>().outlinable.enabled = true;
+            while (rngLongTask2 == rngLongTask1)
+            {
+                rngLongTask2 = Random.Range(0, 5);
+            }
+            GameManager.instance.longTask[rngLongTask2].GetComponent<Task>().finished = false;
+            GameManager.instance.longTask[rngLongTask2].GetComponent<Task>().outlinable.enabled = true;
         }
 
         // If the role indicator is not on then turn it on
@@ -155,11 +224,47 @@ public class Role : MonoBehaviour
             roleIndicator.text = "Winners: " + _winningTeam;
         }
 
-        // If the player was an imposter, revert their role
+        // If the player was an imposter, revert their role, else reset tasks
         if (isImposter)
         {
             isImposter = false;
             killIndicator.gameObject.SetActive(false);
+        }
+        else
+        {
+            // Reset card swipe
+            GameManager.instance.swipeCard.GetComponent<Task>().resetTask = true;
+
+            // Reset short task
+            for (int i = 0; i < GameManager.instance.shortTask.Length; i++)
+            {
+                GameManager.instance.shortTask[i].GetComponent<Task>().resetTask = true;
+            }
+
+            // Reset long task
+            for (int i = 0; i < GameManager.instance.longTask.Length; i++)
+            {
+                GameManager.instance.longTask[i].GetComponent<Task>().resetTask = true;
+            }
+
+            // Reset fix wiring
+            for (int i = 0; i < GameManager.instance.fixWiring.Length; i++)
+            {
+                GameManager.instance.fixWiring[i].GetComponent<Task>().resetTask = true;
+            }
+
+            // Reset divert power
+            for (int i = 0; i < GameManager.instance.divertPower.Length; i++)
+            {
+                GameManager.instance.divertPower[i].GetComponent<Task>().resetTask = true;
+            }
+
+            // Reset upload data
+            for (int i = 0; i < GameManager.instance.uploadData.Length; i++)
+            {
+                GameManager.instance.uploadData[i].GetComponent<Task>().resetTask = true;
+            }
+
         }
 
         // If the player was dead, respawn their body

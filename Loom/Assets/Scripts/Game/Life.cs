@@ -43,6 +43,7 @@ public class Life : MonoBehaviour
         // Show the player's body again
         model.SetActive(true);
         GetComponent<PlayerManager>().nameInidcator.gameObject.SetActive(true);
+        gameObject.tag = "Untagged";
 
         // Destroy the player's dead body if it is still in the ship
         if (body != null)
