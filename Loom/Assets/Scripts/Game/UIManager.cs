@@ -84,6 +84,12 @@ public class UIManager : MonoBehaviour
             localPlayer.GetComponent<Role>().UpdateRole(false);
         }
 
+        // If the player is looking at the map, close it
+        if (localPlayer.GetComponent<Role>().map.activeSelf)
+        {
+            localPlayer.GetComponent<Role>().map.SetActive(false);
+        }
+
         // Despawn any left over dead bodies
         GameManager.instance.DespawnBodies();
 

@@ -5,6 +5,7 @@ using SensorToolkit;
 
 public class Role : MonoBehaviour
 {
+    public GameObject map;
     public Text roleIndicator, useIndicator, killIndicator, reportIndicator, 
         emergencyTimerTitle, emergencyTimerText;
     public Slider progressBar, taskBar;
@@ -14,7 +15,7 @@ public class Role : MonoBehaviour
     public float killCooldown, currentCooldown, emergencyTimer;
     public int numOfInteractables;
     private RangeSensor rangeSensor;
-    private bool isUsing, isHolding, isKilling, isReporting;
+    private bool isUsing, isHolding, isKilling, isReporting, isUsingMap;
 
     // Awake is called before Start
     public void Awake()
@@ -50,6 +51,10 @@ public class Role : MonoBehaviour
             // Perform any interaction the player wants
             PerformInteractions();
         }
+
+        // Check if the player is looking at the map
+        isUsingMap = Input.GetKeyDown(KeyCode.M);
+        CheckMap();
 
         if (isImposter)
         {
@@ -346,7 +351,7 @@ public class Role : MonoBehaviour
 
         isHolding = Input.GetKey(KeyCode.E);
 
-        if (isImposter && !gameObject.tag.Equals("Ghost"))
+        if (isImposter)
         {
             isKilling = Input.GetKeyDown(KeyCode.F);
         }
@@ -392,7 +397,7 @@ public class Role : MonoBehaviour
     // Kill whicever player is within range
     private void Kill()
     {
-        if (isKilling)
+        if (isKilling && !life.isDead)
         {
             List<GameObject> crewmates = new List<GameObject>();
 
@@ -448,6 +453,22 @@ public class Role : MonoBehaviour
                 }
 
                 ClientSend.ReportRequest();
+            }
+        }
+    }
+
+    // Interact with the map
+    private void CheckMap()
+    {
+        if (isUsingMap)
+        {
+            if (map.activeSelf)
+            {
+                map.SetActive(false);
+            }
+            else
+            {
+                map.SetActive(true);
             }
         }
     }

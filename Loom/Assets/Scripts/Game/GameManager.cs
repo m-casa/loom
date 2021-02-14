@@ -7,10 +7,8 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
     public static Dictionary<int, PlayerManager> players = new Dictionary<int, PlayerManager>();
 
-    public GameObject localPlayerPrefab;
-    public GameObject playerPrefab;
+    public GameObject localPlayerPrefab, playerPrefab, swipeCard, map;
     public GameObject[] fixWiring, divertPower, uploadData, shortTask, longTask;
-    public GameObject swipeCard;
     public Emergency emergency;
     private float simulationTimer;
 
@@ -56,6 +54,7 @@ public class GameManager : MonoBehaviour
         if (_id == Client.instance.myId)
         {
             _player = Instantiate(localPlayerPrefab, _position, _rotation);
+            _player.GetComponent<Role>().map = map;
             _player.GetComponent<Role>().emergency = emergency;
         }
         else
