@@ -27,8 +27,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_RendererFeatures:
   - {fileID: 8964770856989842565}
+  - {fileID: 87623566567368259}
   - {fileID: -7326419188756829220}
-  m_RendererFeatureMap: 855ca7d79843697cdc2b8b9a9054539a
+  m_RendererFeatureMap: 855ca7d79843697c436633672b4d3701dc2b8b9a9054539a
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
   shaders:
@@ -58,6 +59,20 @@ MonoBehaviour:
   m_ShadowTransparentReceive: 1
   m_RenderingMode: 0
   m_AccurateGbufferNormals: 0
+--- !u!114 &87623566567368259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 770acbaed70db4ad696458511aa3f084, type: 3}
+  m_Name: NewFlatKitFog
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  settings: {fileID: 11400000, guid: 742e00c01d7767b4aa71d2cb044726a8, type: 2}
 --- !u!114 &8964770856989842565
 MonoBehaviour:
   m_ObjectHideFlags: 0

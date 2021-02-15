@@ -123,6 +123,28 @@ public class ClientSend : MonoBehaviour
         }
     }
 
+    // Send a request to the server letting it know to sabotage lights
+    public static void SabotageElectrical()
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.sabotageElectrical))
+        {
+            _packet.Write("Sabotage the lights!");
+
+            SendTCPData(_packet);
+        }
+    }
+
+    // Send a request to the server letting it know to fix the lights
+    public static void FixElectrical()
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.fixElectrical))
+        {
+            _packet.Write("Fix the lights!");
+
+            SendTCPData(_packet);
+        }
+    }
+
     // Send the ejected player's id to the server
     public static void ConfirmEject(int _ejectedId)
     {

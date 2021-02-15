@@ -44,7 +44,7 @@
     }
     
     fixed4 frag (v2f i) : COLOR {
-        half d = dot(normalize(i.texcoord), _Direction) * 0.5f + 0.5f;
+        const half d = dot(normalize(i.texcoord), _Direction) * 0.5f + 0.5f;
         return lerp (_Color1, _Color2, pow(d, _Exponent)) * _Intensity;
     }
 

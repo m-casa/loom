@@ -182,18 +182,19 @@
 
             inline float DepthFade(float2 uv, VertexOutput i)
             {
-                float is_ortho = unity_OrthoParams.w;
-                float is_persp = 1.0 - unity_OrthoParams.w;
+                const float is_ortho = unity_OrthoParams.w;
+                const float is_persp = 1.0 - unity_OrthoParams.w;
 
-                float depth_packed = SampleSceneDepth(uv);
+                const float depth_packed = SampleSceneDepth(uv);
 
                 // Separately handles orthographic and perspective cameras.
-                float scene_depth = lerp(_ProjectionParams.z, _ProjectionParams.y, depth_packed) * is_ortho +
+                const float scene_depth = lerp(_ProjectionParams.z, _ProjectionParams.y, depth_packed) * is_ortho +
                     LinearEyeDepth(SampleSceneDepth(uv), _ZBufferParams) * is_persp;
-                float surface_depth = lerp(_ProjectionParams.z, _ProjectionParams.y, i.screenPosition.z) * is_ortho + i.
-                    screenPosition.w * is_persp;
+                const float surface_depth = lerp(_ProjectionParams.z, _ProjectionParams.y, i.screenPosition.z) *
+                    is_ortho + i.
+                               screenPosition.w * is_persp;
 
-                float water_depth = scene_depth - surface_depth;
+                const float water_depth = scene_depth - surface_depth;
 
                 return saturate((water_depth - _FadeDistance) / _WaterDepth);
             }
@@ -216,13 +217,13 @@
 
                     s = SineWave(positionOS, noise);
 
-                    #if defined(_WAVEMODE_GRID)
+                #if defined(_WAVEMODE_GRID)
                         s *= SineWave(positionOS, HALF_PI + noise);
-                    #endif
+                #endif
 
-                    #if defined(_WAVEMODE_POINTY)
+                #if defined(_WAVEMODE_POINTY)
                         s = 1.0 - abs(s);
-                    #endif
+                #endif
                 #endif
 
                 return s;
@@ -251,7 +252,7 @@
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
                 // Vertex animation.
-                float3 original_pos_ws = TransformObjectToWorld(i.positionOS);
+                float3 original_pos_ws = TransformObjectToWorld(i.positionOS.xyz);
                 float s = WaveHeight(i.texcoord, original_pos_ws);
                 o.positionWS = original_pos_ws;
                 o.positionWS.y += s * _WaveAmplitude;
@@ -293,21 +294,21 @@
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
                 // Refraction.
-                float2 noise_uv_refraction = i.uv * _RefractionFrequency + _Time.zz * _RefractionSpeed;
-                float noise01_refraction = GradientNoise(noise_uv_refraction, _RefractionScale);
-                float noise11_refraction = noise01_refraction * 2.0 - 1.0;
-                float4 screen_uv = float4(i.screenPosition.xy / i.screenPosition.w, 0, 0);
-                float depth_fade_original = DepthFade(screen_uv, i);
+                const float2 noise_uv_refraction = i.uv * _RefractionFrequency + _Time.zz * _RefractionSpeed;
+                const float noise01_refraction = GradientNoise(noise_uv_refraction, _RefractionScale);
+                const float noise11_refraction = noise01_refraction * 2.0f - 1.0f;
+                const float2 screen_uv = i.screenPosition.xy / i.screenPosition.w;
+                const float depth_fade_original = DepthFade(screen_uv, i);
                 float2 displaced_uv = screen_uv + noise11_refraction * _RefractionAmplitude * depth_fade_original;
                 float depth_fade = DepthFade(displaced_uv, i);
 
-                if (depth_fade <= 0) // If above water surface.
+                if (depth_fade <= 0.0f) // If above water surface.
                 {
                     displaced_uv = screen_uv;
                     depth_fade = DepthFade(displaced_uv, i);
                 }
 
-                half3 scene_color = SampleSceneColor(displaced_uv);
+                const half3 scene_color = SampleSceneColor(displaced_uv);
                 half3 c = scene_color;
 
                 // Water depth.
@@ -319,18 +320,18 @@
                 #endif
 
                 #if defined(_COLORMODE_GRADIENT_TEXTURE)
-                float2 gradient_uv = float2(depth_fade, 0.5);
+                float2 gradient_uv = float2(depth_fade, 0.5f);
                 depth_color = SAMPLE_TEXTURE2D(_ColorGradient, sampler_ColorGradient, gradient_uv);
-                color_shallow = SAMPLE_TEXTURE2D(_ColorGradient, sampler_ColorGradient, float2(0, 0.5));
+                color_shallow = SAMPLE_TEXTURE2D(_ColorGradient, sampler_ColorGradient, float2(0.0f, 0.5f));
                 #endif
 
                 c = lerp(depth_color.rgb, c, _WaterClearness * depth_color.a);
 
                 // Crest.
                 {
-                    half c_inv = 1.0 - _CrestSize;
-                    c = lerp(c, _CrestColor,
-                             smoothstep(c_inv, saturate(c_inv + (1.0 - _CrestSharpness)),
+                    const half c_inv = 1.0f - _CrestSize;
+                    c = lerp(c, _CrestColor.rgb,
+                             smoothstep(c_inv, saturate(c_inv + (1.0f - _CrestSharpness)),
                                         i.waveHeight) * _CrestColor.a);
                 }
 
@@ -340,19 +341,19 @@
                     float cs = cos(uv_angle + _FoamDirection * PI);
                     float sn = sin(uv_angle + _FoamDirection * PI);
                     float2 rotated_uv = float2(i.uv.x * cs - i.uv.y * sn, i.uv.x * sn + i.uv.y * cs);
-                    float2 noise_uv_foam = rotated_uv * 100.0 + _Time.zz * _FoamSpeed;
+                    float2 noise_uv_foam = rotated_uv * 100.0f + _Time.zz * _FoamSpeed;
 
                     float noise_foam_base;
-                    #if defined(_FOAMMODE_TEXTURE)
+                #if defined(_FOAMMODE_TEXTURE)
                         float2 stretch_factor = float2(_FoamStretchX, _FoamStretchY);
                         noise_foam_base = SAMPLE_TEXTURE2D(_NoiseMap, sampler_NoiseMap,
                             noise_uv_foam * stretch_factor / (_FoamScale * 100.0)).r;
-                    #endif
+                #endif
 
-                    #if defined(_FOAMMODE_GRADIENT_NOISE)
+                #if defined(_FOAMMODE_GRADIENT_NOISE)
                         float2 stretch_factor = float2(_FoamStretchX, _FoamStretchY);
                         noise_foam_base = GradientNoise(noise_uv_foam * stretch_factor, _FoamScale);
-                    #endif
+                #endif
 
                     float foam_blur = 1.0 - _FoamSharpness;
                     float shore_fade = saturate(depth_fade / _FoamDepth);

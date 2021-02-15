@@ -48,13 +48,8 @@
         [Space(10)]
         [Toggle(DR_VERTEX_COLORS_ON)] _VertexColorsEnabled("Enable Vertex Colors", Int) = 0
 
-        /*_FLAT_KIT_BUILT_IN_BEGIN_
-        _LightContribution("[FOLDOUT(Advanced Lighting){4}]Light Color Contribution", Range(0, 1)) = 0
-        _FLAT_KIT_BUILT_IN_END_*/
-        //_FLAT_KIT_URP_BEGIN_
         _LightContribution("[FOLDOUT(Advanced Lighting){5}]Light Color Contribution", Range(0, 1)) = 0
         _LightFalloffSize("Falloff size (point / spot)", Range(0.0001, 1)) = 0.0001
-        //_FLAT_KIT_URP_END_
 
         // Used to provide light direction to cel shading if all light in the scene is baked.
         [Space]
@@ -71,8 +66,9 @@
         [MainTexture] _BaseMap("[FOLDOUT(Texture maps){4}]Albedo", 2D) = "white" {}
         [Space][KeywordEnum(Multiply, Add)]_TextureBlendingMode("[_]Blending Mode", Float) = 0
         [Space]_TextureImpact("[_]Texture Impact", Range(0, 1)) = 1.0
-
         [Space(20)]_BumpMap ("Bump Map", 2D) = "bump" {}
+
+        _Cutoff ("Base Alpha cutoff", Range (0, 1)) = .5
 
         // Blending state
         [HideInInspector] _Surface("__surface", Float) = 0.0
@@ -85,14 +81,8 @@
 
         // Editmode props
         [HideInInspector] _QueueOffset("Queue offset", Float) = 0.0
-
-        // ObsoleteProperties
-        [HideInInspector] _MainTex("BaseMap", 2D) = "white" {}
-        [HideInInspector] _Color("Base Color", Color) = (1, 1, 1, 1)
     }
 
-    // -----------------------------------------------
-    //_FLAT_KIT_URP_BEGIN_
     SubShader
     {
         Tags{"RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline" "IgnoreProjector" = "True"}
@@ -108,13 +98,11 @@
             Cull[_Cull]
 
             HLSLPROGRAM
-            // Required to compile gles 2.0 with standard SRP library
-            // All shaders must be compiled with HLSLcc and currently only gles is not using HLSLcc by default
+            // Legacy of pre-URP 10.0.
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
             #pragma target 2.0
 
-            #pragma shader_feature UNITY_2020_2_OR_NEWER
             #pragma shader_feature_local __ _CELPRIMARYMODE_SINGLE _CELPRIMARYMODE_STEPS _CELPRIMARYMODE_CURVE
             #pragma shader_feature_local DR_CEL_EXTRA_ON
             #pragma shader_feature_local DR_GRADIENT_ON
@@ -126,27 +114,24 @@
 
             // -------------------------------------
             // Material Keywords
-            #pragma shader_feature _NORMALMAP
-            #pragma shader_feature _ALPHATEST_ON
-            #pragma shader_feature _ALPHAPREMULTIPLY_ON
-            #pragma shader_feature _EMISSION
-            #pragma shader_feature _METALLICSPECGLOSSMAP
-            #pragma shader_feature _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-            #pragma shader_feature _OCCLUSIONMAP
-
-            #pragma shader_feature _SPECULARHIGHLIGHTS_OFF
-            #pragma shader_feature _GLOSSYREFLECTIONS_OFF
-            #pragma shader_feature _SPECULAR_SETUP
-            #pragma shader_feature _RECEIVE_SHADOWS_OFF
+            #pragma shader_feature_local_fragment _ALPHATEST_ON                     // shader_feature_local_fragment
+            #pragma shader_feature_local_fragment _ALPHAPREMULTIPLY_ON              // shader_feature_local_fragment
+            #pragma shader_feature_local_fragment _ _SPECGLOSSMAP _SPECULAR_COLOR   // shader_feature_local_fragment
+            #pragma shader_feature_local_fragment _GLOSSINESS_FROM_BASE_ALPHA       // shader_feature_local_fragment
+            #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local_fragment _EMISSION                         // shader_feature_local_fragment
+            #pragma shader_feature_local _RECEIVE_SHADOWS_OFF
 
             // -------------------------------------
-            // Universal Render Pipeline keywords
+            // Universal Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT
-            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
+            #pragma multi_compile _ SHADOWS_SHADOWMASK
+            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
 
             // -------------------------------------
             // Unity defined keywords
@@ -157,13 +142,14 @@
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            #pragma multi_compile _ DOTS_INSTANCING_ON
 
             #pragma vertex StylizedPassVertex
             #pragma fragment StylizedPassFragment
+            #define BUMP_SCALE_NOT_SUPPORTED 1
 
             // TODO: Toggle _NORMALMAP from the editor script.
             #define _NORMALMAP
-            #define BUMP_SCALE_NOT_SUPPORTED 1
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/SimpleLitInput.hlsl"
             #include "LibraryUrp/StylizedInput.hlsl"
@@ -173,6 +159,8 @@
             ENDHLSL
         }
 
+        // All the following passes are from URP SimpleLit.shader.
+        // UsePass "Universal Render Pipeline/Simple Lit/..." - produces z-buffer glitches in local and global outlines combination.
         Pass
         {
             Name "ShadowCaster"
@@ -180,29 +168,84 @@
 
             ZWrite On
             ZTest LEqual
+            ColorMask 0
             Cull[_Cull]
 
             HLSLPROGRAM
-            // Required to compile gles 2.0 with standard srp library
+            // Legacy of pre-URP 10.0.
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
             #pragma target 2.0
 
             // -------------------------------------
             // Material Keywords
-            #pragma shader_feature _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _GLOSSINESS_FROM_BASE_ALPHA
 
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
-            #pragma shader_feature _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+            #pragma multi_compile _ DOTS_INSTANCING_ON
 
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/SimpleLitInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
+            ENDHLSL
+        }
 
+        Pass
+        {
+            Name "GBuffer"
+            Tags{"LightMode" = "UniversalGBuffer"}
+
+            ZWrite[_ZWrite]
+            ZTest LEqual
+            Cull[_Cull]
+
+            HLSLPROGRAM
+            // Legacy of pre-URP 10.0.
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
+            //#pragma shader_feature _ALPHAPREMULTIPLY_ON
+            #pragma shader_feature_local_fragment _ _SPECGLOSSMAP _SPECULAR_COLOR
+            #pragma shader_feature_local_fragment _GLOSSINESS_FROM_BASE_ALPHA
+            #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local_fragment _EMISSION
+            #pragma shader_feature_local _RECEIVE_SHADOWS_OFF
+
+            // -------------------------------------
+            // Universal Pipeline keywords
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+            //#pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
+            //#pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile _ _SHADOWS_SOFT
+            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
+
+            // -------------------------------------
+            // Unity defined keywords
+            #pragma multi_compile _ DIRLIGHTMAP_COMBINED
+            #pragma multi_compile _ LIGHTMAP_ON
+            #pragma multi_compile_fragment _ _GBUFFER_NORMALS_OCT
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+            #pragma multi_compile _ DOTS_INSTANCING_ON
+
+            #pragma vertex LitPassVertexSimple
+            #pragma fragment LitPassFragmentSimple
+            #define BUMP_SCALE_NOT_SUPPORTED 1
+
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/SimpleLitInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/SimpleLitGBufferPass.hlsl"
             ENDHLSL
         }
 
@@ -216,7 +259,7 @@
             Cull[_Cull]
 
             HLSLPROGRAM
-            // Required to compile gles 2.0 with standard srp library
+            // Legacy of pre-URP 10.0.
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
             #pragma target 2.0
@@ -226,16 +269,50 @@
 
             // -------------------------------------
             // Material Keywords
-            #pragma shader_feature _ALPHATEST_ON
-            #pragma shader_feature _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _GLOSSINESS_FROM_BASE_ALPHA
 
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            #pragma multi_compile _ DOTS_INSTANCING_ON
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/SimpleLitInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
+            ENDHLSL
+        }
 
+        // This pass is used when drawing to a _CameraNormalsTexture texture
+        Pass
+        {
+            Name "DepthNormals"
+            Tags{"LightMode" = "DepthNormals"}
+
+            ZWrite On
+            Cull[_Cull]
+
+            HLSLPROGRAM
+            // Legacy of pre-URP 10.0.
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            #pragma vertex DepthNormalsVertex
+            #pragma fragment DepthNormalsFragment
+
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _GLOSSINESS_FROM_BASE_ALPHA
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+            #pragma multi_compile _ DOTS_INSTANCING_ON
+
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/SimpleLitInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthNormalsPass.hlsl"
             ENDHLSL
         }
 
@@ -248,22 +325,22 @@
             Cull Off
 
             HLSLPROGRAM
-            // Required to compile gles 2.0 with standard srp library
+            // Legacy of pre-URP 10.0.
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
 
             #pragma vertex UniversalVertexMeta
             #pragma fragment UniversalFragmentMetaSimple
 
-            #pragma shader_feature _EMISSION
-            #pragma shader_feature _SPECGLOSSMAP
+            #pragma shader_feature_local_fragment _EMISSION
+            #pragma shader_feature_local_fragment _SPECGLOSSMAP
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/SimpleLitInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/SimpleLitMetaPass.hlsl"
 
             ENDHLSL
         }
-
         Pass
         {
             Name "Universal2D"
@@ -271,57 +348,22 @@
             Tags{ "RenderType" = "Transparent" "Queue" = "Transparent" }
 
             HLSLPROGRAM
-            // Required to compile gles 2.0 with standard srp library
+            // Legacy of pre-URP 10.0.
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
 
             #pragma vertex vert
             #pragma fragment frag
-            #pragma shader_feature _ALPHATEST_ON
-            #pragma shader_feature _ALPHAPREMULTIPLY_ON
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _ALPHAPREMULTIPLY_ON
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/SimpleLitInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Utils/Universal2D.hlsl"
             ENDHLSL
         }
     }
-    //_FLAT_KIT_URP_END_
-    // -----------------------------------------------
 
-    // -----------------------------------------------
-    /*_FLAT_KIT_BUILT_IN_BEGIN_
-    SubShader
-    {
-        Tags {
-            "RenderType"="Opaque"
-        }
-        LOD 200
-
-        CGPROGRAM
-
-        // Doc: https://docs.unity3d.com/Manual/SL-SurfaceShaders.html
-        #include "DustyroomStylizedLighting.cginc"
-        #pragma surface surfObject DustyroomStylized vertex:vertObject fullforwardshadows
-        #pragma target 3.0
-        #pragma require interpolators15
-        #define Input InputObject
-
-        #pragma shader_feature_local __ _CELPRIMARYMODE_SINGLE _CELPRIMARYMODE_STEPS _CELPRIMARYMODE_CURVE
-        #pragma shader_feature_local DR_CEL_EXTRA_ON
-        #pragma shader_feature_local DR_GRADIENT_ON
-        #pragma shader_feature_local DR_SPECULAR_ON
-        #pragma shader_feature_local DR_RIM_ON
-        #pragma shader_feature_local DR_VERTEX_COLORS_ON
-        #pragma shader_feature_local __ _UNITYSHADOWMODE_MULTIPLY _UNITYSHADOWMODE_COLOR
-        #pragma shader_feature_local _TEXTUREBLENDINGMODE_MULTIPLY _TEXTUREBLENDINGMODE_ADD
-
-        #pragma skip_variants POINT_COOKIE DIRECTIONAL_COOKIE
-
-        ENDCG
-    }
-    FallBack "Diffuse"
-    _FLAT_KIT_BUILT_IN_END_*/
-    // -----------------------------------------------
-
+    Fallback "Hidden/Universal Render Pipeline/FallbackError"
     CustomEditor "StylizedSurfaceEditor"
 }

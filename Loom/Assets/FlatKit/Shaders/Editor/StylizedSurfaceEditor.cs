@@ -35,7 +35,7 @@ public class StylizedSurfaceEditor : ShaderGUI {
         new Dictionary<string, bool> {{"Rendering options", false}};
 
     private static readonly Color HashColor = new Color(0.85023f, 0.85034f, 0.85045f, 0.85056f);
-    private static readonly int ColorPropertyName = Shader.PropertyToID("_Color");
+    private static readonly int ColorPropertyName = Shader.PropertyToID("_BaseColor");
 
     void DrawStandard(MaterialProperty property) {
         string displayName = property.displayName;

@@ -202,6 +202,65 @@ public class ClientHandle : MonoBehaviour
         }
     }
 
+    // Reads a packet from the server to turn off the lights
+    public static void TurnOffLights(Packet _packet)
+    {
+        string _msg = _packet.ReadString();
+
+        Debug.Log(_msg);
+
+        // Deactivate the sabotage buttons and turn off the lights
+        GameManager.instance.sabotage.GetComponentInChildren<ElectricalSabotage>().button.interactable = false;
+
+        // If the local player isn't an imposter, they shouldn't see
+        if (!GameManager.players[Client.instance.myId].GetComponent<Role>().isImposter)
+        {
+            GameManager.instance.fogSettings.useDistance = true;
+            GameManager.instance.fogSettings.useHeight = true;
+        }
+
+        // If the local player isn't dead, they should be able to fix the lights
+        if (!GameManager.players[Client.instance.myId].GetComponent<Life>().isDead)
+        {
+            GameManager.instance.fixElectrical.GetComponent<Task>().finished = false;
+            GameManager.instance.fixElectrical.GetComponent<Task>().outlinable.enabled = true;
+        }
+    }
+
+    // Reads a packet from the server to turn on the lights
+    public static void TurnOnLights(Packet _packet)
+    {
+        string _msg = _packet.ReadString();
+
+        Debug.Log(_msg);
+
+        // Turn on the lights and do not allow others to interact with them any longer
+        GameManager.instance.fogSettings.useDistance = false;
+        GameManager.instance.fogSettings.useHeight = false;
+        GameManager.instance.fixElectrical.GetComponent<Task>().resetTask = true;
+    }
+
+    // Reads a packet from the server to turn on the lights
+    public static void TimeToSabotage(Packet _packet)
+    {
+        float _timeToSabotage = _packet.ReadFloat();
+
+        // Update the time it will take until the imposters can sabotage again
+        if (_timeToSabotage > 0)
+        {
+            GameManager.players[Client.instance.myId].GetComponent<Role>().sabotageTimerTitle.text = "Can sabotage in:";
+            GameManager.players[Client.instance.myId].GetComponent<Role>().sabotageTimerText.text = _timeToSabotage.ToString("0");
+        }
+        else
+        {
+            GameManager.players[Client.instance.myId].GetComponent<Role>().sabotageTimerTitle.text = "Can sabotage!";
+            GameManager.players[Client.instance.myId].GetComponent<Role>().sabotageTimerText.text = "";
+
+            // Reactivate the sabotage buttons
+            GameManager.instance.sabotage.GetComponentInChildren<ElectricalSabotage>().button.interactable = true;
+        }
+    }
+
     // Reads a packet from the server letting us know which team won
     public static void Winners(Packet _packet)
     {

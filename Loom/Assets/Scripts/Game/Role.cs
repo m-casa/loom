@@ -2,12 +2,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using SensorToolkit;
+using ECM.Components;
 
 public class Role : MonoBehaviour
 {
-    public GameObject map;
+    public GameObject map, sabotage;
     public Text roleIndicator, useIndicator, killIndicator, reportIndicator, 
-        emergencyTimerTitle, emergencyTimerText;
+        emergencyTimerTitle, emergencyTimerText, sabotageTimerTitle, sabotageTimerText;
     public Slider progressBar, taskBar;
     public Life life;
     public Emergency emergency;
@@ -54,7 +55,12 @@ public class Role : MonoBehaviour
 
         // Check if the player is looking at the map
         isUsingMap = Input.GetKeyDown(KeyCode.M);
-        CheckMap();
+
+        // Only be able to open the map if not in a meeting
+        if (!UIManager.instance.activeMeeting)
+        {
+            CheckMap();
+        }
 
         if (isImposter)
         {
@@ -124,6 +130,8 @@ public class Role : MonoBehaviour
 
             currentCooldown = killCooldown;
             killIndicator.gameObject.SetActive(true);
+            sabotage.SetActive(true);
+            sabotageTimerTitle.gameObject.SetActive(true);
         }
         else
         {
@@ -229,6 +237,13 @@ public class Role : MonoBehaviour
     {
         gameObject.tag = "Untagged";
 
+        // If the fog is on still, turn if off
+        if (GameManager.instance.fogSettings.useDistance)
+        {
+            GameManager.instance.fogSettings.useDistance = false;
+            GameManager.instance.fogSettings.useHeight = false;
+        }
+
         // Updates the player's HUD to reflect which team won the last round
         if (_winningTeam.Equals("Crewmates"))
         {
@@ -246,6 +261,8 @@ public class Role : MonoBehaviour
         {
             isImposter = false;
             killIndicator.gameObject.SetActive(false);
+            sabotage.SetActive(false);
+            sabotageTimerTitle.gameObject.SetActive(false);
         }
         else
         {
@@ -283,6 +300,9 @@ public class Role : MonoBehaviour
             }
 
         }
+
+        // Reset any sabotage settings
+        GameManager.instance.fixElectrical.GetComponent<Task>().resetTask = true;
 
         // If the player was dead, respawn their body
         if (life.isDead)
@@ -465,10 +485,12 @@ public class Role : MonoBehaviour
             if (map.activeSelf)
             {
                 map.SetActive(false);
+                GetComponent<MouseLook>().SetCursorLock(true);
             }
             else
             {
                 map.SetActive(true);
+                GetComponent<MouseLook>().SetCursorLock(false);
             }
         }
     }

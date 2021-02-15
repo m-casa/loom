@@ -2,7 +2,7 @@ Shader "Hidden/FlatKit/OutlineFilter"
 {
     Properties
     {
-        [HideInInspector]_MainTex ("Base (RGB)", 2D) = "white" {}
+        [HideInInspector]_BaseMap ("Base (RGB)", 2D) = "white" {}
 
         _EdgeColor ("Outline Color", Color) = (1, 1, 1, 1)
         _Thickness ("Thickness", Range(0, 5)) = 1
@@ -33,12 +33,11 @@ Shader "Hidden/FlatKit/OutlineFilter"
         }
         LOD 200
 
-
-
         Pass
         {
             HLSLPROGRAM
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SurfaceInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
 
             #pragma shader_feature OUTLINE_USE_DEPTH
             #pragma shader_feature OUTLINE_USE_NORMALS
@@ -51,14 +50,11 @@ Shader "Hidden/FlatKit/OutlineFilter"
             uniform half _NormalThresholdMin, _NormalThresholdMax;
             uniform half _ColorThresholdMin, _ColorThresholdMax;
 
-            TEXTURE2D(_CameraColorTexture);
+            TEXTURE2D_X(_CameraColorTexture);
             SAMPLER(sampler_CameraColorTexture);
             float4 _CameraColorTexture_TexelSize;
 
-            TEXTURE2D(_CameraDepthTexture);
-            SAMPLER(sampler_CameraDepthTexture);
-
-            TEXTURE2D(_CameraDepthNormalsTexture);
+            TEXTURE2D_X(_CameraDepthNormalsTexture);
             SAMPLER(sampler_CameraDepthNormalsTexture);
 
             float3 DecodeViewNormalStereo(float4 enc4)
@@ -85,27 +81,22 @@ Shader "Hidden/FlatKit/OutlineFilter"
             // Decode normals stored in _CameraDepthNormalsTexture
             float3 SampleNormal(float2 uv)
             {
-                float4 raw = SAMPLE_TEXTURE2D(_CameraDepthNormalsTexture, sampler_CameraDepthNormalsTexture, uv);
+                float4 raw = SAMPLE_TEXTURE2D_X(_CameraDepthNormalsTexture, sampler_CameraDepthNormalsTexture, UnityStereoTransformScreenSpaceTex(uv));
                 return DecodeViewNormalStereo(raw);
             }
 
             float SampleDepth(float2 uv)
             {
-                float d;
-                #if defined(UNITY_STEREO_INSTANCING_ENABLED) || defined(UNITY_STEREO_MULTIVIEW_ENABLED)
-                d = SAMPLE_TEXTURE2D_ARRAY(_CameraDepthTexture, sampler_CameraDepthTexture, uv, unity_StereoEyeIndex).r;
-                #else
-                d = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, uv);
-                #endif
+                float d = SampleSceneDepth(uv);
                 return Linear01Depth(d);
             }
 
             float4 Outline(float2 uv)
             {
-                float4 original = SAMPLE_TEXTURE2D(_CameraColorTexture, sampler_CameraColorTexture, uv);
+                float4 original = SAMPLE_TEXTURE2D_X(_CameraColorTexture, sampler_CameraColorTexture, UnityStereoTransformScreenSpaceTex(uv));
 
-                const float offset_positive = + ceil(_Thickness * 0.5);
-                const float offset_negative = - floor(_Thickness * 0.5);
+                const float offset_positive = + ceil(_Thickness * 0.5f);
+                const float offset_negative = - floor(_Thickness * 0.5f);
                 const float2 texel_size = 1.0 / float2(_CameraColorTexture_TexelSize.z, _CameraColorTexture_TexelSize.w);
 
                 float left = texel_size.x * offset_negative;
@@ -113,43 +104,43 @@ Shader "Hidden/FlatKit/OutlineFilter"
                 float top = texel_size.y * offset_negative;
                 float bottom = texel_size.y * offset_positive;
 
-                float2 uv0 = uv + float2(left, top);
-                float2 uv1 = uv + float2(right, bottom);
-                float2 uv2 = uv + float2(right, top);
-                float2 uv3 = uv + float2(left, bottom);
+                const float2 uv0 = uv + float2(left, top);
+                const float2 uv1 = uv + float2(right, bottom);
+                const float2 uv2 = uv + float2(right, top);
+                const float2 uv3 = uv + float2(left, bottom);
 
                 #ifdef OUTLINE_USE_DEPTH
-                float d0 = SampleDepth(uv0);
-                float d1 = SampleDepth(uv1);
-                float d2 = SampleDepth(uv2);
-                float d3 = SampleDepth(uv3);
-                
-                float depthThresholdScale = 300.0;
-                float d = length(float2(d1 - d0, d3 - d2)) * depthThresholdScale;
+                const float d0 = SampleDepth(uv0);
+                const float d1 = SampleDepth(uv1);
+                const float d2 = SampleDepth(uv2);
+                const float d3 = SampleDepth(uv3);
+
+                const float depth_threshold_scale = 300.0f;
+                float d = length(float2(d1 - d0, d3 - d2)) * depth_threshold_scale;
                 d = smoothstep(_DepthThresholdMin, _DepthThresholdMax, d);
                 #else
-                float d = 0;
+                float d = 0.0f;
                 #endif  // OUTLINE_USE_DEPTH
 
                 #ifdef OUTLINE_USE_NORMALS
-                float3 n0 = SampleNormal(uv0);
-                float3 n1 = SampleNormal(uv1);
-                float3 n2 = SampleNormal(uv2);
-                float3 n3 = SampleNormal(uv3);
+                const float3 n0 = SampleNormal(uv0);
+                const float3 n1 = SampleNormal(uv1);
+                const float3 n2 = SampleNormal(uv2);
+                const float3 n3 = SampleNormal(uv3);
                 
-                float3 nd1 = n1 - n0;
-                float3 nd2 = n3 - n2;
+                const float3 nd1 = n1 - n0;
+                const float3 nd2 = n3 - n2;
                 float n = sqrt(dot(nd1, nd1) + dot(nd2, nd2));
                 n = smoothstep(_NormalThresholdMin, _NormalThresholdMax, n);
                 #else
-                float n = 0;
+                float n = 0.0f;
                 #endif  // OUTLINE_USE_NORMALS
 
                 #ifdef OUTLINE_USE_COLOR
-                const float3 c0 = SAMPLE_TEXTURE2D(_CameraColorTexture, sampler_CameraColorTexture, uv0);
-                const float3 c1 = SAMPLE_TEXTURE2D(_CameraColorTexture, sampler_CameraColorTexture, uv1);
-                const float3 c2 = SAMPLE_TEXTURE2D(_CameraColorTexture, sampler_CameraColorTexture, uv2);
-                const float3 c3 = SAMPLE_TEXTURE2D(_CameraColorTexture, sampler_CameraColorTexture, uv3);
+                const float3 c0 = SAMPLE_TEXTURE2D_X(_CameraColorTexture, sampler_CameraColorTexture, UnityStereoTransformScreenSpaceTex(uv0));
+                const float3 c1 = SAMPLE_TEXTURE2D_X(_CameraColorTexture, sampler_CameraColorTexture, UnityStereoTransformScreenSpaceTex(uv1));
+                const float3 c2 = SAMPLE_TEXTURE2D_X(_CameraColorTexture, sampler_CameraColorTexture, UnityStereoTransformScreenSpaceTex(uv2));
+                const float3 c3 = SAMPLE_TEXTURE2D_X(_CameraColorTexture, sampler_CameraColorTexture, UnityStereoTransformScreenSpaceTex(uv3));
 
                 const float3 cd1 = c1 - c0;
                 const float3 cd2 = c3 - c2;
@@ -161,10 +152,12 @@ Shader "Hidden/FlatKit/OutlineFilter"
 
                 float g = max(d, max(n, c));
 
+                // _EdgeColor.rgb = float3(1, 0, 0);
                 #ifdef OUTLINE_ONLY
                 original.rgb = lerp(1.0 - _EdgeColor.rgb, _EdgeColor.rgb, g * _EdgeColor.a);
                 #endif  // OUTLINE_ONLY
 
+                
                 float4 output;
                 output.rgb = lerp(original.rgb, _EdgeColor.rgb, g * _EdgeColor.a);
                 output.a = original.a;
@@ -174,7 +167,7 @@ Shader "Hidden/FlatKit/OutlineFilter"
             struct Attributes
             {
                 float4 positionOS : POSITION;
-                float2 uv : TEXCOORD0;
+                float2 texcoord : TEXCOORD0;
 
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
@@ -182,7 +175,7 @@ Shader "Hidden/FlatKit/OutlineFilter"
             struct Varyings
             {
                 float2 uv : TEXCOORD0;
-                float4 vertex : SV_POSITION;
+                float4 positionCS : SV_POSITION;
 
                 UNITY_VERTEX_INPUT_INSTANCE_ID
                 UNITY_VERTEX_OUTPUT_STEREO
@@ -190,13 +183,16 @@ Shader "Hidden/FlatKit/OutlineFilter"
 
             Varyings vert(Attributes input)
             {
-                UNITY_SETUP_INSTANCE_ID(input);
                 Varyings output = (Varyings)0;
+
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_TRANSFER_INSTANCE_ID(input, output);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
-                const VertexPositionInputs vertexInput = GetVertexPositionInputs(input.positionOS.xyz);
-                output.vertex = vertexInput.positionCS;
-                output.uv = input.uv;
+                const float3 positionWS = TransformObjectToWorld(input.positionOS.xyz);
+                const float4 positionCS = TransformWorldToHClip(positionWS);
+                output.positionCS = positionCS;
+                output.uv = input.texcoord;
 
                 return output;
             }

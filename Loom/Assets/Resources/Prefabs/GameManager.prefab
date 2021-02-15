@@ -47,4 +47,48 @@ MonoBehaviour:
     type: 3}
   playerPrefab: {fileID: 7895108494425555221, guid: da8effbe8e3972c4d9c5c9aa5cf8a146,
     type: 3}
+  swipeCard: {fileID: 0}
+  map: {fileID: 0}
+  sabotage: {fileID: 0}
+  fixElectrical: {fileID: 0}
+  fixWiring:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  divertPower:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  uploadData:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  shortTask:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  longTask:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   emergency: {fileID: 0}
+  fogSettings: {fileID: 11400000, guid: 742e00c01d7767b4aa71d2cb044726a8, type: 2}

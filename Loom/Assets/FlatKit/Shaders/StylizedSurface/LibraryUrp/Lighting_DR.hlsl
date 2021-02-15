@@ -36,6 +36,12 @@ half3 LightingPhysicallyBased_DSTRM(Light light, half3 normalWS, half3 viewDirec
 
     half4 c = _BaseColor;
 
+#if defined(_QUIBLI_GRADIENT)
+    _BaseColor = SAMPLE_TEXTURE2D(_ColorGradient, sampler_ColorGradient, float2(1.0, 0.5));
+    const half NdotLTPrimary = NdotLTransitionPrimary(normalWS, light.direction);
+    float2 gradient_uv = float2(NdotLTPrimary, 0.5);
+    c = SAMPLE_TEXTURE2D(_ColorGradient, sampler_ColorGradient, gradient_uv);
+#else
 #if defined(_CELPRIMARYMODE_SINGLE)
     const half NdotLTPrimary = NdotLTransitionPrimary(normalWS, light.direction);
     c = lerp(UNITY_ACCESS_INSTANCED_PROP(Props, _ColorDim), c, NdotLTPrimary);
@@ -55,6 +61,7 @@ half3 LightingPhysicallyBased_DSTRM(Light light, half3 normalWS, half3 viewDirec
     const half NdotLTExtra = NdotLTransitionExtra(normalWS, light.direction);
     c = lerp(_ColorDimExtra, c, NdotLTExtra);
 #endif  // DR_CEL_EXTRA_ON
+#endif
 
 #if defined(DR_GRADIENT_ON)
     const float angleRadians = _GradientAngle / 180.0 * PI;
@@ -67,7 +74,7 @@ half3 LightingPhysicallyBased_DSTRM(Light light, half3 normalWS, half3 viewDirec
 
 #if defined(DR_RIM_ON)
     const half NdotL = dot(normalWS, light.direction);
-    const float4 rim = 1.0 - dot(viewDirectionWS, normalWS);
+    const float rim = 1.0 - dot(viewDirectionWS, normalWS);
     const float rimLightAlign = UNITY_ACCESS_INSTANCED_PROP(Props, _FlatRimLightAlign);
     const float rimSize = UNITY_ACCESS_INSTANCED_PROP(Props, _FlatRimSize);
     const float rimSpread = 1.0 - rimSize - NdotL * rimLightAlign;
@@ -82,7 +89,7 @@ half3 LightingPhysicallyBased_DSTRM(Light light, half3 normalWS, half3 viewDirec
     const float NdotH = dot(normalWS, halfVector) * 0.5 + 0.5;
     const float specularSize = UNITY_ACCESS_INSTANCED_PROP(Props, _FlatSpecularSize);
     const float specEdgeSmooth = UNITY_ACCESS_INSTANCED_PROP(Props, _FlatSpecularEdgeSmoothness);
-    const float specular = saturate(pow(NdotH, 100.0 * (1.0 - specularSize) * (1.0 - specularSize)));
+    const float specular = saturate(pow(abs(NdotH), 100.0 * (1.0 - specularSize) * (1.0 - specularSize)));
     const float specularTransition = smoothstep(0.5 - specEdgeSmooth * 0.1, 0.5 + specEdgeSmooth * 0.1, specular);
     c = lerp(c, UNITY_ACCESS_INSTANCED_PROP(Props, _FlatSpecularColor), specularTransition);
 #endif  // DR_SPECULAR_ON

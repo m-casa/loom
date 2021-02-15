@@ -1,15 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using FlatKit;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
     public static Dictionary<int, PlayerManager> players = new Dictionary<int, PlayerManager>();
 
-    public GameObject localPlayerPrefab, playerPrefab, swipeCard, map;
+    public GameObject localPlayerPrefab, playerPrefab, swipeCard, map, sabotage, fixElectrical;
     public GameObject[] fixWiring, divertPower, uploadData, shortTask, longTask;
     public Emergency emergency;
+    public FogSettings fogSettings;
     private float simulationTimer;
 
     // Make sure there is only once instance of this client
@@ -55,6 +57,7 @@ public class GameManager : MonoBehaviour
         {
             _player = Instantiate(localPlayerPrefab, _position, _rotation);
             _player.GetComponent<Role>().map = map;
+            _player.GetComponent<Role>().sabotage = sabotage;
             _player.GetComponent<Role>().emergency = emergency;
         }
         else

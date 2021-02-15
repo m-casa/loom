@@ -138,7 +138,7 @@ half4 StylizedPassFragment(Varyings input) : SV_Target
 
     const float2 uv = input.uv;
     const half4 diffuseAlpha = SampleAlbedoAlpha(uv, TEXTURE2D_ARGS(_BaseMap, sampler_BaseMap));
-    half3 diffuse = diffuseAlpha.rgb * _BaseColor.rgb;
+    const half3 diffuse = diffuseAlpha.rgb * _BaseColor.rgb;
 
     const half alpha = diffuseAlpha.a * _BaseColor.a;
     AlphaDiscard(alpha, _Cutoff);
@@ -158,10 +158,10 @@ half4 StylizedPassFragment(Varyings input) : SV_Target
     {
         const half4 tex = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.uv);
 #if defined(_TEXTUREBLENDINGMODE_ADD)
-        color.rgb += lerp(half4(0.0, 0.0, 0.0, 0.0), tex, _TextureImpact).rgb;
+        color.rgb += lerp(half4(0.0f, 0.0f, 0.0f, 0.0f), tex, _TextureImpact).rgb;
 #else  // _TEXTUREBLENDINGMODE_MULTIPLY
         // This is the default blending mode for compatibility with the v.1 of the asset.
-        color.rgb *= lerp(half4(1.0, 1.0, 1.0, 1.0), tex, _TextureImpact).rgb;
+        color.rgb *= lerp(half4(1.0f, 1.0f, 1.0f, 1.0f), tex, _TextureImpact).rgb;
 #endif
     }
 

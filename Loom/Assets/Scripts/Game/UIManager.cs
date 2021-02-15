@@ -14,7 +14,7 @@ public class UIManager : MonoBehaviour
     public Button[] votingOption;
     public Button skip;
     public Text meetingTimerText, serverMessage;
-    public bool activeMeeting;
+    public bool activeMeeting, revealingVotes;
     private float meetingTimer;
     private int ejectedId;
     private bool playerEjected;
@@ -38,10 +38,10 @@ public class UIManager : MonoBehaviour
     public void Update()
     {
         // If the meeting came to an end, reveal the votes
-        if (activeMeeting && meetingTimer <= 0)
+        if (meetingTimer <= 0 && !revealingVotes)
         {
+            revealingVotes = true;
             RevealVotes();
-            activeMeeting = false;
         }
     }
 
@@ -94,6 +94,7 @@ public class UIManager : MonoBehaviour
         GameManager.instance.DespawnBodies();
 
         // Disable the local player's movement/input, and allow them to interact with the voting system
+        localPlayer.GetComponent<LocalFirstPersonController>().moveDirection = Vector3.zero;
         localPlayer.GetComponent<LocalFirstPersonController>().enabled = false;
         localPlayer.GetComponent<RangeSensor>().enabled = false;
         localPlayer.GetComponent<Role>().canInteract = false;
@@ -276,6 +277,8 @@ public class UIManager : MonoBehaviour
     // Ends the meeting and resumes the round
     public void EndMeeting()
     {
+        activeMeeting = false;
+
         PlayerManager localPlayer = GameManager.players[Client.instance.myId];
         CardInfo cardInfo;
         ColorBlock newColor = skip.colors;
@@ -385,6 +388,7 @@ public class UIManager : MonoBehaviour
             }
             else if (currentCard.numOfVotes == mostVoted.numOfVotes)
             {
+                skip.GetComponent<CardInfo>().numOfVotes = currentCard.numOfVotes;
                 mostVoted = skip.GetComponent<CardInfo>();
                 previouslyMostVoted = currentCard;
             }

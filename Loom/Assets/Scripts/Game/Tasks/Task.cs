@@ -15,6 +15,7 @@ public class Task : MonoBehaviour
         isBeingUsed = false;
         isBeingHeld = false;
         finished = true;
+        resetTask = false;
     }
 
     // Is used to pass the current interaction state of the player to

@@ -21,6 +21,9 @@ public class Life : MonoBehaviour
         GetComponent<PlayerManager>().nameInidcator.gameObject.SetActive(false);
         gameObject.tag = "Ghost";
 
+        // Do not allow this player to fix anything currently sabotaged
+        GameManager.instance.fixElectrical.GetComponent<Task>().resetTask = true;
+
         if (!UIManager.instance.activeMeeting)
         {
             // Spawn in the dead body and assign it the correct color

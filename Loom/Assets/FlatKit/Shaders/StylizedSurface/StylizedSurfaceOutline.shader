@@ -48,13 +48,8 @@
         [Space(10)]
         [Toggle(DR_VERTEX_COLORS_ON)] _VertexColorsEnabled("Enable Vertex Colors", Int) = 0
 
-        /*_FLAT_KIT_BUILT_IN_BEGIN_
-        _LightContribution("[FOLDOUT(Advanced Lighting){4}]Light Color Contribution", Range(0, 1)) = 0
-        _FLAT_KIT_BUILT_IN_END_*/
-        //_FLAT_KIT_URP_BEGIN_
         _LightContribution("[FOLDOUT(Advanced Lighting){5}]Light Color Contribution", Range(0, 1)) = 0
         _LightFalloffSize("Falloff size (point / spot)", Range(0.0001, 1)) = 0.0001
-        //_FLAT_KIT_URP_END_
 
         // Used to provide light direction to cel shading if all light in the scene is baked.
         [Space(5)]
@@ -71,8 +66,9 @@
         [MainTexture] _BaseMap("[FOLDOUT(Texture maps){4}]Albedo", 2D) = "white" {}
         [Space][KeywordEnum(Multiply, Add)]_TextureBlendingMode("[_]Blending Mode", Float) = 0
         [Space]_TextureImpact("[_]Texture Impact", Range(0, 1)) = 1.0
-        
         [Space(20)]_BumpMap ("Bump Map", 2D) = "bump" {}
+
+        _Cutoff ("Base Alpha cutoff", Range (0, 1)) = .5
 
         // Blending state
         [HideInInspector] _Surface("__surface", Float) = 0.0
@@ -86,20 +82,14 @@
         // Editmode props
         [HideInInspector] _QueueOffset("Queue offset", Float) = 0.0
 
-        // ObsoleteProperties
-        [HideInInspector] _MainTex("BaseMap", 2D) = "white" {}
-        [HideInInspector] _Color("Base Color", Color) = (1, 1, 1, 1)
-        
         // --------------------- OUTLINE PROPS -----------------------
-        [Space(25)]
-        _OutlineColor("[FOLDOUT(Outline){4}]Outline Color", Color) = (0.85023, 0.85034, 0.85045, 0.85056)
-        _OutlineWidth("Outline Width", Float) = 0.01
-        _OutlineDepthOffset("Outline Depth Offset", Range(0, 1)) = 0.0
+        _OutlineColor("[FOLDOUT(Outline){5}]Color", Color) = (0.85023, 0.85034, 0.85045, 0.85056)
+        _OutlineWidth("Width", Float) = 0.01
+        _OutlineScale("Scale", Float) = 1.0
+        _OutlineDepthOffset("Depth Offset", Range(0, 1)) = 0.0
         _CameraDistanceImpact("Camera Distance Impact", Range(0, 1)) = 0.0
     }
 
-    // -----------------------------------------------
-    //_FLAT_KIT_URP_BEGIN_
     SubShader
     {
         Tags{"RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline" "IgnoreProjector" = "True"}
@@ -121,6 +111,7 @@
             UNITY_INSTANCING_BUFFER_START(OutlineProps)
             UNITY_DEFINE_INSTANCED_PROP(half4, _OutlineColor)
             UNITY_DEFINE_INSTANCED_PROP(half, _OutlineWidth)
+            UNITY_DEFINE_INSTANCED_PROP(half, _OutlineScale)
             UNITY_DEFINE_INSTANCED_PROP(half, _OutlineDepthOffset)
             UNITY_DEFINE_INSTANCED_PROP(half, _CameraDistanceImpact)
             UNITY_INSTANCING_BUFFER_END(OutlineProps)
@@ -138,6 +129,8 @@
                 float4 position : SV_POSITION;
                 float3 normal : NORMAL;
 
+                UNITY_FOG_COORDS(0)
+
                 UNITY_VERTEX_INPUT_INSTANCE_ID
                 UNITY_VERTEX_OUTPUT_STEREO
             };
@@ -149,18 +142,18 @@
                 UNITY_INITIALIZE_OUTPUT(VertexOutput, o);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-                float4 clipPosition = UnityObjectToClipPos(v.position);
-                float3 clipNormal = mul((float3x3) UNITY_MATRIX_VP, mul((float3x3) UNITY_MATRIX_M, v.normal));
-                half outlineWidth = UNITY_ACCESS_INSTANCED_PROP(OutlineProps, _OutlineWidth);
-                half cameraDistanceImpact = lerp(clipPosition.w, 4.0, _CameraDistanceImpact);
-                float2 offset = normalize(clipNormal.xy) / _ScreenParams.xy * outlineWidth * cameraDistanceImpact * 2.0;
+                float4 clipPosition = UnityObjectToClipPos(v.position * _OutlineScale);
+                const float3 clipNormal = mul((float3x3) UNITY_MATRIX_VP, mul((float3x3) UNITY_MATRIX_M, v.normal));
+                const half outlineWidth = UNITY_ACCESS_INSTANCED_PROP(OutlineProps, _OutlineWidth);
+                const half cameraDistanceImpact = lerp(clipPosition.w, 4.0, _CameraDistanceImpact);
+                const float2 offset = normalize(clipNormal.xy) / _ScreenParams.xy * outlineWidth * cameraDistanceImpact * 2.0;
                 clipPosition.xy += offset;
-                half outlineDepthOffset = UNITY_ACCESS_INSTANCED_PROP(OutlineProps, _OutlineDepthOffset);
+                const half outlineDepthOffset = UNITY_ACCESS_INSTANCED_PROP(OutlineProps, _OutlineDepthOffset);
                 clipPosition.z -= outlineDepthOffset;
                 o.position = clipPosition;
                 o.normal = clipNormal;
 
-                UNITY_TRANSFER_FOG(o, o.vertex);
+                UNITY_TRANSFER_FOG(o, o.position);
 
                 return o;
             }
@@ -175,95 +168,211 @@
             ENDCG
         }
 
-    }
-    FallBack "FlatKit/Stylized Surface"
-    //_FLAT_KIT_URP_END_
-    // -----------------------------------------------
+        // All the following passes are from URP SimpleLit.shader.
+        // UsePass "Universal Render Pipeline/Simple Lit/..." - produces z-buffer glitches in local and global outlines combination.
+        Pass
+        {
+            Name "ShadowCaster"
+            Tags{"LightMode" = "ShadowCaster"}
 
-    // -----------------------------------------------
-    /*_FLAT_KIT_BUILT_IN_BEGIN_
-    SubShader
-    {
-        Tags {
-            "RenderType"="Opaque"
-        }
-        LOD 200
+            ZWrite On
+            ZTest LEqual
+            ColorMask 0
+            Cull[_Cull]
 
-        CGPROGRAM
-        #include "DustyroomStylizedLighting.cginc"
-        // Doc: https://docs.unity3d.com/Manual/SL-SurfaceShaders.html
-        #pragma surface surfObject DustyroomStylized vertex:vertObject fullforwardshadows
-        #pragma require interpolators15
-        #pragma target 3.0
-        #define Input InputObject
+            HLSLPROGRAM
+            // Legacy of pre-URP 10.0.
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
 
-        #pragma shader_feature_local __ _CELPRIMARYMODE_SINGLE _CELPRIMARYMODE_STEPS _CELPRIMARYMODE_CURVE
-        #pragma shader_feature_local DR_CEL_EXTRA_ON
-        #pragma shader_feature_local DR_GRADIENT_ON
-        #pragma shader_feature_local DR_SPECULAR_ON
-        #pragma shader_feature_local DR_RIM_ON
-        #pragma shader_feature_local DR_VERTEX_COLORS_ON
-        #pragma shader_feature_local __ _UNITYSHADOWMODE_MULTIPLY _UNITYSHADOWMODE_COLOR
-        #pragma shader_feature_local _TEXTUREBLENDINGMODE_MULTIPLY _TEXTUREBLENDINGMODE_ADD
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _GLOSSINESS_FROM_BASE_ALPHA
 
-        #pragma skip_variants POINT_COOKIE DIRECTIONAL_COOKIE
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+            #pragma multi_compile _ DOTS_INSTANCING_ON
 
-        ENDCG
+            #pragma vertex ShadowPassVertex
+            #pragma fragment ShadowPassFragment
 
-        Pass {
-            Cull Front
-
-            CGPROGRAM
-            #include "UnityInstancing.cginc"
-            #include "UnityCG.cginc"
-
-            #pragma vertex VertexProgram
-            #pragma fragment FragmentProgram
-
-            #pragma multi_compile_fog
-
-            UNITY_INSTANCING_BUFFER_START(OutlineProps)
-            UNITY_DEFINE_INSTANCED_PROP(half4, _OutlineColor)
-            UNITY_DEFINE_INSTANCED_PROP(half, _OutlineWidth)
-            UNITY_DEFINE_INSTANCED_PROP(half, _OutlineDepthOffset)
-            UNITY_DEFINE_INSTANCED_PROP(half, _CameraDistanceImpact)
-            UNITY_INSTANCING_BUFFER_END(OutlineProps)
-
-            struct v2f
-            {
-                UNITY_FOG_COORDS(0)
-                float4 vertex : SV_POSITION;
-            };
-
-            v2f VertexProgram(float4 position : POSITION, float3 normal : NORMAL) {
-                float4 clipPosition = UnityObjectToClipPos(position);
-                float3 clipNormal = mul((float3x3) UNITY_MATRIX_VP, mul((float3x3) UNITY_MATRIX_M, normal));
-                half outlineWidth = UNITY_ACCESS_INSTANCED_PROP(OutlineProps, _OutlineWidth);
-                half cameraDistanceImpact = lerp(clipPosition.w, 4.0, _CameraDistanceImpact);
-                float2 offset = normalize(clipNormal.xy) / _ScreenParams.xy * outlineWidth * cameraDistanceImpact * 2.0;
-                clipPosition.xy += offset;
-                half outlineDepthOffset = UNITY_ACCESS_INSTANCED_PROP(OutlineProps, _OutlineDepthOffset);
-                clipPosition.z -= outlineDepthOffset;
-
-                v2f o;
-                o.vertex = clipPosition;
-                UNITY_TRANSFER_FOG(o, o.vertex);
-                return o;
-            }
-
-            half4 FragmentProgram(v2f i) : SV_TARGET {
-                half4 color = UNITY_ACCESS_INSTANCED_PROP(OutlineProps, _OutlineColor);
-                UNITY_APPLY_FOG(i.fogCoord, color);
-                return color;
-            }
-
-            ENDCG
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/SimpleLitInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
+            ENDHLSL
         }
 
-    }
-    FallBack "Diffuse"
-    _FLAT_KIT_BUILT_IN_END_*/
-    // -----------------------------------------------
+        Pass
+        {
+            Name "GBuffer"
+            Tags{"LightMode" = "UniversalGBuffer"}
 
+            ZWrite[_ZWrite]
+            ZTest LEqual
+            Cull[_Cull]
+
+            HLSLPROGRAM
+            // Legacy of pre-URP 10.0.
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
+            //#pragma shader_feature _ALPHAPREMULTIPLY_ON
+            #pragma shader_feature_local_fragment _ _SPECGLOSSMAP _SPECULAR_COLOR
+            #pragma shader_feature_local_fragment _GLOSSINESS_FROM_BASE_ALPHA
+            #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local_fragment _EMISSION
+            #pragma shader_feature_local _RECEIVE_SHADOWS_OFF
+
+            // -------------------------------------
+            // Universal Pipeline keywords
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+            //#pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
+            //#pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile _ _SHADOWS_SOFT
+            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
+
+            // -------------------------------------
+            // Unity defined keywords
+            #pragma multi_compile _ DIRLIGHTMAP_COMBINED
+            #pragma multi_compile _ LIGHTMAP_ON
+            #pragma multi_compile_fragment _ _GBUFFER_NORMALS_OCT
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+            #pragma multi_compile _ DOTS_INSTANCING_ON
+
+            #pragma vertex LitPassVertexSimple
+            #pragma fragment LitPassFragmentSimple
+            #define BUMP_SCALE_NOT_SUPPORTED 1
+
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/SimpleLitInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/SimpleLitGBufferPass.hlsl"
+            ENDHLSL
+        }
+
+        Pass
+        {
+            Name "DepthOnly"
+            Tags{"LightMode" = "DepthOnly"}
+
+            ZWrite On
+            ColorMask 0
+            Cull[_Cull]
+
+            HLSLPROGRAM
+            // Legacy of pre-URP 10.0.
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            #pragma vertex DepthOnlyVertex
+            #pragma fragment DepthOnlyFragment
+
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _GLOSSINESS_FROM_BASE_ALPHA
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+            #pragma multi_compile _ DOTS_INSTANCING_ON
+
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/SimpleLitInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
+            ENDHLSL
+        }
+
+        // This pass is used when drawing to a _CameraNormalsTexture texture
+        Pass
+        {
+            Name "DepthNormals"
+            Tags{"LightMode" = "DepthNormals"}
+
+            ZWrite On
+            Cull[_Cull]
+
+            HLSLPROGRAM
+            // Legacy of pre-URP 10.0.
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            #pragma vertex DepthNormalsVertex
+            #pragma fragment DepthNormalsFragment
+
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _GLOSSINESS_FROM_BASE_ALPHA
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+            #pragma multi_compile _ DOTS_INSTANCING_ON
+
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/SimpleLitInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthNormalsPass.hlsl"
+            ENDHLSL
+        }
+
+        // This pass it not used during regular rendering, only for lightmap baking.
+        Pass
+        {
+            Name "Meta"
+            Tags{ "LightMode" = "Meta" }
+
+            Cull Off
+
+            HLSLPROGRAM
+            // Legacy of pre-URP 10.0.
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            #pragma vertex UniversalVertexMeta
+            #pragma fragment UniversalFragmentMetaSimple
+
+            #pragma shader_feature_local_fragment _EMISSION
+            #pragma shader_feature_local_fragment _SPECGLOSSMAP
+
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/SimpleLitInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/SimpleLitMetaPass.hlsl"
+
+            ENDHLSL
+        }
+        Pass
+        {
+            Name "Universal2D"
+            Tags{ "LightMode" = "Universal2D" }
+            Tags{ "RenderType" = "Transparent" "Queue" = "Transparent" }
+
+            HLSLPROGRAM
+            // Legacy of pre-URP 10.0.
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            #pragma vertex vert
+            #pragma fragment frag
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _ALPHAPREMULTIPLY_ON
+
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/SimpleLitInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/Utils/Universal2D.hlsl"
+            ENDHLSL
+        }
+    }
+
+    Fallback "Hidden/Universal Render Pipeline/FallbackError"
     CustomEditor "StylizedSurfaceEditor"
 }

@@ -4,13 +4,13 @@ using UnityEngine.Rendering.Universal;
 
 public class FlatKitDepthNormals : ScriptableRendererFeature {
     class DepthNormalsPass : ScriptableRenderPass {
-        private readonly int _depthBufferBits = 32;
         private RenderTargetHandle _depthAttachmentHandle;
         private RenderTextureDescriptor _descriptor;
-        private readonly Material _depthNormalsMaterial = null;
         private FilteringSettings _filteringSettings;
-        readonly string _profilerTag = "[Flat Kit] Depth Normals Pass";
-        readonly ShaderTagId _shaderTagId = new ShaderTagId("DepthOnly");
+        private readonly Material _depthNormalsMaterial = null;
+        private readonly string _profilerTag = "[Flat Kit] Depth Normals Pass";
+        private readonly ShaderTagId _shaderTagId = new ShaderTagId("DepthOnly");
+        private readonly int _depthBufferBits = 32;
 
         public DepthNormalsPass(RenderQueueRange renderQueueRange, LayerMask layerMask, Material material) {
             _filteringSettings = new FilteringSettings(renderQueueRange, layerMask);
@@ -52,8 +52,7 @@ public class FlatKitDepthNormals : ScriptableRendererFeature {
 
                 drawSettings.overrideMaterial = _depthNormalsMaterial;
 
-                context.DrawRenderers(renderingData.cullResults, ref drawSettings,
-                    ref _filteringSettings);
+                context.DrawRenderers(renderingData.cullResults, ref drawSettings, ref _filteringSettings);
 
                 cmd.SetGlobalTexture("_CameraDepthNormalsTexture", _depthAttachmentHandle.id);
             }
@@ -62,7 +61,8 @@ public class FlatKitDepthNormals : ScriptableRendererFeature {
             CommandBufferPool.Release(cmd);
         }
 
-        public override void FrameCleanup(CommandBuffer cmd) {
+        public override void OnCameraCleanup(CommandBuffer cmd) {
+        // public override void FrameCleanup(CommandBuffer cmd) {
             if (_depthAttachmentHandle == RenderTargetHandle.CameraTarget) return;
             cmd.ReleaseTemporaryRT(_depthAttachmentHandle.id);
             _depthAttachmentHandle = RenderTargetHandle.CameraTarget;
@@ -79,8 +79,8 @@ public class FlatKitDepthNormals : ScriptableRendererFeature {
 
     public override void Create() {
         _depthNormalsMaterial = CoreUtils.CreateEngineMaterial("Hidden/Internal-DepthNormalsTexture");
-        _depthNormalsPass = new DepthNormalsPass(RenderQueueRange.opaque, -1, _depthNormalsMaterial) {
-            renderPassEvent = RenderPassEvent.AfterRenderingPrePasses
+        _depthNormalsPass = new DepthNormalsPass(RenderQueueRange.all, -1, _depthNormalsMaterial) {
+            renderPassEvent = RenderPassEvent.AfterRenderingTransparents
         };
         _depthNormalsTexture.Init("_CameraDepthNormalsTexture");
     }
