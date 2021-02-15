@@ -23,7 +23,6 @@ public class FixElectrical : MonoBehaviour
         {
             task.finished = true;
             task.outlinable.enabled = false;
-            Debug.Log("Finished fixing eletrical!");
             ClientSend.FixElectrical();
 
             // Reset the task states to false

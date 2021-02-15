@@ -4543,6 +4543,7 @@ MonoBehaviour:
   meetingTimerText: {fileID: 4072988626261697435}
   serverMessage: {fileID: 448702679697091993}
   activeMeeting: 0
+  revealingVotes: 0
 --- !u!1 &3716304899090728810
 GameObject:
   m_ObjectHideFlags: 0
@@ -15869,7 +15870,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
-  m_RenderPostProcessing: 1
+  m_RenderPostProcessing: 0
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0

@@ -122,22 +122,6 @@ namespace ECM.Controllers
         }
 
         /// <summary>
-        /// Use this method to animate camera.
-        /// The default implementation use this to animate camera's when crouching.
-        /// Called on LateUpdate.
-        /// </summary>
-
-        protected virtual void AnimateView()
-        {
-            // Scale camera pivot to simulate crouching
-
-            var yScale = isCrouching ? Mathf.Clamp01(crouchingHeight / standingHeight) : 1.0f;
-
-            cameraPivotTransform.localScale = Vector3.MoveTowards(cameraPivotTransform.localScale,
-                new Vector3(1.0f, yScale, 1.0f), 5.0f * Time.deltaTime);
-        }
-
-        /// <summary>
         /// Perform 'Look' rotation.
         /// This rotate the character along its y-axis (yaw) and a child camera along its local x-axis (pitch).
         /// </summary>
@@ -293,38 +277,6 @@ namespace ECM.Controllers
             // Call the parent class' version of method
 
             base.Awake();
-
-            // Cache and initialize this components
-
-            mouseLook = GetComponent<Components.MouseLook>();
-            if (mouseLook == null)
-            {
-                Debug.LogError(
-                    string.Format(
-                        "BaseFPSController: No 'MouseLook' found. Please add a 'MouseLook' component to '{0}' game object",
-                        name));
-            }
-
-            cameraPivotTransform = transform.Find("Camera_Pivot");
-            if (cameraPivotTransform == null)
-            {
-                Debug.LogError(string.Format(
-                    "BaseFPSController: No 'Camera_Pivot' found. Please parent a transform gameobject to '{0}' game object.",
-                    name));
-            }
-
-            var cam = GetComponentInChildren<Camera>();
-            if (cam == null)
-            {
-                Debug.LogError(
-                    string.Format(
-                        "BaseFPSController: No 'Camera' found. Please parent a camera to '{0}' game object.", name));
-            }
-            else
-            {
-                cameraTransform = cam.transform;
-                mouseLook.Init(transform, cameraTransform);
-            }
         }
 
         public override void FixedUpdate()
@@ -337,13 +289,6 @@ namespace ECM.Controllers
         {
             // Perform character animation (if not paused)
             Animate();
-        }
-
-        public virtual void LateUpdate()
-        {
-            // Perform camera's (view) animation
-
-            AnimateView();
         }
 
         #endregion

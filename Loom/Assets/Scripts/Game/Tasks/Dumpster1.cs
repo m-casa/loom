@@ -24,7 +24,6 @@ public class Dumpster1 : MonoBehaviour
             task.outlinable.enabled = false;
             garbage.task.finished = false;
             garbage.task.outlinable.enabled = true;
-            Debug.Log("Finished dumping garbage into dumpster 1!");
 
             // Reset the task states to false
             task.isBeingUsed = false;

@@ -20,7 +20,6 @@ public class AlignEngines : MonoBehaviour
         {
             task.finished = true;
             task.outlinable.enabled = false;
-            Debug.Log("Finished aligning engine!");
             ClientSend.CompletedTask();
 
             // Reset the task states to false

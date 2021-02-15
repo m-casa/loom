@@ -20,7 +20,6 @@ public class ClearAstroids : MonoBehaviour
         {
             task.finished = true;
             task.outlinable.enabled = false;
-            Debug.Log("Finished clearing astroids!");
             ClientSend.CompletedTask();
 
             // Reset the task states to false

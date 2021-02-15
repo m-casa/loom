@@ -20,7 +20,6 @@ public class SubmitScan : MonoBehaviour
         {
             task.finished = true;
             task.outlinable.enabled = false;
-            Debug.Log("Finished submitting scan!");
             ClientSend.CompletedTask();
 
             // Reset the task states to false

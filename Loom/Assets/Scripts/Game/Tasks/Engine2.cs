@@ -21,7 +21,6 @@ public class Engine2 : MonoBehaviour
         {
             task.finished = true;
             task.outlinable.enabled = false;
-            Debug.Log("Finished filling Engine 2 with fuel!");
             ClientSend.CompletedTask();
 
             // Reset the task states to false

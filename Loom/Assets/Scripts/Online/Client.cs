@@ -33,7 +33,6 @@ public class Client : MonoBehaviour
         }
         else if (instance != this)
         {
-            Debug.Log("Instance already exists, destroying object!");
             Destroy(this);
         }
     }
@@ -380,8 +379,6 @@ public class Client : MonoBehaviour
     {
         if (isConnected)
         {
-            Debug.Log("Disconnected from server.");
-
             isConnected = false;
 
             tcp.socket.Close();

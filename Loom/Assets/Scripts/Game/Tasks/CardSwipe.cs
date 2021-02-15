@@ -20,7 +20,6 @@ public class CardSwipe : MonoBehaviour
         {
             task.finished = true;
             task.outlinable.enabled = false;
-            Debug.Log("Finished card swipe!");
             ClientSend.CompletedTask();
 
             // Reset the task states to false

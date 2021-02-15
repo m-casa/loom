@@ -11,6 +11,7 @@ public class ClientHandle : MonoBehaviour
         int _myId = _packet.ReadInt();
 
         Debug.Log($"Message from server: {_msg}");
+
         Client.instance.myId = _myId;
         ClientSend.WelcomeReceived();
 
@@ -158,8 +159,6 @@ public class ClientHandle : MonoBehaviour
     {
         string _msg = _packet.ReadString();
 
-        Debug.Log(_msg);
-
         UIManager.instance.StartMeeting();
     }
 
@@ -185,8 +184,6 @@ public class ClientHandle : MonoBehaviour
     {
         string _msg = _packet.ReadString();
 
-        Debug.Log(_msg);
-
         UIManager.instance.EndMeeting();
     }
 
@@ -206,8 +203,6 @@ public class ClientHandle : MonoBehaviour
     public static void TurnOffLights(Packet _packet)
     {
         string _msg = _packet.ReadString();
-
-        Debug.Log(_msg);
 
         // Deactivate the sabotage buttons and turn off the lights
         GameManager.instance.sabotage.GetComponentInChildren<ElectricalSabotage>().button.interactable = false;
@@ -231,8 +226,6 @@ public class ClientHandle : MonoBehaviour
     public static void TurnOnLights(Packet _packet)
     {
         string _msg = _packet.ReadString();
-
-        Debug.Log(_msg);
 
         // Turn on the lights and do not allow others to interact with them any longer
         GameManager.instance.fogSettings.useDistance = false;

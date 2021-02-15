@@ -31,7 +31,6 @@ public class Garbage : MonoBehaviour
                 filledDumpster1 = true;
                 dumpster1.task.finished = false;
                 dumpster1.task.outlinable.enabled = true;
-                Debug.Log("Finished collecting garbage!");
 
                 // Reset the task states to false
                 task.isBeingUsed = false;
@@ -43,7 +42,6 @@ public class Garbage : MonoBehaviour
                 filledDumpster1 = false;
                 dumpster2.task.finished = false;
                 dumpster2.task.outlinable.enabled = true;
-                Debug.Log("Finished collecting garbage!");
 
                 // Reset the task states to false
                 task.isBeingUsed = false;

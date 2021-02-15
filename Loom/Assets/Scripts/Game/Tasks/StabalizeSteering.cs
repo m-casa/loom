@@ -20,7 +20,6 @@ public class StabalizeSteering : MonoBehaviour
         {
             task.finished = true;
             task.outlinable.enabled = false;
-            Debug.Log("Finished stabalizing steering!");
             ClientSend.CompletedTask();
 
             // Reset the task states to false

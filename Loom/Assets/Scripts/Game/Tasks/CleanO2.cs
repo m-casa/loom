@@ -26,7 +26,6 @@ public class CleanO2 : MonoBehaviour
             // Have the player empty the O2 shoot
             emptyShoot.task.finished = false;
             emptyShoot.task.outlinable.enabled = true;
-            Debug.Log("Finished cleaning O2!");
 
             // Reset the task states to false
             task.isBeingUsed = false;

@@ -31,7 +31,6 @@ public class Fuel : MonoBehaviour
                 filledEngine1 = true;
                 engine1.task.finished = false;
                 engine1.task.outlinable.enabled = true;
-                Debug.Log("Finished collecting fuel!");
 
                 // Reset the task states to false
                 task.isBeingUsed = false;
@@ -43,7 +42,6 @@ public class Fuel : MonoBehaviour
                 filledEngine1 = false;
                 engine2.task.finished = false;
                 engine2.task.outlinable.enabled = true;
-                Debug.Log("Finished collecting fuel!");
 
                 // Reset the task states to false
                 task.isBeingUsed = false;

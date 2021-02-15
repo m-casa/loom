@@ -20,7 +20,6 @@ public class InspectSample : MonoBehaviour
         {
             task.finished = true;
             task.outlinable.enabled = false;
-            Debug.Log("Finished inspecting sample!");
             ClientSend.CompletedTask();
 
             // Reset the task states to false

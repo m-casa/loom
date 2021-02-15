@@ -20,7 +20,6 @@ public class ChartCourse : MonoBehaviour
         {
             task.finished = true;
             task.outlinable.enabled = false;
-            Debug.Log("Finished charting course!");
             ClientSend.CompletedTask();
 
             // Reset the task states to false

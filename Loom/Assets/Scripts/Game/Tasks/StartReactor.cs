@@ -20,7 +20,6 @@ public class StartReactor : MonoBehaviour
         {
             task.finished = true;
             task.outlinable.enabled = false;
-            Debug.Log("Finished starting reactor!");
             ClientSend.CompletedTask();
 
             // Reset the task states to false
