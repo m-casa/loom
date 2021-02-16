@@ -5,7 +5,7 @@ public class ElectricalSabotage : MonoBehaviour
 {
     public Button button;
 
-    // Enables the fog to represent no lights
+    // Can request the server to enable the fog to represent no lights
     public void TurnOffLights()
     {
         // If the fog is not yet enabled, request to enable it and disable the button

@@ -365,6 +365,8 @@ public class Client : MonoBehaviour
             { (int)ServerPackets.playerVote, ClientHandle.PlayerVote },
             { (int)ServerPackets.resumeRound, ClientHandle.ResumeRound },
             { (int)ServerPackets.taskUpdate, ClientHandle.TaskUpdate },
+            { (int)ServerPackets.closeDoor, ClientHandle.CloseDoor },
+            { (int)ServerPackets.openDoor, ClientHandle.OpenDoor },
             { (int)ServerPackets.turnOffLights, ClientHandle.TurnOffLights },
             { (int)ServerPackets.turnOnLights, ClientHandle.TurnOnLights },
             { (int)ServerPackets.timeToSabotage, ClientHandle.TimeToSabotage },

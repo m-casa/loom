@@ -66,7 +66,7 @@ public class UIManager : MonoBehaviour
     {
         serverMessage.text = _serverMessage;
         serverMessage.CrossFadeAlpha(1f, 0f, false);
-        serverMessage.CrossFadeAlpha(0f, 5f, false);
+        serverMessage.CrossFadeAlpha(0f, 10f, false);
     }
 
     // Start the meeting
@@ -101,9 +101,10 @@ public class UIManager : MonoBehaviour
         // Despawn any left over dead bodies
         GameManager.instance.DespawnBodies();
 
-        // Disable the local player's movement/input, and allow them to interact with the voting system
+        // Disable the local player's movement, and allow them to interact with the voting system
         localPlayer.GetComponent<LocalFirstPersonController>().moveDirection = Vector3.zero;
-        localPlayer.GetComponent<LocalFirstPersonController>().enabled = false;
+        localPlayer.GetComponent<LocalFirstPersonController>().animator.SetFloat("horizontal", 0);
+        localPlayer.GetComponent<LocalFirstPersonController>().animator.SetFloat("vertical", 0);
         localPlayer.GetComponent<RangeSensor>().enabled = false;
         localPlayer.GetComponent<Role>().canInteract = false;
         localPlayer.GetComponent<Role>().numOfInteractables = 0;
@@ -122,7 +123,9 @@ public class UIManager : MonoBehaviour
                 // Disable this player's movement if they are not the local player
                 if (onlinePlayer != localPlayer)
                 {
-                    onlinePlayer.GetComponent<OnlineFirstPersonController>().enabled = false;
+                    onlinePlayer.GetComponent<OnlineFirstPersonController>().moveDirection = Vector3.zero;
+                    onlinePlayer.GetComponent<OnlineFirstPersonController>().animator.SetFloat("horizontal", 0);
+                    onlinePlayer.GetComponent<OnlineFirstPersonController>().animator.SetFloat("vertical", 0);
                 }
 
                 // If the local player is dead, do not allow them to vote, else allow voting
@@ -167,6 +170,9 @@ public class UIManager : MonoBehaviour
 
         // Start the meeting
         activeMeeting = true;
+
+        // Reset the requirement to reveal votes
+        revealingVotes = false;
     }
 
     // Update the remaining time in the meeting
@@ -301,20 +307,10 @@ public class UIManager : MonoBehaviour
             localPlayer.GetComponent<Role>().sabotageTimerText.enabled = true;
         }
 
-        // Enable the local player's movement/input, and emergency timer
-        localPlayer.GetComponent<LocalFirstPersonController>().enabled = true;
+        // Enable the local player's movement, and emergency timer
         localPlayer.GetComponent<MouseLook>().SetCursorLock(true);
         localPlayer.GetComponent<RangeSensor>().enabled = true;
         localPlayer.GetComponent<Role>().emergencyTimerText.enabled = true;
-
-        // Enable movement for the other players
-        foreach (PlayerManager onlinePlayer in GameManager.players.Values)
-        {
-            if (onlinePlayer != localPlayer)
-            {
-                onlinePlayer.GetComponent<OnlineFirstPersonController>().enabled = true;
-            }
-        }
 
         // Go through every voting card and reset it for the next meeting
         for (int v = 0; v < votingOption.Length; v++)

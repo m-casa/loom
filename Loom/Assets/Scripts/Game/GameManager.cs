@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
     public static Dictionary<int, PlayerManager> players = new Dictionary<int, PlayerManager>();
 
     public GameObject localPlayerPrefab, playerPrefab, swipeCard, map, sabotage, fixElectrical;
-    public GameObject[] fixWiring, divertPower, uploadData, shortTask, longTask;
+    public GameObject[] fixWiring, divertPower, uploadData, shortTask, longTask, doors;
     public Emergency emergency;
     public FogSettings fogSettings;
     private float simulationTimer;

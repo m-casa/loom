@@ -431,20 +431,25 @@ namespace ECM.Controllers
 
         public override void Update()
         {
-            // Handle input
-            HandleInput();
+            // Handle input (if not in meeting)
+            if (!UIManager.instance.activeMeeting)
+            {
+                HandleInput();
+            }
 
-            // Update character rotation (if not paused)
-            UpdateRotation();
+            // Update character rotation (if not in meeting)
+            if (!UIManager.instance.activeMeeting && !GameManager.instance.map.activeSelf)
+            {
+                UpdateRotation();
+            }
 
-            // Perform character animation (if not paused)
+            // Perform character animation
             Animate();
         }
 
         public virtual void LateUpdate()
         {
             // Perform camera's (view) animation
-
             AnimateView();
         }
 

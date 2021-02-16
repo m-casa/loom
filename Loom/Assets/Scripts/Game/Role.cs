@@ -116,6 +116,8 @@ public class Role : MonoBehaviour
         // Updates the player's HUD to reflect what their role is
         if (isImposter)
         {
+            Button[] sabotageButtons = sabotage.GetComponentsInChildren<Button>();
+
             gameObject.tag = "Imposter";
 
             roleIndicator.color = Color.red;
@@ -134,6 +136,13 @@ public class Role : MonoBehaviour
             currentCooldown = killCooldown;
             killIndicator.gameObject.SetActive(true);
             sabotage.SetActive(true);
+            foreach (Button sabotageButton in sabotageButtons)
+            {
+                if (!sabotageButton.GetComponent<DoorSabotage>())
+                {
+                    sabotageButton.interactable = false;
+                }
+            }
             sabotageTimerText.gameObject.SetActive(true);
         }
         else
@@ -344,7 +353,7 @@ public class Role : MonoBehaviour
         else
         {
             currentCooldown -= 1 * Time.deltaTime;
-            killIndicator.text = currentCooldown.ToString("0");
+            killIndicator.text = "Can kill in: " + currentCooldown.ToString("0") + "s";
         }
     }
 

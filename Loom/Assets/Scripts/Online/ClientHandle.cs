@@ -199,6 +199,38 @@ public class ClientHandle : MonoBehaviour
         }
     }
 
+    // Reads a packet from the server to close a specific door
+    public static void CloseDoor(Packet _packet)
+    {
+        int _doorId = _packet.ReadInt();
+
+        foreach (GameObject door in GameManager.instance.doors)
+        {
+            if (_doorId == door.GetComponent<DoorInfo>().doorId)
+            {
+                door.SetActive(true);
+                door.GetComponent<Task>().finished = false;
+                break;
+            }
+        }
+    }
+
+    // Reads a packet from the server to open a specific door
+    public static void OpenDoor(Packet _packet)
+    {
+        int _doorId = _packet.ReadInt();
+
+        foreach (GameObject door in GameManager.instance.doors)
+        {
+            if (_doorId == door.GetComponent<DoorInfo>().doorId)
+            {
+                door.SetActive(false);
+                door.GetComponent<Task>().finished = true;
+                break;
+            }
+        }
+    }
+
     // Reads a packet from the server to turn off the lights
     public static void TurnOffLights(Packet _packet)
     {

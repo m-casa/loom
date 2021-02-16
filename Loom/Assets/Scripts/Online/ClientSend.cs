@@ -123,6 +123,32 @@ public class ClientSend : MonoBehaviour
         }
     }
 
+    // Send a request to the server letting it know to sabotage doors
+    public static void SabotageDoors(GameObject[] _doors)
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.sabotageDoors))
+        {
+            _packet.Write(_doors.Length);
+            foreach (GameObject door in _doors)
+            {
+                _packet.Write(door.GetComponent<DoorInfo>().doorId);
+            }
+
+            SendTCPData(_packet);
+        }
+    }
+
+    // Send a request to the server letting it know to open a door
+    public static void OpenDoor(int _doorId)
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.openDoor))
+        {
+            _packet.Write(_doorId);
+
+            SendTCPData(_packet);
+        }
+    }
+
     // Send a request to the server letting it know to sabotage lights
     public static void SabotageElectrical()
     {

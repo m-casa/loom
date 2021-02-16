@@ -1,8 +1,9 @@
 using UnityEngine;
 
-public class FixElectrical : MonoBehaviour
+public class DoorInfo : MonoBehaviour
 {
     public Task task;
+    public int doorId;
     private float taskTime, timeToFinish;
 
     // Awake is called before Start
@@ -19,8 +20,7 @@ public class FixElectrical : MonoBehaviour
         if (timeToFinish <= 0 && !task.finished)
         {
             task.finished = true;
-            task.outlinable.enabled = false;
-            ClientSend.FixElectrical();
+            ClientSend.OpenDoor(doorId);
 
             // Reset the task states to false
             task.isBeingUsed = false;
@@ -44,7 +44,6 @@ public class FixElectrical : MonoBehaviour
             // Reset this task
             task.resetTask = false;
             task.finished = true;
-            task.outlinable.enabled = false;
             timeToFinish = taskTime;
         }
     }
