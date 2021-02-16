@@ -204,10 +204,14 @@ public class ClientHandle : MonoBehaviour
     {
         string _msg = _packet.ReadString();
 
-        // Deactivate the sabotage buttons and turn off the lights
-        GameManager.instance.sabotage.GetComponentInChildren<ElectricalSabotage>().button.interactable = false;
+        // If the local player is an imposter, deactivate the sabotage buttons
+        if (GameManager.players[Client.instance.myId].GetComponent<Role>().isImposter)
+        {
+            GameManager.instance.sabotage.GetComponentInChildren<ElectricalSabotage>().button.interactable = false;
+            GameManager.players[Client.instance.myId].GetComponent<Role>().sabotageTimerText.text = "Sabotage unvailable!";
+        }
 
-        // If the local player isn't an imposter, they shouldn't see
+        // If the local player isn't an imposter, turn off the lights
         if (!GameManager.players[Client.instance.myId].GetComponent<Role>().isImposter)
         {
             GameManager.instance.fogSettings.useDistance = true;
@@ -236,18 +240,16 @@ public class ClientHandle : MonoBehaviour
     // Reads a packet from the server to turn on the lights
     public static void TimeToSabotage(Packet _packet)
     {
-        float _timeToSabotage = _packet.ReadFloat();
+        float timeToSabotage = _packet.ReadFloat();
 
         // Update the time it will take until the imposters can sabotage again
-        if (_timeToSabotage > 0)
+        if (timeToSabotage > 0)
         {
-            GameManager.players[Client.instance.myId].GetComponent<Role>().sabotageTimerTitle.text = "Can sabotage in:";
-            GameManager.players[Client.instance.myId].GetComponent<Role>().sabotageTimerText.text = _timeToSabotage.ToString("0");
+            GameManager.players[Client.instance.myId].GetComponent<Role>().sabotageTimerText.text = "Can sabotage in: " + timeToSabotage.ToString("0") + "s";
         }
         else
         {
-            GameManager.players[Client.instance.myId].GetComponent<Role>().sabotageTimerTitle.text = "Can sabotage!";
-            GameManager.players[Client.instance.myId].GetComponent<Role>().sabotageTimerText.text = "";
+            GameManager.players[Client.instance.myId].GetComponent<Role>().sabotageTimerText.text = "Sabotage available!";
 
             // Reactivate the sabotage buttons
             GameManager.instance.sabotage.GetComponentInChildren<ElectricalSabotage>().button.interactable = true;

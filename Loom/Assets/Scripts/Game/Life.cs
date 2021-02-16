@@ -21,8 +21,11 @@ public class Life : MonoBehaviour
         GetComponent<PlayerManager>().nameInidcator.gameObject.SetActive(false);
         gameObject.tag = "Ghost";
 
-        // Do not allow this player to fix anything currently sabotaged
-        GameManager.instance.fixElectrical.GetComponent<Task>().resetTask = true;
+        // If this is the local player, do not allow this player to fix anything currently sabotaged
+        if (GameManager.players[Client.instance.myId].tag.Equals("Ghost"))
+        {
+            GameManager.instance.fixElectrical.GetComponent<Task>().resetTask = true;
+        }
 
         if (!UIManager.instance.activeMeeting)
         {

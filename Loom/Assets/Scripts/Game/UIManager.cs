@@ -89,6 +89,15 @@ public class UIManager : MonoBehaviour
             localPlayer.GetComponent<Role>().map.SetActive(false);
         }
 
+        // Hide the emergency cooldown
+        localPlayer.GetComponent<Role>().emergencyTimerText.enabled = false;
+
+        // If the local player is an imposter, hide the sabotage cooldown
+        if (localPlayer.GetComponent<Role>().isImposter)
+        {
+            localPlayer.GetComponent<Role>().sabotageTimerText.enabled = false;
+        }
+
         // Despawn any left over dead bodies
         GameManager.instance.DespawnBodies();
 
@@ -167,12 +176,12 @@ public class UIManager : MonoBehaviour
         if (_meetingTimer > 0)
         {
             meetingTimer = _meetingTimer;
-            meetingTimerText.text = meetingTimer.ToString("0") + "s";
+            meetingTimerText.text = "Voting ends in: " + meetingTimer.ToString("0") + "s";
         }
         else
         {
             meetingTimer = 0;
-            meetingTimerText.text = meetingTimer.ToString("0") + "s";
+            meetingTimerText.text = "Voting has ended!";
         }
     }
 
@@ -289,12 +298,14 @@ public class UIManager : MonoBehaviour
         {
             localPlayer.GetComponent<Role>().canKill = false;
             localPlayer.GetComponent<Role>().currentCooldown = localPlayer.GetComponent<Role>().killCooldown;
+            localPlayer.GetComponent<Role>().sabotageTimerText.enabled = true;
         }
 
-        // Enable the local player's movement/input
+        // Enable the local player's movement/input, and emergency timer
         localPlayer.GetComponent<LocalFirstPersonController>().enabled = true;
         localPlayer.GetComponent<MouseLook>().SetCursorLock(true);
         localPlayer.GetComponent<RangeSensor>().enabled = true;
+        localPlayer.GetComponent<Role>().emergencyTimerText.enabled = true;
 
         // Enable movement for the other players
         foreach (PlayerManager onlinePlayer in GameManager.players.Values)

@@ -34,7 +34,7 @@ namespace ECM.Controllers
 
         [Tooltip("Speed multiplier for syncing player.")]
         [SerializeField]
-        private float _lerpSpeed = 0.9f;
+        private float _lerpSpeed = 1.0f;
 
         #endregion
 

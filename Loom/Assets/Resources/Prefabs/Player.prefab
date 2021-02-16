@@ -551,7 +551,7 @@ MonoBehaviour:
   _backwardSpeed: 7
   _strafeSpeed: 7
   _runSpeedMultiplier: 1.5
-  _lerpSpeed: 0.9
+  _lerpSpeed: 1
 --- !u!114 &7895108494425555140
 MonoBehaviour:
   m_ObjectHideFlags: 0

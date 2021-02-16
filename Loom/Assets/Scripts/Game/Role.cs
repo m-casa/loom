@@ -6,15 +6,18 @@ using ECM.Components;
 
 public class Role : MonoBehaviour
 {
+    [HideInInspector]
     public GameObject map, sabotage;
+    [HideInInspector]
+    public Emergency emergency;
+
     public Text roleIndicator, useIndicator, killIndicator, reportIndicator, 
-        emergencyTimerTitle, emergencyTimerText, sabotageTimerTitle, sabotageTimerText;
+        emergencyTimerText, sabotageTimerText;
     public Slider progressBar, taskBar;
     public Life life;
-    public Emergency emergency;
-    public bool isImposter, canInteract, canKill;
     public float killCooldown, currentCooldown, emergencyTimer;
     public int numOfInteractables;
+    public bool isImposter, canInteract, canKill;
     private RangeSensor rangeSensor;
     private bool isUsing, isHolding, isKilling, isReporting, isUsingMap;
 
@@ -131,7 +134,7 @@ public class Role : MonoBehaviour
             currentCooldown = killCooldown;
             killIndicator.gameObject.SetActive(true);
             sabotage.SetActive(true);
-            sabotageTimerTitle.gameObject.SetActive(true);
+            sabotageTimerText.gameObject.SetActive(true);
         }
         else
         {
@@ -223,12 +226,12 @@ public class Role : MonoBehaviour
         }
 
         // If the timer for the panic button is not on then turn it on
-        if (!emergencyTimerTitle.gameObject.activeSelf)
+        if (!emergencyTimerText.gameObject.activeSelf)
         {
             // Reset the panic button contraint
             emergencyTimer = 15;
 
-            emergencyTimerTitle.gameObject.SetActive(true);
+            emergencyTimerText.gameObject.SetActive(true);
         }
     }
 
@@ -262,7 +265,7 @@ public class Role : MonoBehaviour
             isImposter = false;
             killIndicator.gameObject.SetActive(false);
             sabotage.SetActive(false);
-            sabotageTimerTitle.gameObject.SetActive(false);
+            sabotageTimerText.gameObject.SetActive(false);
         }
         else
         {
@@ -317,9 +320,9 @@ public class Role : MonoBehaviour
         }
 
         // If the timer for the panic button is active, turn it off
-        if (emergencyTimerTitle.gameObject.activeSelf)
+        if (emergencyTimerText.gameObject.activeSelf)
         {
-            emergencyTimerTitle.gameObject.SetActive(false);
+            emergencyTimerText.gameObject.SetActive(false);
 
             // Reset the number of uses on the emergency button
             if (emergency.numOfUses > 0)
@@ -352,15 +355,13 @@ public class Role : MonoBehaviour
         if (emergencyTimer <= 0)
         {
             emergency.canPanic = true;
-            emergencyTimerTitle.text = "Can now panic!";
-            emergencyTimerText.text = "";
+            emergencyTimerText.text = "Emergency available!";
         }
         else
         {
             emergency.canPanic = false;
             emergencyTimer -= 1 * Time.deltaTime;
-            emergencyTimerTitle.text = "Can panic in:";
-            emergencyTimerText.text = emergencyTimer.ToString("0");
+            emergencyTimerText.text = "Emergency button in: " + emergencyTimer.ToString("0") + "s";
         }
     }
 
