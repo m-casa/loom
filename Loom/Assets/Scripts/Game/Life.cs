@@ -2,7 +2,9 @@ using UnityEngine;
 
 public class Life : MonoBehaviour
 {
-    public GameObject body, model, deadModel;
+    [HideInInspector]
+    public GameObject body;
+    public GameObject model, deadModel;
     public bool isDead;
     private GameObject deathPrefab, deathEffect;
 
@@ -21,12 +23,21 @@ public class Life : MonoBehaviour
         GetComponent<PlayerManager>().nameInidcator.gameObject.SetActive(false);
         gameObject.tag = "Ghost";
 
-        // If this is the local player, do not allow this player to fix anything currently sabotaged
+        // If this is the local player, do not allow them to fix sabotages
+        // Also, let them see dead players
         if (GameManager.players[Client.instance.myId].tag.Equals("Ghost"))
         {
             GameManager.instance.fixElectrical.GetComponent<Task>().resetTask = true;
+            foreach (PlayerManager player in GameManager.players.Values)
+            {
+                if (player.GetComponent<Life>().isDead)
+                {
+                    player.nameInidcator.gameObject.SetActive(true);
+                }
+            }
         }
 
+        // Don't spawn a body if it was killed for being ejected
         if (!UIManager.instance.activeMeeting)
         {
             // Spawn in the dead body and assign it the correct color

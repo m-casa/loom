@@ -13,7 +13,7 @@ public class UIManager : MonoBehaviour
     public Dropdown colorField;
     public Button[] votingOption;
     public Button skip;
-    public Text meetingTimerText, serverMessage;
+    public Text meetingTimerText, gameMessage;
     public bool activeMeeting, revealingVotes;
     private float meetingTimer;
     private int ejectedId;
@@ -64,9 +64,9 @@ public class UIManager : MonoBehaviour
     // Announce to the player a message from the server
     public void Announce(string _serverMessage)
     {
-        serverMessage.text = _serverMessage;
-        serverMessage.CrossFadeAlpha(1f, 0f, false);
-        serverMessage.CrossFadeAlpha(0f, 10f, false);
+        gameMessage.text = _serverMessage;
+        gameMessage.CrossFadeAlpha(1f, 0f, false);
+        gameMessage.CrossFadeAlpha(0f, 10f, false);
     }
 
     // Start the meeting
@@ -77,20 +77,16 @@ public class UIManager : MonoBehaviour
         CardInfo cardInfo;
         int playerCountOffset = 0;
 
+        localPlayer.GetComponent<Role>().CloseMap();
+
+        // Despawn any left over dead bodies
+        GameManager.instance.DespawnBodies();
+
         // If this is a new player, make them a crewmate
         if (localPlayer.tag.Equals("Untagged"))
         {
             localPlayer.GetComponent<Role>().UpdateRole(false);
         }
-
-        // If the player is looking at the map, close it
-        if (localPlayer.GetComponent<Role>().map.activeSelf)
-        {
-            localPlayer.GetComponent<Role>().map.SetActive(false);
-        }
-
-        // Hide the emergency cooldown
-        localPlayer.GetComponent<Role>().emergencyTimerText.enabled = false;
 
         // If the local player is an imposter, hide the sabotage cooldown
         if (localPlayer.GetComponent<Role>().isImposter)
@@ -98,16 +94,14 @@ public class UIManager : MonoBehaviour
             localPlayer.GetComponent<Role>().sabotageTimerText.enabled = false;
         }
 
-        // Despawn any left over dead bodies
-        GameManager.instance.DespawnBodies();
-
-        // Disable the local player's movement, and allow them to interact with the voting system
+        // Disable the local player's movement, sensor, emergency cooldown and allow them to interact with the voting system
         localPlayer.GetComponent<LocalFirstPersonController>().moveDirection = Vector3.zero;
         localPlayer.GetComponent<LocalFirstPersonController>().animator.SetFloat("horizontal", 0);
         localPlayer.GetComponent<LocalFirstPersonController>().animator.SetFloat("vertical", 0);
         localPlayer.GetComponent<RangeSensor>().enabled = false;
         localPlayer.GetComponent<Role>().canInteract = false;
         localPlayer.GetComponent<Role>().numOfInteractables = 0;
+        localPlayer.GetComponent<Role>().emergencyTimerText.enabled = false;
         localPlayer.GetComponent<MouseLook>().SetCursorLock(false);
 
         // Set up the number of voting cards equal to the number of players
@@ -161,18 +155,20 @@ public class UIManager : MonoBehaviour
             }
             else
             {
+                // Is used to help offset the client IDs
+                //  EX: If client 4 isn't in the game but 5 is, we need to skip 4 and loop one more time
                 playerCountOffset++;
             }
         }
+
+        // Reset the boolean which reveals votes
+        revealingVotes = false;
 
         // Enable the meeting menu after setting up each player's voting card
         meetingMenu.SetActive(true);
 
         // Start the meeting
         activeMeeting = true;
-
-        // Reset the requirement to reveal votes
-        revealingVotes = false;
     }
 
     // Update the remaining time in the meeting
@@ -200,7 +196,7 @@ public class UIManager : MonoBehaviour
         {
             votingOption[i].interactable = false;
 
-            // Check which player's voting card was chosen
+            // Check if the current voting card was chosen
             if (_choice == votingOption[i])
             {
                 ColorBlock newColor = votingOption[i].colors;
@@ -302,12 +298,12 @@ public class UIManager : MonoBehaviour
         // If the local player is an imposter, reset their cooldown
         if (localPlayer.GetComponent<Role>().isImposter)
         {
-            localPlayer.GetComponent<Role>().canKill = false;
             localPlayer.GetComponent<Role>().currentCooldown = localPlayer.GetComponent<Role>().killCooldown;
+            localPlayer.GetComponent<Role>().canKill = false;
             localPlayer.GetComponent<Role>().sabotageTimerText.enabled = true;
         }
 
-        // Enable the local player's movement, and emergency timer
+        // Enable the local player's mouse movement, sensor and emergency timer
         localPlayer.GetComponent<MouseLook>().SetCursorLock(true);
         localPlayer.GetComponent<RangeSensor>().enabled = true;
         localPlayer.GetComponent<Role>().emergencyTimerText.enabled = true;
@@ -318,7 +314,7 @@ public class UIManager : MonoBehaviour
             // Get the info on this voting card
             cardInfo = votingOption[v].GetComponent<CardInfo>();
 
-            // Look at all the positions we placed votes on and hide the icons
+            // Look at all the positions votes can be placed
             for (int i = 0; i < cardInfo.voterIcon.Length; i++)
             {
                 // Check if a vote was placed on this position, if so hide the icon
@@ -328,12 +324,12 @@ public class UIManager : MonoBehaviour
                 }
             }
 
-            // Reset the number of votes, hide any icons, reset the colors and hide the voting card
-            cardInfo.numOfVotes = 0;
-            cardInfo.revealer.SetActive(false);
+            // Hide the voting card and reset its settings
             cardInfo.checkmark.gameObject.SetActive(false);
-            votingOption[v].colors = newColor;
+            cardInfo.revealer.SetActive(false);
             votingOption[v].gameObject.SetActive(false);
+            votingOption[v].colors = newColor;
+            cardInfo.numOfVotes = 0;
         }
 
         //  Go through the skip card and reset it for the next meeting
@@ -346,17 +342,17 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        // Reset the number of votes, hide any icons and reset the colors
-        skip.GetComponent<CardInfo>().numOfVotes = 0;
+        // Reset the settings on the skip card
         skip.GetComponent<CardInfo>().revealer.SetActive(false);
         skip.colors = newColor;
+        skip.GetComponent<CardInfo>().numOfVotes = 0;
+
+        // Reset the emergency button timer and the meeting timer
+        localPlayer.GetComponent<Role>().emergencyTimer = 15;
+        meetingTimer = 120;
 
         // Disable the meeting menu
         meetingMenu.SetActive(false);
-
-        // Reset the timer for the meeting length as well as the panic button constraint
-        meetingTimer = 120;
-        localPlayer.GetComponent<Role>().emergencyTimer = 15;
 
         // Check if a player was ejected, if so, let the server check if they were an imposter
         if (playerEjected)
@@ -382,7 +378,7 @@ public class UIManager : MonoBehaviour
             currentCard.revealer.SetActive(true);
 
             // Check if the current card's number of votes is greater than the most voted card
-            // Else, check if there is a tie, which would skip the vote
+            // Else check if there is a tie, which would skip the vote
             if (currentCard.numOfVotes > mostVoted.numOfVotes)
             {
                 // Since the previously most voted card could have been a tie,
@@ -400,7 +396,7 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        // Reveal the votes to skip
+        // Reveal the votes on the skip card
         skip.GetComponent<CardInfo>().revealer.SetActive(true);
 
         // If a player was ejected, then they must be killed (but first check if they're still in the game)
@@ -410,18 +406,6 @@ public class UIManager : MonoBehaviour
 
             // Kill the player who was ejected
             GameManager.players[ejectedId].GetComponent<Life>().Die();
-
-            // If the local player is dead, let them see any other players that are dead
-            if (GameManager.players[Client.instance.myId].GetComponent<Life>().isDead)
-            {
-                foreach (PlayerManager player in GameManager.players.Values)
-                {
-                    if (player.GetComponent<Life>().isDead)
-                    {
-                        player.nameInidcator.gameObject.SetActive(true);
-                    }
-                }
-            }
             
             playerEjected = true;
             Announce(GameManager.players[ejectedId].username + " was ejected!");

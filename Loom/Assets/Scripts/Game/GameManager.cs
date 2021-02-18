@@ -56,7 +56,6 @@ public class GameManager : MonoBehaviour
         {
             _player = Instantiate(localPlayerPrefab, _position, _rotation);
             _player.GetComponent<Role>().map = map;
-            _player.GetComponent<Role>().sabotage = sabotage;
             _player.GetComponent<Role>().emergency = emergency;
         }
         else
@@ -87,6 +86,210 @@ public class GameManager : MonoBehaviour
                 Destroy(body);
             }
         }
+    }
+
+    // Pick out the crewmate's tasks at random
+    public void AssignTasks()
+    {
+        int rngFixWiring1 = Random.Range(0, 5);
+        int rngFixWiring2 = rngFixWiring1;
+
+        int rngDivertPower1 = Random.Range(0, 10);
+        int rngDivertPower2 = rngDivertPower1;
+
+        int rngUploadData1 = Random.Range(0, 5);
+        int rngUploadData2 = rngUploadData1;
+
+        int rngShortTask1 = Random.Range(0, 7);
+        int rngShortTask2 = Random.Range(0, 7);
+
+        int rngLongTask1 = Random.Range(0, 7);
+        int rngLongTask2 = Random.Range(0, 7);
+
+        // Assign everyone the swipe card task
+        swipeCard.GetComponent<Task>().finished = false;
+        swipeCard.GetComponent<Task>().outlinable.enabled = true;
+
+        // Pick two random fix wiring tasks
+        fixWiring[rngFixWiring1].GetComponent<Task>().finished = false;
+        fixWiring[rngFixWiring1].GetComponent<Task>().outlinable.enabled = true;
+        while (rngFixWiring2 == rngFixWiring1)
+        {
+            rngFixWiring2 = Random.Range(0, 5);
+        }
+        fixWiring[rngFixWiring2].GetComponent<Task>().finished = false;
+        fixWiring[rngFixWiring2].GetComponent<Task>().outlinable.enabled = true;
+
+        // Pick two random divert power tasks
+        divertPower[rngDivertPower1].GetComponent<Task>().finished = false;
+        divertPower[rngDivertPower1].GetComponent<Task>().outlinable.enabled = true;
+        while (rngDivertPower2 == rngDivertPower1)
+        {
+            rngDivertPower2 = Random.Range(0, 10);
+        }
+        divertPower[rngDivertPower2].GetComponent<Task>().finished = false;
+        divertPower[rngDivertPower2].GetComponent<Task>().outlinable.enabled = true;
+
+        // Pick two random upload data tasks
+        uploadData[rngUploadData1].GetComponent<Task>().finished = false;
+        uploadData[rngUploadData1].GetComponent<Task>().outlinable.enabled = true;
+        while (rngUploadData2 == rngUploadData1)
+        {
+            rngUploadData2 = Random.Range(0, 5);
+        }
+        uploadData[rngUploadData2].GetComponent<Task>().finished = false;
+        uploadData[rngUploadData2].GetComponent<Task>().outlinable.enabled = true;
+
+        // Pick two random short tasks
+        shortTask[rngShortTask1].GetComponent<Task>().finished = false;
+        shortTask[rngShortTask1].GetComponent<Task>().outlinable.enabled = true;
+        while (rngShortTask2 == rngShortTask1)
+        {
+            rngShortTask2 = Random.Range(0, 5);
+        }
+        shortTask[rngShortTask2].GetComponent<Task>().finished = false;
+        shortTask[rngShortTask2].GetComponent<Task>().outlinable.enabled = true;
+
+        // Pick two random long tasks
+        longTask[rngLongTask1].GetComponent<Task>().finished = false;
+        longTask[rngLongTask1].GetComponent<Task>().outlinable.enabled = true;
+        while (rngLongTask2 == rngLongTask1)
+        {
+            rngLongTask2 = Random.Range(0, 5);
+        }
+        longTask[rngLongTask2].GetComponent<Task>().finished = false;
+        longTask[rngLongTask2].GetComponent<Task>().outlinable.enabled = true;
+    }
+
+    // Reset all tasks in the game
+    public void ResetTasks()
+    {
+        // Reset card swipe task
+        swipeCard.GetComponent<Task>().resetTask = true;
+
+        // Reset short tasks
+        for (int i = 0; i < shortTask.Length; i++)
+        {
+           instance.shortTask[i].GetComponent<Task>().resetTask = true;
+        }
+
+        // Reset long tasks
+        for (int i = 0; i < instance.longTask.Length; i++)
+        {
+            instance.longTask[i].GetComponent<Task>().resetTask = true;
+        }
+
+        // Reset fix wiring tasks
+        for (int i = 0; i < instance.fixWiring.Length; i++)
+        {
+            instance.fixWiring[i].GetComponent<Task>().resetTask = true;
+        }
+
+        // Reset divert power tasks
+        for (int i = 0; i < instance.divertPower.Length; i++)
+        {
+            instance.divertPower[i].GetComponent<Task>().resetTask = true;
+        }
+
+        // Reset upload data tasks
+        for (int i = 0; i < instance.uploadData.Length; i++)
+        {
+            instance.uploadData[i].GetComponent<Task>().resetTask = true;
+        }
+    }
+
+    // If the local player is an imposter, deactivate the sabotage buttons
+    public void DeactivateSabotages()
+    {
+        if (players[Client.instance.myId].GetComponent<Role>().isImposter)
+        {
+            sabotage.GetComponentInChildren<ElectricalSabotage>().button.interactable = false;
+            players[Client.instance.myId].GetComponent<Role>().sabotageTimerText.text = "Sabotage unvailable!";
+        }
+    }
+
+    // If the local player is an imposter, deactivate the door sabotage buttons
+    public void DeactivateDoorSabotages()
+    {
+        foreach (GameObject door in doors)
+        {
+            DeactivateDoorButton(door.GetComponent<DoorInfo>().doorId);
+            StartDoorCooldown(door.GetComponent<DoorInfo>().doorId);
+        }
+    }
+
+    // Deactivate the sabotage button for the specified door
+    public void DeactivateDoorButton(int _doorId)
+    {
+        foreach (DoorSabotage sabotageButton in sabotage.GetComponentsInChildren<DoorSabotage>())
+        {
+            foreach (GameObject door in sabotageButton.doors)
+            {
+                if (door.GetComponent<DoorInfo>().doorId == _doorId)
+                {
+                    sabotageButton.button.interactable = false;
+                    return;
+                }
+            }
+        }
+    }
+
+    // Start a cooldown on the sabotage button for the specified door
+    public void StartDoorCooldown(int _doorId)
+    {
+        foreach (DoorSabotage sabotageButton in sabotage.GetComponentsInChildren<DoorSabotage>())
+        {
+            foreach (GameObject door in sabotageButton.doors)
+            {
+                if (door.GetComponent<DoorInfo>().doorId == _doorId)
+                {
+                    sabotageButton.currentCooldown = sabotageButton.doorCooldown;
+                    sabotageButton.activeCooldown = true;
+                    return;
+                }
+            }
+        }
+    }
+
+    // Open any doors that were left closed when the round ended
+    public void ResetDoors()
+    {
+        // Shut every door
+        foreach (GameObject door in doors)
+        {
+            door.SetActive(false);
+        }
+
+        // Reset every door sabotage button
+        foreach (DoorSabotage sabotageButton in sabotage.GetComponentsInChildren<DoorSabotage>())
+        {
+            sabotageButton.button.interactable = true;
+        }
+    }
+
+    // If the local player isn't an imposter, turn off the lights
+    // Also, if the local player isn't dead, they should be able to fix the lights
+    public void TurnOffLights()
+    {
+        if (!players[Client.instance.myId].GetComponent<Role>().isImposter)
+        {
+            fogSettings.useDistance = true;
+            fogSettings.useHeight = true;
+        }
+
+        if (!players[Client.instance.myId].GetComponent<Life>().isDead)
+        {
+            fixElectrical.GetComponent<Task>().finished = false;
+            fixElectrical.GetComponent<Task>().outlinable.enabled = true;
+        }
+    }
+
+    // Turn on the lights and do not allow others to interact with them any longer
+    public void TurnOnLights()
+    {
+        fogSettings.useDistance = false;
+        fogSettings.useHeight = false;
+        fixElectrical.GetComponent<Task>().resetTask = true;
     }
 
     // Destroys a specified player for the client

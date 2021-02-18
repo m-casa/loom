@@ -19,6 +19,7 @@ public class ClientSend : MonoBehaviour
     }
 
     #region Packets
+
     // Send back a message to the server that we received the welcome packet
     public static void WelcomeReceived()
     {
@@ -68,17 +69,6 @@ public class ClientSend : MonoBehaviour
         }
     }
 
-    // Sends a packet to the server specifying which player was just killed
-    public static void KillRequest(int _id)
-    {
-        using (Packet _packet = new Packet((int)ClientPackets.killRequest))
-        {
-            _packet.Write(_id);
-
-            SendTCPData(_packet);
-        }
-    }
-
     // Send a request to the server to start a meeting
     public static void MeetingRequest()
     {
@@ -90,23 +80,45 @@ public class ClientSend : MonoBehaviour
         }
     }
 
-    // Send a request to the server to report a body
-    public static void ReportRequest()
-    {
-        using (Packet _packet = new Packet((int)ClientPackets.reportRequest))
-        {
-            _packet.Write("Report a dead body.");
-
-            SendTCPData(_packet);
-        }
-    }
-
     // Send in the player's vote to the server
     public static void PlayerVote(int _playerId)
     {
         using (Packet _packet = new Packet((int)ClientPackets.playerVote))
         {
             _packet.Write(_playerId);
+
+            SendTCPData(_packet);
+        }
+    }
+
+    // Send the ejected player's id to the server
+    public static void ConfirmEject(int _ejectedId)
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.confirmEject))
+        {
+            _packet.Write(_ejectedId);
+
+            SendTCPData(_packet);
+        }
+    }
+
+    // Sends a packet to the server specifying which player was just killed
+    public static void KillRequest(int _id)
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.killRequest))
+        {
+            _packet.Write(_id);
+
+            SendTCPData(_packet);
+        }
+    }
+
+    // Send a request to the server to report a body
+    public static void ReportRequest()
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.reportRequest))
+        {
+            _packet.Write("Report a dead body.");
 
             SendTCPData(_packet);
         }
@@ -171,15 +183,5 @@ public class ClientSend : MonoBehaviour
         }
     }
 
-    // Send the ejected player's id to the server
-    public static void ConfirmEject(int _ejectedId)
-    {
-        using (Packet _packet = new Packet((int)ClientPackets.confirmEject))
-        {
-            _packet.Write(_ejectedId);
-
-            SendTCPData(_packet);
-        }
-    }
     #endregion
 }

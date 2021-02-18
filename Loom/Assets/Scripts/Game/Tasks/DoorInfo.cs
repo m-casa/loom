@@ -31,8 +31,8 @@ public class DoorInfo : MonoBehaviour
         {
             timeToFinish -= 1 * Time.deltaTime;
 
-            // Update the player's progress bar to represent when the task will finsih
-            GameManager.players[Client.instance.myId].GetComponent<Role>().progressBar.value = ((taskTime - timeToFinish) / taskTime) * 100;
+            // Update the player's progress bar to represent when the task will finish
+            GameManager.players[Client.instance.myId].GetComponent<Role>().progressBar.value = (taskTime - timeToFinish) / taskTime * 100;
 
             // Reset the task states to false
             task.isBeingUsed = false;

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace ECM.Controllers
 {
@@ -437,8 +438,8 @@ namespace ECM.Controllers
                 HandleInput();
             }
 
-            // Update character rotation (if not in meeting)
-            if (!UIManager.instance.activeMeeting && !GameManager.instance.map.activeSelf)
+            // Update character rotation (if not in meeting or using map)
+            if (!UIManager.instance.activeMeeting && !GameManager.instance.map.GetComponent<Image>().enabled)
             {
                 UpdateRotation();
             }
