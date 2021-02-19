@@ -1,13 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ElectricalSabotage : MonoBehaviour
+public class ReactorSabotage : MonoBehaviour
 {
     public Button button;
 
     // Can request the server to enable the fog to represent no lights
-    public void TurnOffLights()
+    public void MeltdownReactor()
     {
-        ClientSend.SabotageElectrical();
+        //ClientSend.SabotageReactor();
     }
 }

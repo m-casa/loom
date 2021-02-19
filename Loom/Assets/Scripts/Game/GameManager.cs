@@ -8,8 +8,10 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
     public static Dictionary<int, PlayerManager> players = new Dictionary<int, PlayerManager>();
 
-    public GameObject localPlayerPrefab, playerPrefab, swipeCard, map, sabotage, fixElectrical;
-    public GameObject[] fixWiring, divertPower, uploadData, shortTask, longTask, doors;
+    public GameObject localPlayerPrefab, playerPrefab, swipeCard, map, 
+        sabotage, fixElectrical;
+    public GameObject[] fixWiring, divertPower, 
+        uploadData, shortTask, longTask, doors, fixReactor, fixO2;
     public Emergency emergency;
     public FogSettings fogSettings;
     private float simulationTimer;
@@ -204,6 +206,7 @@ public class GameManager : MonoBehaviour
         if (players[Client.instance.myId].GetComponent<Role>().isImposter)
         {
             sabotage.GetComponentInChildren<ElectricalSabotage>().button.interactable = false;
+            sabotage.GetComponentInChildren<O2Sabotage>().button.interactable = false;
             players[Client.instance.myId].GetComponent<Role>().sabotageTimerText.text = "Sabotage unvailable!";
         }
     }
@@ -290,6 +293,28 @@ public class GameManager : MonoBehaviour
         fogSettings.useDistance = false;
         fogSettings.useHeight = false;
         fixElectrical.GetComponent<Task>().resetTask = true;
+    }
+
+    // If the local player isn't dead, they should be able to fix the oxygen
+    public void TurnOffO2()
+    {
+        if (!players[Client.instance.myId].GetComponent<Life>().isDead)
+        {
+            fixO2[0].GetComponent<Task>().finished = false;
+            fixO2[0].GetComponent<Task>().outlinable.enabled = true;
+
+            fixO2[1].GetComponent<Task>().finished = false;
+            fixO2[1].GetComponent<Task>().outlinable.enabled = true;
+        }
+    }
+
+    // Turn on the oxygen and do not allow others to interact with them any longer
+    public void TurnOnO2()
+    {
+        fixO2[0].GetComponent<Task>().resetTask = true;
+        fixO2[1].GetComponent<Task>().resetTask = true;
+
+        UIManager.instance.gameTimerText.gameObject.SetActive(false);
     }
 
     // Destroys a specified player for the client

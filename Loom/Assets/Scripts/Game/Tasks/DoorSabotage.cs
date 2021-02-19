@@ -5,16 +5,13 @@ public class DoorSabotage : MonoBehaviour
 {
     public GameObject[] doors;
     public Button button;
-    public ColorBlock newColor;
-    public float doorCooldown, currentCooldown, ogAlphaValue, alphaValue;
+    public float doorCooldown, currentCooldown;
     public bool activeCooldown;
 
     // Awake is called before Start
     public void Awake()
     {
-        newColor = button.colors;
-        doorCooldown = 20;
-        ogAlphaValue = button.colors.disabledColor.a;
+        doorCooldown = 25;
         activeCooldown = false;
     }
 

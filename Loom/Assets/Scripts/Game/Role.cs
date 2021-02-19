@@ -30,9 +30,9 @@ public class Role : MonoBehaviour
         rangeSensor = GetComponent<RangeSensor>();
         canKill = false;
         canInteract = false;
-        killCooldown = 20;
+        killCooldown = 25;
         currentCooldown = killCooldown;
-        emergencyTimer = 15;
+        emergencyTimer = 20;
         numOfInteractables = 0;
     }
 
@@ -167,7 +167,7 @@ public class Role : MonoBehaviour
         if (!emergencyTimerText.gameObject.activeSelf)
         {
             // Reset the panic button contraint
-            emergencyTimer = 15;
+            emergencyTimer = 20;
             emergencyTimerText.gameObject.SetActive(true);
         }
     }
@@ -188,6 +188,8 @@ public class Role : MonoBehaviour
             roleIndicator.color = Color.red;
             roleIndicator.text = "Winners: " + _winningTeam;
         }
+
+        UIManager.instance.gameTimerText.gameObject.SetActive(false);
 
         gameObject.tag = "Untagged";
 
@@ -211,6 +213,7 @@ public class Role : MonoBehaviour
 
         // Reset any current sabotages
         GameManager.instance.TurnOnLights();
+        GameManager.instance.TurnOnO2();
         GameManager.instance.ResetDoors();
 
         // If the task bar is on, turn it off

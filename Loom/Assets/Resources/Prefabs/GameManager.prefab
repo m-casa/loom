@@ -104,5 +104,11 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  fixReactor:
+  - {fileID: 0}
+  - {fileID: 0}
+  fixO2:
+  - {fileID: 0}
+  - {fileID: 0}
   emergency: {fileID: 0}
   fogSettings: {fileID: 11400000, guid: 742e00c01d7767b4aa71d2cb044726a8, type: 2}

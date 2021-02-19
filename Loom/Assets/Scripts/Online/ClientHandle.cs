@@ -228,6 +228,33 @@ public class ClientHandle : MonoBehaviour
         GameManager.instance.TurnOnLights();
     }
 
+    // Reads a packet from the server to turn off the oxygen
+    public static void TurnOffO2(Packet _packet)
+    {
+        string _msg = _packet.ReadString();
+
+        GameManager.instance.DeactivateSabotages();
+        GameManager.instance.TurnOffO2();
+
+        UIManager.instance.gameTimerText.gameObject.SetActive(true);
+    }
+
+    // Reads a packet from the server to turn on the lights
+    public static void TurnOnO2(Packet _packet)
+    {
+        string _msg = _packet.ReadString();
+
+        GameManager.instance.TurnOnO2();
+    }
+
+    // Reads a packet from the server letting us know the remining game time
+    public static void RemainingGameTime(Packet _packet)
+    {
+        float _remainingTime = _packet.ReadFloat();
+
+        UIManager.instance.gameTimerText.text = "Premature death in: " + _remainingTime.ToString("0") + "s";
+    }
+
     // Reads a packet from the server to turn on the lights
     public static void TimeToSabotage(Packet _packet)
     {
@@ -247,6 +274,7 @@ public class ClientHandle : MonoBehaviour
 
                 // Reactivate the sabotage buttons
                 GameManager.instance.sabotage.GetComponentInChildren<ElectricalSabotage>().button.interactable = true;
+                GameManager.instance.sabotage.GetComponentInChildren<O2Sabotage>().button.interactable = true;
             }
         }
     }

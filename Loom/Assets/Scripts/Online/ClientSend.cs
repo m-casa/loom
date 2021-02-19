@@ -183,5 +183,27 @@ public class ClientSend : MonoBehaviour
         }
     }
 
+    // Send a request to the server letting it know to sabotage O2
+    public static void SabotageO2()
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.sabotageO2))
+        {
+            _packet.Write("Sabotage the oxygen!");
+
+            SendTCPData(_packet);
+        }
+    }
+
+    // Send a request to the server letting it know to turn on oxygen
+    public static void FixO2()
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.fixO2))
+        {
+            _packet.Write("Fix the oxygen!");
+
+            SendTCPData(_packet);
+        }
+    }
+
     #endregion
 }

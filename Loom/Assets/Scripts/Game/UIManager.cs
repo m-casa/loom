@@ -13,7 +13,7 @@ public class UIManager : MonoBehaviour
     public Dropdown colorField;
     public Button[] votingOption;
     public Button skip;
-    public Text meetingTimerText, gameMessage;
+    public Text gameTimerText, meetingTimerText, gameMessage;
     public bool activeMeeting, revealingVotes;
     private float meetingTimer;
     private int ejectedId;
@@ -51,6 +51,7 @@ public class UIManager : MonoBehaviour
         {
             usernameField.gameObject.SetActive(false);
             colorField.gameObject.SetActive(true);
+
             Client.instance.ConnectToServer();
         }
     }
@@ -77,6 +78,7 @@ public class UIManager : MonoBehaviour
         CardInfo cardInfo;
         int playerCountOffset = 0;
 
+        // Make sure the map is closed
         localPlayer.GetComponent<Role>().CloseMap();
 
         // Despawn any left over dead bodies
@@ -348,7 +350,7 @@ public class UIManager : MonoBehaviour
         skip.GetComponent<CardInfo>().numOfVotes = 0;
 
         // Reset the emergency button timer and the meeting timer
-        localPlayer.GetComponent<Role>().emergencyTimer = 15;
+        localPlayer.GetComponent<Role>().emergencyTimer = 20;
         meetingTimer = 120;
 
         // Disable the meeting menu
