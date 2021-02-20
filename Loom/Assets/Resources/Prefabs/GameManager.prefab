@@ -112,3 +112,6 @@ MonoBehaviour:
   - {fileID: 0}
   emergency: {fileID: 0}
   fogSettings: {fileID: 11400000, guid: 742e00c01d7767b4aa71d2cb044726a8, type: 2}
+  currentProfile: {fileID: 11400000, guid: c83bc8223bb3253489d009088d503888, type: 2}
+  normalProfile: {fileID: 11400000, guid: 054bdce3d84ee1747b62ac41f62eeda6, type: 2}
+  sabotageProfile: {fileID: 11400000, guid: 4c359026060c1c84da240804da4a3a09, type: 2}

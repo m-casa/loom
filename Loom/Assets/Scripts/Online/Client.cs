@@ -371,6 +371,8 @@ public class Client : MonoBehaviour
             { (int)ServerPackets.turnOnLights, ClientHandle.TurnOnLights },
             { (int)ServerPackets.turnOffO2, ClientHandle.TurnOffO2 },
             { (int)ServerPackets.turnOnO2, ClientHandle.TurnOnO2 },
+            { (int)ServerPackets.meltdownReactor, ClientHandle.MeltdownReactor },
+            { (int)ServerPackets.restoreReactor, ClientHandle.RestoreReactor },
             { (int)ServerPackets.remainingGameTime, ClientHandle.RemainingGameTime },
             { (int)ServerPackets.timeToSabotage, ClientHandle.TimeToSabotage },
             { (int)ServerPackets.winners, ClientHandle.Winners },

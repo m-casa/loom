@@ -205,5 +205,27 @@ public class ClientSend : MonoBehaviour
         }
     }
 
+    // Send a request to the server letting it know to sabotage reactor
+    public static void SabotageReactor()
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.sabotageReactor))
+        {
+            _packet.Write("Sabotage the reactor!");
+
+            SendTCPData(_packet);
+        }
+    }
+
+    // Send a request to the server letting it know to restore reactor
+    public static void FixReactor()
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.fixReactor))
+        {
+            _packet.Write("Restore the reactor!");
+
+            SendTCPData(_packet);
+        }
+    }
+
     #endregion
 }

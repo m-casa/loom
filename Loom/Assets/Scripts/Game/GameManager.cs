@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using FlatKit;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,10 +12,12 @@ public class GameManager : MonoBehaviour
 
     public GameObject localPlayerPrefab, playerPrefab, swipeCard, map, 
         sabotage, fixElectrical;
-    public GameObject[] fixWiring, divertPower, 
-        uploadData, shortTask, longTask, doors, fixReactor, fixO2;
+    public GameObject[] fixWiring, divertPower, uploadData, 
+        shortTask, longTask, doors, fixReactor, fixO2;
     public Emergency emergency;
     public FogSettings fogSettings;
+    public VolumeProfile currentProfile, normalProfile, sabotageProfile;
+    private ColorAdjustments currentColorAdjustments, normalColorAdjustments, sabotageColorAdjustments;
     private float simulationTimer;
 
     // Make sure there is only once instance of this client
@@ -23,6 +27,9 @@ public class GameManager : MonoBehaviour
         {
             instance = this;
             simulationTimer = 0;
+            currentProfile.TryGet(out currentColorAdjustments);
+            normalProfile.TryGet(out normalColorAdjustments);
+            sabotageProfile.TryGet(out sabotageColorAdjustments);
         }
         else if (instance != this)
         {
@@ -207,6 +214,7 @@ public class GameManager : MonoBehaviour
         {
             sabotage.GetComponentInChildren<ElectricalSabotage>().button.interactable = false;
             sabotage.GetComponentInChildren<O2Sabotage>().button.interactable = false;
+            sabotage.GetComponentInChildren<ReactorSabotage>().button.interactable = false;
             players[Client.instance.myId].GetComponent<Role>().sabotageTimerText.text = "Sabotage unvailable!";
         }
     }
@@ -246,8 +254,13 @@ public class GameManager : MonoBehaviour
             {
                 if (door.GetComponent<DoorInfo>().doorId == _doorId)
                 {
-                    sabotageButton.currentCooldown = sabotageButton.doorCooldown;
-                    sabotageButton.activeCooldown = true;
+                    // Do not reset the door cooldown unless it is not active and not interactable
+                    if (!sabotageButton.activeCooldown && sabotageButton.button.interactable == false)
+                    {
+                        sabotageButton.currentCooldown = sabotageButton.doorCooldown;
+                        sabotageButton.activeCooldown = true;
+                    }
+                    
                     return;
                 }
             }
@@ -306,6 +319,9 @@ public class GameManager : MonoBehaviour
             fixO2[1].GetComponent<Task>().finished = false;
             fixO2[1].GetComponent<Task>().outlinable.enabled = true;
         }
+
+        UIManager.instance.gameTimerText.gameObject.SetActive(true);
+        currentColorAdjustments.colorFilter.Override(sabotageColorAdjustments.colorFilter.value);
     }
 
     // Turn on the oxygen and do not allow others to interact with them any longer
@@ -315,6 +331,33 @@ public class GameManager : MonoBehaviour
         fixO2[1].GetComponent<Task>().resetTask = true;
 
         UIManager.instance.gameTimerText.gameObject.SetActive(false);
+        currentColorAdjustments.colorFilter.Override(normalColorAdjustments.colorFilter.value);
+    }
+
+    // If the local player isn't dead, they should be able to restore the reactor
+    public void MeltdownReactor()
+    {
+        if (!players[Client.instance.myId].GetComponent<Life>().isDead)
+        {
+            fixReactor[0].GetComponent<Task>().finished = false;
+            fixReactor[0].GetComponent<Task>().outlinable.enabled = true;
+
+            fixReactor[1].GetComponent<Task>().finished = false;
+            fixReactor[1].GetComponent<Task>().outlinable.enabled = true;
+        }
+
+        UIManager.instance.gameTimerText.gameObject.SetActive(true);
+        currentColorAdjustments.colorFilter.Override(sabotageColorAdjustments.colorFilter.value);
+    }
+
+    // Restore the reactor and do not allow others to interact with it any longer
+    public void RestoreReactor()
+    {
+        fixReactor[0].GetComponent<Task>().resetTask = true;
+        fixReactor[1].GetComponent<Task>().resetTask = true;
+
+        UIManager.instance.gameTimerText.gameObject.SetActive(false);
+        currentColorAdjustments.colorFilter.Override(normalColorAdjustments.colorFilter.value);
     }
 
     // Destroys a specified player for the client

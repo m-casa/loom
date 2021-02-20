@@ -18,7 +18,10 @@ public class Emergency : MonoBehaviour
     {
         // Only allow emergency meetings if there are no active sabotages
         if (GameManager.instance.fixElectrical.GetComponent<Task>().finished && 
-            GameManager.instance.fixO2[0].GetComponent<Task>().finished)
+            GameManager.instance.fixO2[0].GetComponent<Task>().finished &&
+            GameManager.instance.fixO2[1].GetComponent<Task>().finished &&
+            GameManager.instance.fixReactor[0].GetComponent<Task>().finished &&
+            GameManager.instance.fixReactor[1].GetComponent<Task>().finished)
         {
             // Only request a meeting if this player hasn't used up all of their emergency meetings
             if (numOfUses < 1)

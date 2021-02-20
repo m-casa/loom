@@ -47,7 +47,7 @@ public class UIManager : MonoBehaviour
     // Will connect the client to the game server
     public void ConnectToServer()
     {
-        if (usernameField.text != "" && usernameField.text.Length <= 20)
+        if (usernameField.text != "" && usernameField.text.Length <= 13)
         {
             usernameField.gameObject.SetActive(false);
             colorField.gameObject.SetActive(true);
@@ -302,6 +302,9 @@ public class UIManager : MonoBehaviour
         {
             localPlayer.GetComponent<Role>().currentCooldown = localPlayer.GetComponent<Role>().killCooldown;
             localPlayer.GetComponent<Role>().canKill = false;
+
+            // Reset sabotages so they can't be used right after the meeting
+            GameManager.instance.DeactivateSabotages();
             localPlayer.GetComponent<Role>().sabotageTimerText.enabled = true;
         }
 
@@ -350,7 +353,7 @@ public class UIManager : MonoBehaviour
         skip.GetComponent<CardInfo>().numOfVotes = 0;
 
         // Reset the emergency button timer and the meeting timer
-        localPlayer.GetComponent<Role>().emergencyTimer = 20;
+        localPlayer.GetComponent<Role>().emergencyTimer = 25;
         meetingTimer = 120;
 
         // Disable the meeting menu

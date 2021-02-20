@@ -235,8 +235,6 @@ public class ClientHandle : MonoBehaviour
 
         GameManager.instance.DeactivateSabotages();
         GameManager.instance.TurnOffO2();
-
-        UIManager.instance.gameTimerText.gameObject.SetActive(true);
     }
 
     // Reads a packet from the server to turn on the lights
@@ -245,6 +243,23 @@ public class ClientHandle : MonoBehaviour
         string _msg = _packet.ReadString();
 
         GameManager.instance.TurnOnO2();
+    }
+
+    // Reads a packet from the server to meltdown the reactor
+    public static void MeltdownReactor(Packet _packet)
+    {
+        string _msg = _packet.ReadString();
+
+        GameManager.instance.DeactivateSabotages();
+        GameManager.instance.MeltdownReactor();
+    }
+
+    // Reads a packet from the server to turn restore the reactor
+    public static void RestoreReactor(Packet _packet)
+    {
+        string _msg = _packet.ReadString();
+
+        GameManager.instance.RestoreReactor();
     }
 
     // Reads a packet from the server letting us know the remining game time
@@ -275,6 +290,7 @@ public class ClientHandle : MonoBehaviour
                 // Reactivate the sabotage buttons
                 GameManager.instance.sabotage.GetComponentInChildren<ElectricalSabotage>().button.interactable = true;
                 GameManager.instance.sabotage.GetComponentInChildren<O2Sabotage>().button.interactable = true;
+                GameManager.instance.sabotage.GetComponentInChildren<ReactorSabotage>().button.interactable = true;
             }
         }
     }

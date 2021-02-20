@@ -32,7 +32,7 @@ public class Role : MonoBehaviour
         canInteract = false;
         killCooldown = 25;
         currentCooldown = killCooldown;
-        emergencyTimer = 20;
+        emergencyTimer = 25;
         numOfInteractables = 0;
     }
 
@@ -77,17 +77,24 @@ public class Role : MonoBehaviour
 
         foreach (GameObject detectedObject in rangeSensor.GetDetected())
         {
-            if (detectedObject.tag.Equals("Interactable"))
+            if (!life.isDead)
+            {
+                if (detectedObject.tag.Equals("Interactable"))
+                {
+                    useIndicator.CrossFadeAlpha(1f, 0f, false);
+                }
+                else if (detectedObject.tag.Equals("Crewmate"))
+                {
+                    killIndicator.CrossFadeAlpha(1f, 0f, false);
+                }
+                else if (detectedObject.tag.Equals("DeadBody"))
+                {
+                    reportIndicator.CrossFadeAlpha(1f, 0f, false);
+                }
+            }
+            else if (detectedObject.tag.Equals("Interactable") && !detectedObject.GetComponent<Emergency>())
             {
                 useIndicator.CrossFadeAlpha(1f, 0f, false);
-            }
-            else if (detectedObject.tag.Equals("Crewmate") && !life.isDead)
-            {
-                killIndicator.CrossFadeAlpha(1f, 0f, false);
-            }
-            else if (detectedObject.tag.Equals("DeadBody") && !life.isDead)
-            {
-                reportIndicator.CrossFadeAlpha(1f, 0f, false);
             }
         }
     }
@@ -145,7 +152,7 @@ public class Role : MonoBehaviour
         {
             // Let the player know their role
             gameObject.tag = "Crewmate";
-            roleIndicator.color = Color.white;
+            roleIndicator.color = Color.green;
             roleIndicator.text = "Crewmate";
 
             GameManager.instance.AssignTasks();
@@ -167,7 +174,7 @@ public class Role : MonoBehaviour
         if (!emergencyTimerText.gameObject.activeSelf)
         {
             // Reset the panic button contraint
-            emergencyTimer = 20;
+            emergencyTimer = 25;
             emergencyTimerText.gameObject.SetActive(true);
         }
     }
@@ -214,6 +221,7 @@ public class Role : MonoBehaviour
         // Reset any current sabotages
         GameManager.instance.TurnOnLights();
         GameManager.instance.TurnOnO2();
+        GameManager.instance.RestoreReactor();
         GameManager.instance.ResetDoors();
 
         // If the task bar is on, turn it off

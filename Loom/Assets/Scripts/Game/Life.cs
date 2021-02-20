@@ -28,6 +28,11 @@ public class Life : MonoBehaviour
         if (GameManager.players[Client.instance.myId].tag.Equals("Ghost"))
         {
             GameManager.instance.fixElectrical.GetComponent<Task>().resetTask = true;
+            GameManager.instance.fixO2[0].GetComponent<Task>().resetTask = true;
+            GameManager.instance.fixO2[1].GetComponent<Task>().resetTask = true;
+            GameManager.instance.fixReactor[0].GetComponent<Task>().resetTask = true;
+            GameManager.instance.fixReactor[1].GetComponent<Task>().resetTask = true;
+
             foreach (PlayerManager player in GameManager.players.Values)
             {
                 if (player.GetComponent<Life>().isDead)
