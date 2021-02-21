@@ -53,6 +53,12 @@ public class Role : MonoBehaviour
             PerformInteractions();
         }
 
+        // Player progress bar should be empty when no tasks are being done
+        if (!canInteract || !isHolding)
+        {
+            progressBar.value = 0;
+        }
+
         // If the player isn't currently in a meeting, let them check the map
         if (!UIManager.instance.activeMeeting)
         {
@@ -220,7 +226,7 @@ public class Role : MonoBehaviour
 
         // Reset any current sabotages
         GameManager.instance.TurnOnLights();
-        GameManager.instance.TurnOnO2();
+        GameManager.instance.TurnOnO2(3);
         GameManager.instance.RestoreReactor();
         GameManager.instance.ResetDoors();
 
@@ -302,6 +308,8 @@ public class Role : MonoBehaviour
     private void Use()
     {
         List<GameObject> interactables = new List<GameObject>();
+        GameObject closestInteractable;
+        float shortestDistanceFromPlayer, newDistance;
 
         // Check if there are interactables near the player
         foreach (GameObject detectedObject in rangeSensor.GetDetected())
@@ -312,12 +320,33 @@ public class Role : MonoBehaviour
             }
         }
 
-        // Interact with the object that first entered the interaction range
+        // Interact with the object that is closest to the player
         if (interactables.Count != 0)
         {
-            GameObject interactable = interactables[0];
-            Task task = interactable.GetComponent<Task>();
+            // Default closest will be the first interactable
+            closestInteractable = interactables[0];
+            shortestDistanceFromPlayer = Vector3.Distance(closestInteractable.transform.position, gameObject.transform.position);
+
+            foreach (GameObject interactable in interactables)
+            {
+                newDistance = Vector3.Distance(interactable.transform.position, gameObject.transform.position);
+
+                // If the new distance is shorter, set this interactable as the closest
+                if (newDistance < shortestDistanceFromPlayer)
+                {
+                    closestInteractable = interactable;
+                    shortestDistanceFromPlayer = newDistance;
+                }
+            }
+
+            Task task = closestInteractable.GetComponent<Task>();
             task.Interact(isUsing, isHolding);
+
+            // If the player is trying to fix the reactor, the script needs to know they are near
+            if (closestInteractable.GetComponent<FixReactor>())
+            {
+                closestInteractable.GetComponent<FixReactor>().isNearPad = true;
+            }
         }
     }
 

@@ -3,6 +3,7 @@ using UnityEngine;
 public class FixO2 : MonoBehaviour
 {
     public Task task;
+    public int O2PadId;
     private float taskTime, timeToFinish;
 
     // Awake is called before Start
@@ -20,7 +21,7 @@ public class FixO2 : MonoBehaviour
         {
             task.finished = true;
             task.outlinable.enabled = false;
-            ClientSend.FixO2();
+            ClientSend.FixO2(O2PadId);
 
             // Reset the task states to false
             task.isBeingUsed = false;

@@ -325,13 +325,20 @@ public class GameManager : MonoBehaviour
     }
 
     // Turn on the oxygen and do not allow others to interact with them any longer
-    public void TurnOnO2()
+    public void TurnOnO2(int _O2PadId)
     {
-        fixO2[0].GetComponent<Task>().resetTask = true;
-        fixO2[1].GetComponent<Task>().resetTask = true;
+        if (_O2PadId < 3)
+        {
+            fixO2[_O2PadId].GetComponent<Task>().resetTask = true;
+        }
+        else
+        {
+            fixO2[0].GetComponent<Task>().resetTask = true;
+            fixO2[1].GetComponent<Task>().resetTask = true;
 
-        UIManager.instance.gameTimerText.gameObject.SetActive(false);
-        currentColorAdjustments.colorFilter.Override(normalColorAdjustments.colorFilter.value);
+            UIManager.instance.gameTimerText.gameObject.SetActive(false);
+            currentColorAdjustments.colorFilter.Override(normalColorAdjustments.colorFilter.value);
+        }
     }
 
     // If the local player isn't dead, they should be able to restore the reactor

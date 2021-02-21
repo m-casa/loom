@@ -240,9 +240,9 @@ public class ClientHandle : MonoBehaviour
     // Reads a packet from the server to turn on the lights
     public static void TurnOnO2(Packet _packet)
     {
-        string _msg = _packet.ReadString();
+        int _O2PadId = _packet.ReadInt();
 
-        GameManager.instance.TurnOnO2();
+        GameManager.instance.TurnOnO2(_O2PadId);
     }
 
     // Reads a packet from the server to meltdown the reactor

@@ -131,6 +131,8 @@ public class ClientSend : MonoBehaviour
         {
             _packet.Write("Completed a task!");
 
+            GameManager.players[Client.instance.myId].GetComponent<Role>().progressBar.value = 0;
+
             SendTCPData(_packet);
         }
     }
@@ -195,11 +197,11 @@ public class ClientSend : MonoBehaviour
     }
 
     // Send a request to the server letting it know to turn on oxygen
-    public static void FixO2()
+    public static void FixO2(int _O2PadId)
     {
         using (Packet _packet = new Packet((int)ClientPackets.fixO2))
         {
-            _packet.Write("Fix the oxygen!");
+            _packet.Write(_O2PadId);
 
             SendTCPData(_packet);
         }
@@ -217,11 +219,12 @@ public class ClientSend : MonoBehaviour
     }
 
     // Send a request to the server letting it know to restore reactor
-    public static void FixReactor()
+    public static void FixReactor(int _reactorPadId, bool _isBeingHeld)
     {
         using (Packet _packet = new Packet((int)ClientPackets.fixReactor))
         {
-            _packet.Write("Restore the reactor!");
+            _packet.Write(_reactorPadId);
+            _packet.Write(_isBeingHeld);
 
             SendTCPData(_packet);
         }
