@@ -71,8 +71,17 @@ public class UIManager : MonoBehaviour
     }
 
     // Start the meeting
-    public void StartMeeting()
+    public void StartMeeting(int _beginType)
     {
+        if (_beginType == 1)
+        {
+            AudioManager.instance.PlaySound("Panic");
+        }
+        else
+        {
+            AudioManager.instance.PlaySound("Report");
+        }
+
         PlayerManager localPlayer = GameManager.players[Client.instance.myId];
         PlayerManager onlinePlayer;
         CardInfo cardInfo;

@@ -123,6 +123,8 @@ public class Role : MonoBehaviour
     // Update the role of the player
     public void UpdateRole(bool _isImposter)
     {
+        AudioManager.instance.PlaySound("Roles");
+
         CloseMap();
 
         isImposter = _isImposter;
@@ -193,11 +195,13 @@ public class Role : MonoBehaviour
         // Update the player's HUD to reflect which team won the last round
         if (_winningTeam.Equals("Crewmates"))
         {
+            AudioManager.instance.PlaySound("Crewmates");
             roleIndicator.color = Color.green;
             roleIndicator.text = "Winners: " + _winningTeam;
         }
         else
         {
+            AudioManager.instance.PlaySound("Imposters");
             roleIndicator.color = Color.red;
             roleIndicator.text = "Winners: " + _winningTeam;
         }
@@ -375,6 +379,7 @@ public class Role : MonoBehaviour
 
                 Life crewmateLife = crewmate.GetComponent<Life>();
                 crewmateLife.Die();
+                AudioManager.instance.PlaySound("Kill");
                 crewmate.nameInidcator.gameObject.SetActive(false);
 
                 currentCooldown = killCooldown;

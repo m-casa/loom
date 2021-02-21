@@ -15,7 +15,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &5653181080404153127
 Transform:
@@ -43,4 +43,119 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc17165bad3abd0489b9e69d21ef0b48, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sounds: []
+  sounds:
+  - audioClip: {fileID: 8300000, guid: 7c34d4e3bd095ca4fa822dc01aa125ee, type: 3}
+    name: Roles
+    volume: 1
+    pitch: 1
+    loop: 0
+    audioSource: {fileID: 0}
+  - audioClip: {fileID: 8300000, guid: ce2cb78ed408bf84b86356b18b1c4abc, type: 3}
+    name: Kill
+    volume: 1
+    pitch: 1
+    loop: 0
+    audioSource: {fileID: 0}
+  - audioClip: {fileID: 8300000, guid: 198fbd6fcd82d94478f1069909f0866f, type: 3}
+    name: Panic
+    volume: 1
+    pitch: 1
+    loop: 0
+    audioSource: {fileID: 0}
+  - audioClip: {fileID: 8300000, guid: c27a81088079aa94993278ccfb66c56a, type: 3}
+    name: Report
+    volume: 1
+    pitch: 1
+    loop: 0
+    audioSource: {fileID: 0}
+  - audioClip: {fileID: 8300000, guid: 03c245080ad91a54a88418975d29b459, type: 3}
+    name: Crewmates
+    volume: 1
+    pitch: 1
+    loop: 0
+    audioSource: {fileID: 0}
+  - audioClip: {fileID: 8300000, guid: 1194a2a1bf21394459c343c0f045a188, type: 3}
+    name: Imposters
+    volume: 1
+    pitch: 1
+    loop: 0
+    audioSource: {fileID: 0}
+  - audioClip: {fileID: 8300000, guid: 887b74caac7073f42a793ed8059940a7, type: 3}
+    name: Close
+    volume: 1
+    pitch: 1
+    loop: 0
+    audioSource: {fileID: 0}
+  - audioClip: {fileID: 8300000, guid: 7f4bebffd7a7ae041959c2acd1456e0e, type: 3}
+    name: Open
+    volume: 1
+    pitch: 1
+    loop: 0
+    audioSource: {fileID: 0}
+  - audioClip: {fileID: 8300000, guid: cd0752a66c63e114a93b56af5b4f8d70, type: 3}
+    name: Ship
+    volume: 0.125
+    pitch: 1
+    loop: 1
+    audioSource: {fileID: 0}
+  - audioClip: {fileID: 8300000, guid: c5c5b99f3d43fba4dbe4ab7b6855c7df, type: 3}
+    name: Complete
+    volume: 1
+    pitch: 1
+    loop: 0
+    audioSource: {fileID: 0}
+  - audioClip: {fileID: 8300000, guid: 87f72d0b4ae7dc84aa944e061d6174c1, type: 3}
+    name: Alarm
+    volume: 1
+    pitch: 1
+    loop: 0
+    audioSource: {fileID: 0}
+  - audioClip: {fileID: 8300000, guid: 2e0cbe1866debc0498f7137baf1016c8, type: 3}
+    name: Spawn
+    volume: 1
+    pitch: 1
+    loop: 0
+    audioSource: {fileID: 0}
+  footsteps:
+  - audioClip: {fileID: 8300000, guid: 6ec4f8156c1364348b676dcbe4123bc1, type: 3}
+    name: Step1
+    volume: 0.5
+    pitch: 1
+    loop: 0
+    audioSource: {fileID: 0}
+  - audioClip: {fileID: 8300000, guid: 103a9630b7e1f5d4a90a8b6320d2d5fb, type: 3}
+    name: Step2
+    volume: 0.5
+    pitch: 1
+    loop: 0
+    audioSource: {fileID: 0}
+  - audioClip: {fileID: 8300000, guid: a40aa9c55590a0f428ffe74d858bf91c, type: 3}
+    name: Step3
+    volume: 0.5
+    pitch: 1
+    loop: 0
+    audioSource: {fileID: 0}
+  - audioClip: {fileID: 8300000, guid: f406d6b1e9ea8b6439c85efd77004d9d, type: 3}
+    name: Step4
+    volume: 0.5
+    pitch: 1
+    loop: 0
+    audioSource: {fileID: 0}
+  - audioClip: {fileID: 8300000, guid: 207ae9f25fc90f84e8ec3267d330c7db, type: 3}
+    name: Step5
+    volume: 0.5
+    pitch: 1
+    loop: 0
+    audioSource: {fileID: 0}
+  - audioClip: {fileID: 8300000, guid: 1ebbf2c0329a48440908d2d37a482caf, type: 3}
+    name: Step6
+    volume: 0.5
+    pitch: 1
+    loop: 0
+    audioSource: {fileID: 0}
+  - audioClip: {fileID: 8300000, guid: 9e0932bee437ada42801f319a1501fdd, type: 3}
+    name: Step7
+    volume: 0.5
+    pitch: 1
+    loop: 0
+    audioSource: {fileID: 0}

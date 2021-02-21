@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,6 +18,7 @@ public class GameManager : MonoBehaviour
     public Emergency emergency;
     public FogSettings fogSettings;
     public VolumeProfile currentProfile, normalProfile, sabotageProfile;
+    public AudioSource[] audioSources;
     private ColorAdjustments currentColorAdjustments, normalColorAdjustments, sabotageColorAdjustments;
     private float simulationTimer;
 
@@ -58,11 +60,19 @@ public class GameManager : MonoBehaviour
     // Spawns in a new player for the client
     public void SpawnPlayer(int _id, string _username, int _colorId, Vector3 _position, Quaternion _rotation)
     {
+        AudioManager.instance.PlaySound("Spawn");
+
         GameObject _player;
 
         // Check whether to instantiate the local player or another player
         if (_id == Client.instance.myId)
         {
+            AudioManager.instance.PlaySound("Ship");
+            foreach (AudioSource audioSource in audioSources)
+            {
+                audioSource.Play();
+            }
+
             _player = Instantiate(localPlayerPrefab, _position, _rotation);
             _player.GetComponent<Role>().map = map;
             _player.GetComponent<Role>().emergency = emergency;
@@ -322,6 +332,8 @@ public class GameManager : MonoBehaviour
 
         UIManager.instance.gameTimerText.gameObject.SetActive(true);
         currentColorAdjustments.colorFilter.Override(sabotageColorAdjustments.colorFilter.value);
+
+        StartCoroutine("PlayAlarm", 2.5f);
     }
 
     // Turn on the oxygen and do not allow others to interact with them any longer
@@ -338,6 +350,8 @@ public class GameManager : MonoBehaviour
 
             UIManager.instance.gameTimerText.gameObject.SetActive(false);
             currentColorAdjustments.colorFilter.Override(normalColorAdjustments.colorFilter.value);
+
+            StopCoroutine("PlayAlarm");
         }
     }
 
@@ -355,6 +369,8 @@ public class GameManager : MonoBehaviour
 
         UIManager.instance.gameTimerText.gameObject.SetActive(true);
         currentColorAdjustments.colorFilter.Override(sabotageColorAdjustments.colorFilter.value);
+
+        StartCoroutine("PlayAlarm", 2.5f);
     }
 
     // Restore the reactor and do not allow others to interact with it any longer
@@ -365,6 +381,8 @@ public class GameManager : MonoBehaviour
 
         UIManager.instance.gameTimerText.gameObject.SetActive(false);
         currentColorAdjustments.colorFilter.Override(normalColorAdjustments.colorFilter.value);
+
+        StopCoroutine("PlayAlarm");
     }
 
     // Destroys a specified player for the client
@@ -386,5 +404,15 @@ public class GameManager : MonoBehaviour
 
         Destroy(players[_id].gameObject);
         players.Remove(_id);
+    }
+
+    private IEnumerator PlayAlarm(float _timeDelay)
+    {
+        while (true)
+        {
+            AudioManager.instance.PlaySound("Alarm");
+
+            yield return new WaitForSeconds(_timeDelay);
+        }
     }
 }

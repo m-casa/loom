@@ -115,3 +115,7 @@ MonoBehaviour:
   currentProfile: {fileID: 11400000, guid: c83bc8223bb3253489d009088d503888, type: 2}
   normalProfile: {fileID: 11400000, guid: 054bdce3d84ee1747b62ac41f62eeda6, type: 2}
   sabotageProfile: {fileID: 11400000, guid: 4c359026060c1c84da240804da4a3a09, type: 2}
+  audioSources:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}

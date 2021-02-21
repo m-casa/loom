@@ -127,9 +127,9 @@ public class ClientHandle : MonoBehaviour
     // Reads a packet from the server letting us know to attend the meeting
     public static void Meeting(Packet _packet)
     {
-        string _msg = _packet.ReadString();
+        int _beginType = _packet.ReadInt();
 
-        UIManager.instance.StartMeeting();
+        UIManager.instance.StartMeeting(_beginType);
     }
 
     // Reads a packet from the server letting us know the remining time of the meeting
@@ -194,6 +194,7 @@ public class ClientHandle : MonoBehaviour
         int doorId = _packet.ReadInt();
 
         doors[doorId - 1].SetActive(true);
+        doors[doorId - 1].GetComponent<DoorInfo>().openSound.Play();
         doors[doorId - 1].GetComponent<Task>().finished = false;
 
         GameManager.instance.DeactivateDoorButton(doorId);
@@ -205,6 +206,7 @@ public class ClientHandle : MonoBehaviour
         GameObject[] doors = GameManager.instance.doors;
         int doorId = _packet.ReadInt();
 
+        doors[doorId - 1].GetComponent<DoorInfo>().closeSound.Play();
         doors[doorId - 1].SetActive(false);
         doors[doorId - 1].GetComponent<Task>().finished = true;
 

@@ -133,6 +133,8 @@ public class ClientSend : MonoBehaviour
 
             GameManager.players[Client.instance.myId].GetComponent<Role>().progressBar.value = 0;
 
+            AudioManager.instance.PlaySound("Complete");
+
             SendTCPData(_packet);
         }
     }

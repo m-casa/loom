@@ -4,6 +4,7 @@ public class DoorInfo : MonoBehaviour
 {
     public Task task;
     public int doorId;
+    public AudioSource openSound, closeSound;
     private float taskTime, timeToFinish;
 
     // Awake is called before Start

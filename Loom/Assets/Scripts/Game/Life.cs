@@ -27,6 +27,8 @@ public class Life : MonoBehaviour
         // Also, let them see dead players
         if (GameManager.players[Client.instance.myId].tag.Equals("Ghost"))
         {
+            AudioManager.instance.PlaySound("Killed");
+
             GameManager.instance.fixElectrical.GetComponent<Task>().resetTask = true;
             GameManager.instance.fixO2[0].GetComponent<Task>().resetTask = true;
             GameManager.instance.fixO2[1].GetComponent<Task>().resetTask = true;
