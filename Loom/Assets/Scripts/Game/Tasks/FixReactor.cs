@@ -15,6 +15,11 @@ public class FixReactor : MonoBehaviour
             // Update the player's progress bar to represent if the reactor is pad is being held or not
             if (task.isBeingHeld)
             {
+                if (!AudioManager.instance.CheckSound("Using"))
+                {
+                    AudioManager.instance.PlaySound("Using");
+                }
+
                 GameManager.players[Client.instance.myId].GetComponent<Role>().progressBar.value = 100;
             }
 
@@ -34,6 +39,13 @@ public class FixReactor : MonoBehaviour
 
         if (task.resetTask)
         {
+            if (task.isBeingHeld)
+            {
+                AudioManager.instance.StopSound("Using");
+                AudioManager.instance.PlaySound("Complete");
+                GameManager.players[Client.instance.myId].GetComponent<Role>().progressBar.value = 0;
+            }
+
             // Reset this task
             task.resetTask = false;
             task.finished = true;

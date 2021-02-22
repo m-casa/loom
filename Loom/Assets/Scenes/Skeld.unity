@@ -1499,11 +1499,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8308267122497838245, guid: e679294cdcab4484c84d7f0a7dce0bff,
-        type: 3}
-      propertyPath: ip
-      value: 40.77.59.84
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e679294cdcab4484c84d7f0a7dce0bff, type: 3}
 --- !u!1001 &2689867153379419890
@@ -2147,31 +2142,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 5653181080404153126, guid: ba775d3d6f2a1e7408c54be4e6afeb6c,
-        type: 3}
-      propertyPath: sounds.Array.size
-      value: 13
-      objectReference: {fileID: 0}
-    - target: {fileID: 5653181080404153126, guid: ba775d3d6f2a1e7408c54be4e6afeb6c,
-        type: 3}
-      propertyPath: sounds.Array.data[12].name
-      value: Killed
-      objectReference: {fileID: 0}
-    - target: {fileID: 5653181080404153126, guid: ba775d3d6f2a1e7408c54be4e6afeb6c,
-        type: 3}
-      propertyPath: sounds.Array.data[12].pitch
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5653181080404153126, guid: ba775d3d6f2a1e7408c54be4e6afeb6c,
-        type: 3}
-      propertyPath: sounds.Array.data[12].volume
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5653181080404153126, guid: ba775d3d6f2a1e7408c54be4e6afeb6c,
-        type: 3}
-      propertyPath: sounds.Array.data[12].audioClip
-      value: 
-      objectReference: {fileID: 8300000, guid: 19352637a8bb9d641a5302257b2b404f, type: 3}
     - target: {fileID: 5653181080404153127, guid: ba775d3d6f2a1e7408c54be4e6afeb6c,
         type: 3}
       propertyPath: m_RootOrder

@@ -131,9 +131,9 @@ public class ClientSend : MonoBehaviour
         {
             _packet.Write("Completed a task!");
 
-            GameManager.players[Client.instance.myId].GetComponent<Role>().progressBar.value = 0;
-
+            AudioManager.instance.StopSound("Using");
             AudioManager.instance.PlaySound("Complete");
+            GameManager.players[Client.instance.myId].GetComponent<Role>().progressBar.value = 0;
 
             SendTCPData(_packet);
         }

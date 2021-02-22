@@ -29,6 +29,11 @@ public class StartReactor : MonoBehaviour
         }
         else if (task.isBeingHeld && !task.finished)
         {
+            if (!AudioManager.instance.CheckSound("Using"))
+            {
+                AudioManager.instance.PlaySound("Using");
+            }
+
             timeToFinish -= 1 * Time.deltaTime;
 
             // Update the player's progress bar to represent when the task will finsih

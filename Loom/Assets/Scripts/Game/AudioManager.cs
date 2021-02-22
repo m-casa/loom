@@ -61,7 +61,7 @@ public class AudioManager : MonoBehaviour
     {
         Sound requestedSound = Array.Find(sounds, sound => sound.name == name);
 
-        // Check if the sound we want to play exists
+        // See if the sound we want to play exists
         if (requestedSound == null)
         {
             Debug.LogWarning("The sound '" + name + "' does not exist");
@@ -70,6 +70,40 @@ public class AudioManager : MonoBehaviour
         else
         {
             requestedSound.audioSource.Play();
+        }
+    }
+
+    // Stop the sound being requested based on the name passed through
+    public void StopSound(string name)
+    {
+        Sound requestedSound = Array.Find(sounds, sound => sound.name == name);
+
+        // See if the sound we want to stop exists
+        if (requestedSound == null)
+        {
+            Debug.LogWarning("The sound '" + name + "' does not exist");
+            return;
+        }
+        else
+        {
+            requestedSound.audioSource.Stop();
+        }
+    }
+
+    // Check if the requested sound is playing based on the name passed through
+    public bool CheckSound(string name)
+    {
+        Sound requestedSound = Array.Find(sounds, sound => sound.name == name);
+
+        // See if the sound we want to check exists
+        if (requestedSound == null)
+        {
+            Debug.LogWarning("The sound '" + name + "' does not exist");
+            return false;
+        }
+        else
+        {
+            return requestedSound.audioSource.isPlaying;
         }
     }
 

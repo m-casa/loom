@@ -163,6 +163,11 @@ public class ClientHandle : MonoBehaviour
         int _targetId = _packet.ReadInt();
 
         GameManager.players[_targetId].GetComponent<Life>().Die();
+
+        if (_targetId == Client.instance.myId)
+        {
+            AudioManager.instance.PlaySound("Killed");
+        }
     }
 
     // Reads a packet from the server letting us know that a body was reported

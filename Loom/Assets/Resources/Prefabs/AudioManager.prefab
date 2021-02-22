@@ -116,6 +116,18 @@ MonoBehaviour:
     pitch: 1
     loop: 0
     audioSource: {fileID: 0}
+  - audioClip: {fileID: 8300000, guid: 19352637a8bb9d641a5302257b2b404f, type: 3}
+    name: Killed
+    volume: 1
+    pitch: 1
+    loop: 0
+    audioSource: {fileID: 0}
+  - audioClip: {fileID: 8300000, guid: a1c42d6f6e8bb0f44a6038fa60695429, type: 3}
+    name: Using
+    volume: 0.25
+    pitch: 1
+    loop: 1
+    audioSource: {fileID: 0}
   footsteps:
   - audioClip: {fileID: 8300000, guid: 6ec4f8156c1364348b676dcbe4123bc1, type: 3}
     name: Step1

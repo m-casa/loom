@@ -57,6 +57,7 @@ public class Role : MonoBehaviour
         if (!canInteract || !isHolding)
         {
             progressBar.value = 0;
+            AudioManager.instance.StopSound("Using");
         }
 
         // If the player isn't currently in a meeting, let them check the map
@@ -312,8 +313,6 @@ public class Role : MonoBehaviour
     private void Use()
     {
         List<GameObject> interactables = new List<GameObject>();
-        GameObject closestInteractable;
-        float shortestDistanceFromPlayer, newDistance;
 
         // Check if there are interactables near the player
         foreach (GameObject detectedObject in rangeSensor.GetDetected())
@@ -327,29 +326,13 @@ public class Role : MonoBehaviour
         // Interact with the object that is closest to the player
         if (interactables.Count != 0)
         {
-            // Default closest will be the first interactable
-            closestInteractable = interactables[0];
-            shortestDistanceFromPlayer = Vector3.Distance(closestInteractable.transform.position, gameObject.transform.position);
-
-            foreach (GameObject interactable in interactables)
-            {
-                newDistance = Vector3.Distance(interactable.transform.position, gameObject.transform.position);
-
-                // If the new distance is shorter, set this interactable as the closest
-                if (newDistance < shortestDistanceFromPlayer)
-                {
-                    closestInteractable = interactable;
-                    shortestDistanceFromPlayer = newDistance;
-                }
-            }
-
-            Task task = closestInteractable.GetComponent<Task>();
+            Task task = interactables[0].GetComponent<Task>();
             task.Interact(isUsing, isHolding);
 
             // If the player is trying to fix the reactor, the script needs to know they are near
-            if (closestInteractable.GetComponent<FixReactor>())
+            if (interactables[0].GetComponent<FixReactor>())
             {
-                closestInteractable.GetComponent<FixReactor>().isNearPad = true;
+                interactables[0].GetComponent<FixReactor>().isNearPad = true;
             }
         }
     }
@@ -370,7 +353,7 @@ public class Role : MonoBehaviour
                 }
             }
 
-            // Kill the crewmate that first entered the kill range
+            // Kill the crewmate that's closest to the player
             if (crewmates.Count != 0)
             {
                 PlayerManager crewmate = crewmates[0].GetComponent<PlayerManager>();
@@ -404,7 +387,7 @@ public class Role : MonoBehaviour
                 }
             }
 
-            // Report the body that first entered the report range
+            // Report the body that's closest to the player
             if (bodies.Count != 0)
             {
                 // Destroy any dead bodies near the player to prevent report spamming
