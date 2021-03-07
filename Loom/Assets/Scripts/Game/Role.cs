@@ -30,7 +30,7 @@ public class Role : MonoBehaviour
         rangeSensor = GetComponent<RangeSensor>();
         canKill = false;
         canInteract = false;
-        killCooldown = 25;
+        killCooldown = 28;
         currentCooldown = killCooldown;
         emergencyTimer = 25;
         numOfInteractables = 0;

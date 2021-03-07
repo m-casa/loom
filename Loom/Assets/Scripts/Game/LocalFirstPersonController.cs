@@ -307,7 +307,7 @@ namespace ECM.Controllers
             // If there is a margin of error, rewind and replay
             if (positionDifference.sqrMagnitude > 0.0000001f)
             {
-                // If the current position is farther away from the server position then
+                // If the current position is far away from the server's position, then
                 //  snap back (rewind) since smoothing wouldn't help a large correction
                 // Else apply smoothing if not too far away, and no correction if less than that
                 if ((_position - transform.position).sqrMagnitude >= 4.5f)

@@ -10,7 +10,7 @@ public class DoorInfo : MonoBehaviour
     // Awake is called before Start
     public void Awake()
     {
-        taskTime = 3;
+        taskTime = 2;
         timeToFinish = taskTime;
     }
 
