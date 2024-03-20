@@ -38,7 +38,14 @@ public class Client : MonoBehaviour
     }
 
     // Create a new instace of TCP and UDP
-    public void Start()
+    //public void Start()
+    //{
+    //    tcp = new TCP();
+    //    udp = new UDP();
+    //}
+
+    // Create a new instace of TCP and UDP
+    public void CreateNewInstances()
     {
         tcp = new TCP();
         udp = new UDP();

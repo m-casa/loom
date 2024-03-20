@@ -9,7 +9,7 @@ public class UIManager : MonoBehaviour
     public static UIManager instance;
 
     public GameObject startMenu, meetingMenu;
-    public InputField usernameField;
+    public InputField usernameField, ipAddressField;
     public Dropdown colorField;
     public Button[] votingOption;
     public Button skip;
@@ -49,9 +49,16 @@ public class UIManager : MonoBehaviour
     {
         if (usernameField.text != "" && usernameField.text.Length <= 13)
         {
+            if (ipAddressField.text != "")
+            {
+                Client.instance.ip = ipAddressField.text;
+            }
+
             usernameField.gameObject.SetActive(false);
+            ipAddressField.gameObject.SetActive(false);
             colorField.gameObject.SetActive(true);
 
+            Client.instance.CreateNewInstances();
             Client.instance.ConnectToServer();
         }
     }
